@@ -1,21 +1,5 @@
 // Shared layout components with i18n support
-import { Language, translations, i18nClientScript } from '../i18n/translations'
-
-// Helper to get translation value
-function t(lang: Language, path: string): string {
-  const keys = path.split('.')
-  let result: any = translations[lang]
-  
-  for (const key of keys) {
-    if (result && typeof result === 'object' && key in result) {
-      result = result[key]
-    } else {
-      return path
-    }
-  }
-  
-  return typeof result === 'string' ? result : path
-}
+import { Language, getSection } from '../i18n/translations'
 
 export const head = (title: string, description: string = '', lang: Language = 'en') => `
   <meta charset="UTF-8">
@@ -26,7 +10,6 @@ export const head = (title: string, description: string = '', lang: Language = '
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-  ${i18nClientScript}
   <style>
     .gradient-text {
       background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
@@ -76,148 +59,199 @@ export const head = (title: string, description: string = '', lang: Language = '
       background: rgba(17, 24, 39, 0.95);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0.5rem;
+      border-radius: 8px;
       min-width: 120px;
       z-index: 100;
-      margin-top: 0.5rem;
+      overflow: hidden;
     }
     .lang-dropdown:hover .lang-dropdown-content {
       display: block;
     }
-    .lang-dropdown-content a {
+    .lang-dropdown-item {
       display: flex;
       align-items: center;
-      padding: 0.5rem 1rem;
+      padding: 10px 16px;
       color: #d1d5db;
-      text-decoration: none;
       transition: all 0.2s;
+      cursor: pointer;
     }
-    .lang-dropdown-content a:hover {
+    .lang-dropdown-item:hover {
       background: rgba(59, 130, 246, 0.2);
       color: white;
     }
-    .lang-dropdown-content a.active {
+    .lang-dropdown-item.active {
       background: rgba(59, 130, 246, 0.3);
       color: white;
     }
   </style>
+  <script>
+    // Language management
+    function getCurrentLang() {
+      return localStorage.getItem('era-dal-lang') || 'en';
+    }
+    
+    function setLang(lang) {
+      localStorage.setItem('era-dal-lang', lang);
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.location.href = url.toString();
+    }
+    
+    // Initialize language on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      const storedLang = localStorage.getItem('era-dal-lang');
+      
+      if (urlLang && ['en', 'ru'].includes(urlLang)) {
+        localStorage.setItem('era-dal-lang', urlLang);
+      } else if (storedLang && !urlLang) {
+        // Redirect to stored language if not in URL
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', storedLang);
+        if (storedLang !== 'en') {
+          window.location.replace(url.toString());
+        }
+      }
+    });
+  </script>
 `
 
-export const navbar = (lang: Language = 'en', activePage: string = '') => `
+export const navbar = (lang: Language = 'en') => {
+  const nav = getSection('nav', lang)
+  const isRu = lang === 'ru'
+  
+  return `
   <nav class="fixed top-0 left-0 right-0 z-50 glass">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-          <a href="/${lang === 'ru' ? '?lang=ru' : ''}" class="flex items-center space-x-2">
+          <a href="/?lang=${lang}" class="flex items-center space-x-2">
             <i class="fas fa-brain text-2xl text-blue-500"></i>
             <span class="text-xl font-bold gradient-text">ERA DAL</span>
           </a>
           <div class="hidden md:flex ml-10 space-x-4">
-            <a href="/${lang === 'ru' ? '?lang=ru' : ''}#features" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${t(lang, 'nav.features')}</a>
-            <a href="/${lang === 'ru' ? '?lang=ru' : ''}#how-it-works" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${t(lang, 'nav.howItWorks')}</a>
-            <a href="/pricing${lang === 'ru' ? '?lang=ru' : ''}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${t(lang, 'nav.pricing')}</a>
-            <a href="/docs${lang === 'ru' ? '?lang=ru' : ''}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${t(lang, 'nav.docs')}</a>
+            <a href="/?lang=${lang}#features" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${nav.features}</a>
+            <a href="/?lang=${lang}#how-it-works" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${nav.howItWorks}</a>
+            <a href="/pricing?lang=${lang}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${nav.pricing}</a>
+            <a href="/docs?lang=${lang}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">${nav.docs}</a>
           </div>
         </div>
         <div class="flex items-center space-x-4">
           <!-- Language Switcher -->
           <div class="lang-dropdown">
-            <button class="text-gray-300 hover:text-white px-3 py-2 text-sm flex items-center">
-              <i class="fas fa-globe mr-2"></i>
-              ${lang === 'ru' ? 'RU' : 'EN'}
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
+            <button class="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-2 text-sm">
+              <i class="fas fa-globe"></i>
+              <span>${isRu ? 'RU' : 'EN'}</span>
+              <i class="fas fa-chevron-down text-xs"></i>
             </button>
             <div class="lang-dropdown-content">
-              <a href="?lang=en" class="${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">
+              <div class="lang-dropdown-item ${!isRu ? 'active' : ''}" onclick="setLang('en')">
                 <span class="mr-2">🇬🇧</span> English
-              </a>
-              <a href="?lang=ru" class="${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">
+              </div>
+              <div class="lang-dropdown-item ${isRu ? 'active' : ''}" onclick="setLang('ru')">
                 <span class="mr-2">🇷🇺</span> Русский
-              </a>
+              </div>
             </div>
           </div>
           
-          <a href="/dashboard${lang === 'ru' ? '?lang=ru' : ''}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">
-            <i class="fas fa-chart-line mr-1"></i> ${t(lang, 'nav.dashboard')}
+          <a href="/dashboard?lang=${lang}" class="text-gray-300 hover:text-white px-3 py-2 text-sm">
+            <i class="fas fa-chart-line mr-1"></i> ${nav.dashboard}
           </a>
-          <a href="/playground${lang === 'ru' ? '?lang=ru' : ''}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-            <i class="fas fa-play mr-1"></i> ${t(lang, 'nav.tryNow')}
+          <a href="/playground?lang=${lang}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            <i class="fas fa-play mr-1"></i> ${nav.tryNow}
           </a>
         </div>
       </div>
     </div>
   </nav>
 `
+}
 
-export const sidebar = (lang: Language = 'en', activePage: string = 'dashboard') => `
+export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en') => {
+  const sb = getSection('sidebar', lang)
+  
+  return `
   <aside class="fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-800 pt-16 z-40">
     <div class="p-4">
+      <div class="flex items-center justify-between mb-4">
+        <!-- Language Switcher in Sidebar -->
+        <div class="lang-dropdown w-full">
+          <button class="flex items-center justify-between w-full glass rounded-lg px-3 py-2 text-gray-300 hover:text-white text-sm">
+            <span><i class="fas fa-globe mr-2"></i>${lang === 'ru' ? 'Русский' : 'English'}</span>
+            <i class="fas fa-chevron-down text-xs"></i>
+          </button>
+          <div class="lang-dropdown-content w-full" style="position: relative; margin-top: 4px;">
+            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">
+              <span class="mr-2">🇬🇧</span> English
+            </div>
+            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">
+              <span class="mr-2">🇷🇺</span> Русский
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div class="flex items-center space-x-3 mb-8 p-3 glass rounded-lg">
         <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
           <i class="fas fa-user text-white"></i>
         </div>
         <div>
           <p class="text-white font-medium">Eugene</p>
-          <p class="text-gray-400 text-xs">Pro Plan</p>
-        </div>
-      </div>
-      
-      <!-- Language Switcher in Sidebar -->
-      <div class="mb-6 p-3 bg-gray-800 rounded-lg">
-        <div class="flex items-center justify-between">
-          <span class="text-gray-400 text-sm"><i class="fas fa-globe mr-2"></i>${t(lang, 'settings.language')}</span>
-          <div class="flex space-x-1">
-            <a href="?lang=en" class="px-2 py-1 text-xs rounded ${lang === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}" onclick="setLang('en')">EN</a>
-            <a href="?lang=ru" class="px-2 py-1 text-xs rounded ${lang === 'ru' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}" onclick="setLang('ru')">RU</a>
-          </div>
+          <p class="text-gray-400 text-xs">${sb.proPlan}</p>
         </div>
       </div>
       
       <nav class="space-y-1">
-        <a href="/dashboard${lang === 'ru' ? '?lang=ru' : ''}" class="sidebar-link ${activePage === 'dashboard' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+        <a href="/dashboard?lang=${lang}" class="sidebar-link ${activePage === 'dashboard' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-chart-pie w-5"></i>
-          <span>${t(lang, 'nav.dashboard')}</span>
+          <span>${sb.dashboard}</span>
         </a>
-        <a href="/playground${lang === 'ru' ? '?lang=ru' : ''}" class="sidebar-link ${activePage === 'playground' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+        <a href="/playground?lang=${lang}" class="sidebar-link ${activePage === 'playground' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-flask w-5"></i>
-          <span>${t(lang, 'nav.playground')}</span>
+          <span>${sb.playground}</span>
         </a>
-        <a href="/history${lang === 'ru' ? '?lang=ru' : ''}" class="sidebar-link ${activePage === 'history' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+        <a href="/history?lang=${lang}" class="sidebar-link ${activePage === 'history' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-history w-5"></i>
-          <span>${t(lang, 'nav.history')}</span>
+          <span>${sb.history}</span>
         </a>
         
         <div class="pt-4 mt-4 border-t border-gray-800">
-          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${t(lang, 'nav.settings')}</p>
+          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
         </div>
         
-        <a href="/settings${lang === 'ru' ? '?lang=ru' : ''}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+        <a href="/settings?lang=${lang}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-cog w-5"></i>
-          <span>${t(lang, 'nav.settings')}</span>
+          <span>${sb.settings}</span>
         </a>
-        <a href="/profile${lang === 'ru' ? '?lang=ru' : ''}" class="sidebar-link ${activePage === 'profile' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+        <a href="/profile?lang=${lang}" class="sidebar-link ${activePage === 'profile' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-user-circle w-5"></i>
-          <span>${t(lang, 'nav.profile')}</span>
+          <span>${sb.profile}</span>
         </a>
       </nav>
       
       <div class="absolute bottom-4 left-4 right-4">
         <div class="glass rounded-lg p-4">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-400 text-sm">${t(lang, 'profile.apiCalls')}</span>
+            <span class="text-gray-400 text-sm">${sb.apiCalls}</span>
             <span class="text-white text-sm font-medium">847 / 1000</span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2">
             <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: 84.7%"></div>
           </div>
-          <a href="/pricing${lang === 'ru' ? '?lang=ru' : ''}" class="text-blue-400 text-xs mt-2 inline-block hover:text-blue-300">${t(lang, 'profile.upgradePlan')} →</a>
+          <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-2 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
         </div>
       </div>
     </div>
   </aside>
 `
+}
 
-export const footer = (lang: Language = 'en') => `
+export const footer = (lang: Language = 'en') => {
+  const ft = getSection('footer', lang)
+  const nav = getSection('nav', lang)
+  
+  return `
   <footer class="bg-gray-900 border-t border-gray-800 py-12">
     <div class="max-w-7xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -227,44 +261,38 @@ export const footer = (lang: Language = 'en') => `
             <span class="text-xl font-bold gradient-text">ERA DAL</span>
           </div>
           <p class="text-gray-400 text-sm">
-            ${t(lang, 'footer.description')}
+            ${ft.description}
           </p>
-          <!-- Language Switcher in Footer -->
-          <div class="mt-4 flex items-center space-x-2">
-            <span class="text-gray-500 text-sm"><i class="fas fa-globe mr-1"></i></span>
-            <a href="?lang=en" class="text-sm ${lang === 'en' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}">EN</a>
-            <span class="text-gray-600">|</span>
-            <a href="?lang=ru" class="text-sm ${lang === 'ru' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}">RU</a>
-          </div>
         </div>
         <div>
-          <h4 class="text-white font-semibold mb-4">${t(lang, 'footer.product')}</h4>
+          <h4 class="text-white font-semibold mb-4">${ft.product}</h4>
           <ul class="space-y-2 text-gray-400 text-sm">
-            <li><a href="/${lang === 'ru' ? '?lang=ru' : ''}#features" class="hover:text-white">${t(lang, 'nav.features')}</a></li>
-            <li><a href="/pricing${lang === 'ru' ? '?lang=ru' : ''}" class="hover:text-white">${t(lang, 'nav.pricing')}</a></li>
-            <li><a href="/docs${lang === 'ru' ? '?lang=ru' : ''}" class="hover:text-white">${t(lang, 'nav.docs')}</a></li>
-            <li><a href="/playground${lang === 'ru' ? '?lang=ru' : ''}" class="hover:text-white">${t(lang, 'nav.playground')}</a></li>
+            <li><a href="/?lang=${lang}#features" class="hover:text-white">${nav.features}</a></li>
+            <li><a href="/pricing?lang=${lang}" class="hover:text-white">${nav.pricing}</a></li>
+            <li><a href="/docs?lang=${lang}" class="hover:text-white">${ft.documentation}</a></li>
+            <li><a href="/playground?lang=${lang}" class="hover:text-white">${nav.tryNow}</a></li>
           </ul>
         </div>
         <div>
-          <h4 class="text-white font-semibold mb-4">${t(lang, 'footer.resources')}</h4>
+          <h4 class="text-white font-semibold mb-4">${ft.resources}</h4>
           <ul class="space-y-2 text-gray-400 text-sm">
             <li><a href="https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer" class="hover:text-white">GitHub</a></li>
-            <li><a href="/docs${lang === 'ru' ? '?lang=ru' : ''}" class="hover:text-white">${t(lang, 'footer.apiReference')}</a></li>
-            <li><a href="/docs${lang === 'ru' ? '?lang=ru' : ''}" class="hover:text-white">${t(lang, 'docs.examples')}</a></li>
+            <li><a href="/docs?lang=${lang}" class="hover:text-white">${ft.apiReference}</a></li>
+            <li><a href="/docs?lang=${lang}#examples" class="hover:text-white">${lang === 'ru' ? 'Примеры' : 'Examples'}</a></li>
           </ul>
         </div>
         <div>
-          <h4 class="text-white font-semibold mb-4">${t(lang, 'footer.contact')}</h4>
+          <h4 class="text-white font-semibold mb-4">${ft.contact}</h4>
           <ul class="space-y-2 text-gray-400 text-sm">
-            <li><a href="https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer/issues" class="hover:text-white">${t(lang, 'footer.support')}</a></li>
+            <li><a href="https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer/issues" class="hover:text-white">${ft.support}</a></li>
             <li><a href="mailto:contact@era-dal.com" class="hover:text-white">Email</a></li>
           </ul>
         </div>
       </div>
       <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
-        ${t(lang, 'footer.copyright')}
+        © 2025 ERA DAL. ${ft.allRightsReserved} ${ft.builtBy}
       </div>
     </div>
   </footer>
 `
+}

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-pages'
+import { Language } from './i18n/translations'
 
 // Pages
 import { landingPage } from './pages/landing'
@@ -15,9 +16,6 @@ import { docsPage } from './pages/docs'
 // API Routes
 import { apiRoutes } from './api/routes'
 
-// i18n
-import { Language } from './i18n/translations'
-
 type Bindings = {
   DB?: D1Database
   KV?: KVNamespace
@@ -25,17 +23,10 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// Helper to get language from request
-function getLang(c: any): Language {
-  const langQuery = c.req.query('lang')
-  if (langQuery === 'ru') return 'ru'
-  if (langQuery === 'en') return 'en'
-  
-  // Check Accept-Language header as fallback
-  const acceptLang = c.req.header('Accept-Language') || ''
-  if (acceptLang.includes('ru')) return 'ru'
-  
-  return 'en'
+// Helper to get language from query params
+const getLang = (c: any): Language => {
+  const lang = c.req.query('lang')
+  return (lang === 'ru' ? 'ru' : 'en') as Language
 }
 
 // CORS
@@ -47,48 +38,18 @@ app.use('/static/*', serveStatic({ root: './public' }))
 // ============================================
 // Landing & Marketing Pages
 // ============================================
-app.get('/', (c) => {
-  const lang = getLang(c)
-  return c.html(landingPage(lang))
-})
-
-app.get('/pricing', (c) => {
-  const lang = getLang(c)
-  return c.html(pricingPage(lang))
-})
-
-app.get('/docs', (c) => {
-  const lang = getLang(c)
-  return c.html(docsPage(lang))
-})
+app.get('/', (c) => c.html(landingPage(getLang(c))))
+app.get('/pricing', (c) => c.html(pricingPage(getLang(c))))
+app.get('/docs', (c) => c.html(docsPage(getLang(c))))
 
 // ============================================
 // Dashboard & App Pages
 // ============================================
-app.get('/dashboard', (c) => {
-  const lang = getLang(c)
-  return c.html(dashboardPage(lang))
-})
-
-app.get('/playground', (c) => {
-  const lang = getLang(c)
-  return c.html(playgroundPage(lang))
-})
-
-app.get('/history', (c) => {
-  const lang = getLang(c)
-  return c.html(historyPage(lang))
-})
-
-app.get('/settings', (c) => {
-  const lang = getLang(c)
-  return c.html(settingsPage(lang))
-})
-
-app.get('/profile', (c) => {
-  const lang = getLang(c)
-  return c.html(profilePage(lang))
-})
+app.get('/dashboard', (c) => c.html(dashboardPage(getLang(c))))
+app.get('/playground', (c) => c.html(playgroundPage(getLang(c))))
+app.get('/history', (c) => c.html(historyPage(getLang(c))))
+app.get('/settings', (c) => c.html(settingsPage(getLang(c))))
+app.get('/profile', (c) => c.html(profilePage(getLang(c))))
 
 // ============================================
 // API Routes
@@ -100,8 +61,7 @@ app.route('/api', apiRoutes)
 // ============================================
 app.notFound((c) => {
   const lang = getLang(c)
-  const title = lang === 'ru' ? 'Страница не найдена' : 'Page not found'
-  const backText = lang === 'ru' ? 'На главную' : 'Back to Home'
+  const isRu = lang === 'ru'
   
   return c.html(`
     <!DOCTYPE html>
@@ -115,9 +75,9 @@ app.notFound((c) => {
     <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
       <div class="text-center">
         <h1 class="text-6xl font-bold text-blue-500 mb-4">404</h1>
-        <p class="text-xl text-gray-400 mb-8">${title}</p>
-        <a href="/${lang === 'ru' ? '?lang=ru' : ''}" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg">
-          ${backText}
+        <p class="text-xl text-gray-400 mb-8">${isRu ? 'Страница не найдена' : 'Page not found'}</p>
+        <a href="/?lang=${lang}" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg">
+          ${isRu ? 'На главную' : 'Back to Home'}
         </a>
       </div>
     </body>

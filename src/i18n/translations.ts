@@ -1,839 +1,441 @@
-// i18n Translations for ERA DAL Web
+// Internationalization translations for ERA DAL Web
 
 export type Language = 'en' | 'ru'
 
 export const translations = {
-  en: {
-    // Navigation
-    nav: {
-      features: 'Features',
-      howItWorks: 'How it Works',
-      pricing: 'Pricing',
-      docs: 'Docs',
-      dashboard: 'Dashboard',
-      tryNow: 'Try Now',
-      profile: 'Profile',
-      settings: 'Settings',
-      history: 'History',
-      playground: 'Playground',
-      logout: 'Logout'
-    },
-
-    // Landing Page
-    landing: {
-      badge: 'v1.2.0 Released — Level 2 Upgrades Available',
-      heroTitle1: 'Enterprise AI',
-      heroTitle2: 'Decision Making',
-      heroDesc: 'Get <span class="text-white font-semibold">stable, reproducible, and quantified</span> answers through LLM ensemble, arbitration, consensus synthesis, and self-critique. Built for scientific, medical, legal, and financial applications.',
-      tryPlayground: 'Try Playground',
-      viewGitHub: 'View on GitHub',
-      testsPassing: 'Tests Passing',
-      modules: 'Modules',
-      wilsonCI: 'Wilson CI',
-      
-      // Problem Section
-      problemTitle: 'The Problem with Single LLM Answers',
-      problemDesc: 'Current AI solutions suffer from critical issues that make them unreliable for enterprise use.',
-      hallucinations: 'Hallucinations',
-      hallucinationsDesc: 'Single models confidently produce incorrect information with no way to verify.',
-      inconsistency: 'Inconsistency',
-      inconsistencyDesc: 'Same question, different answers each time. No reproducibility guarantees.',
-      noConfidence: 'No Confidence Metrics',
-      noConfidenceDesc: 'No way to know how reliable the answer is. Zero quantitative trust.',
-      
-      // Solution Section
-      solutionTitle: 'How ERA DAL Solves This',
-      solutionDesc: 'A multi-layer architecture that ensures reliable, reproducible, and quantified answers.',
-      solverPool: 'Solver Pool',
-      solverPoolDesc: '5-12 LLM models work in parallel, each providing independent analysis.',
-      arbiter: 'Arbiter Ranker',
-      arbiterDesc: 'Evaluates each answer on logic, completeness, risks, and quality.',
-      consensus: 'Consensus Synthesis',
-      consensusDesc: 'Combines top-K answers into a unified, high-quality response.',
-      rebuttal: 'Rebuttal Round',
-      rebuttalDesc: 'Models critique each other\'s answers, catching errors and improving quality.',
-      stability: 'Stability Analysis',
-      stabilityDesc: 'Multi-run testing with Wilson CI 95% confidence intervals.',
-      modelMemory: 'Model Memory',
-      modelMemoryDesc: 'Tracks model reliability over time for weighted consensus.',
-      
-      // How it Works
-      howItWorksTitle: 'How It Works',
-      howItWorksDesc: 'From question to confident answer in 5 steps',
-      step1: 'Submit Problem',
-      step1Desc: 'Enter your question and select the domain (science, math, med, econ)',
-      step2: 'Solver Pool Processes',
-      step2Desc: '5-12 LLM models analyze your question in parallel',
-      step3: 'Arbiter Evaluates',
-      step3Desc: 'Quality assessment, ranking, and disagreement detection',
-      step4: 'Consensus & Rebuttal',
-      step4Desc: 'Synthesis from top answers, optional self-critique round',
-      step5: 'Stability Check',
-      step5Desc: 'Multi-run analysis with Wilson CI confidence intervals',
-      
-      // Use Cases
-      useCasesTitle: 'Use Cases',
-      useCasesDesc: 'Trusted by enterprises for critical decisions',
-      scientific: 'Scientific Research',
-      scientificDesc: 'Hypothesis testing with quantitative reliability metrics',
-      medical: 'Medical Diagnosis',
-      medicalDesc: 'Second opinion from ensemble of medical AI models',
-      legal: 'Legal Analysis',
-      legalDesc: 'Contract analysis with consensus validation',
-      financial: 'Financial Forecasting',
-      financialDesc: 'Risk assessment with confidence intervals',
-      education: 'Education',
-      educationDesc: 'Automated grading with explanation',
-      moderation: 'Content Moderation',
-      moderationDesc: 'Reliable classification with audit trail',
-      
-      // Stats
-      domainPools: 'Domain Pools',
-      
-      // CTA
-      ctaTitle: 'Ready to Make Better Decisions?',
-      ctaDesc: 'Start using ERA DAL today. Free tier available.',
-      getStarted: 'Get Started Free',
-      readDocs: 'Read Documentation'
-    },
-
-    // Dashboard
-    dashboard: {
-      title: 'Dashboard',
-      subtitle: 'Monitor your ERA DAL performance and usage',
-      refresh: 'Refresh',
-      newQuery: 'New Query',
-      totalProblems: 'Total Problems',
-      totalRuns: 'Total Runs',
-      apiCallsToday: 'API Calls Today',
-      activeModels: 'Active Models',
-      usageOverTime: 'Usage Over Time',
-      modelPerformance: 'Model Performance',
-      recentActivity: 'Recent Activity',
-      viewAll: 'View All',
-      quickStats: 'Quick Stats',
-      avgConfidence: 'Avg. Confidence',
-      avgLatency: 'Avg. Latency',
-      successRate: 'Success Rate',
-      topDomain: 'Top Domain',
-      topModel: 'Top Model',
-      systemStatus: 'System Status',
-      apiServer: 'API Server',
-      database: 'Database',
-      cacheLayer: 'Cache Layer',
-      loading: 'Loading...',
-      noActivity: 'No recent activity'
-    },
-
-    // Profile
-    profile: {
-      title: 'Profile',
-      subtitle: 'Manage your account and personal settings',
-      editProfile: 'Edit Profile',
-      accountInfo: 'Account Information',
-      fullName: 'Full Name',
-      email: 'Email',
-      company: 'Company',
-      location: 'Location',
-      saveChanges: 'Save Changes',
-      apiKeys: 'API Keys',
-      generateNew: 'Generate New Key',
-      productionKey: 'Production Key',
-      developmentKey: 'Development Key',
-      active: 'Active',
-      revoke: 'Revoke',
-      copy: 'Copy',
-      securityWarning: 'Keep your API keys secure',
-      securityWarningDesc: 'Never share your API keys publicly or commit them to version control.',
-      subscription: 'Subscription',
-      currentPlan: 'Current Plan',
-      apiCalls: 'API Calls',
-      used: 'used',
-      modelsAvailable: 'Models Available',
-      maxParallel: 'Max Parallel',
-      unlimited: 'Unlimited',
-      prioritySupport: 'Priority Support',
-      upgradePlan: 'Upgrade Plan',
-      billingHistory: 'Billing History',
-      usageStats: 'Usage Statistics',
-      thisMonth: 'This Month',
-      totalAllTime: 'Total All Time',
-      avgResponseTime: 'Avg. Response Time',
-      dangerZone: 'Danger Zone',
-      dangerZoneDesc: 'These actions are irreversible. Please be careful.',
-      exportData: 'Export Data',
-      deleteAccount: 'Delete Account',
-      memberSince: 'Member since'
-    },
-
-    // Playground
-    playground: {
-      title: 'Playground',
-      subtitle: 'Test ERA DAL with your own queries',
-      yourQuestion: 'Your Question',
-      placeholder: 'Enter your question here... e.g., "What is the evidence for dark matter in the universe?"',
-      submit: 'Submit',
-      advancedSettings: 'Advanced Settings',
-      repeats: 'Repeats',
-      consensusTopK: 'Consensus Top-K',
-      epsilon: 'Epsilon',
-      enableRebuttal: 'Enable Rebuttal',
-      hardOnly: 'Hard Only Selection',
-      solverPool: 'Solver Pool',
-      ready: 'Ready',
-      quickExamples: 'Quick Examples',
-      darkMatter: 'Dark matter evidence',
-      riemann: 'Riemann hypothesis',
-      mrna: 'mRNA vaccine mechanism',
-      inflation: 'Inflation causes',
-      finalAnswer: 'Final Answer',
-      confidence: 'Confidence',
-      majorityRate: 'Majority Rate',
-      latency: 'Latency',
-      modelsUsed: 'Models Used',
-      modelResponses: 'Individual Model Responses',
-      processing: 'Processing Query...',
-      initializingPool: 'Initializing solver pool...',
-      copyResult: 'Copied to clipboard!'
-    },
-
-    // History
-    history: {
-      title: 'Query History',
-      subtitle: 'View and analyze your past queries',
-      export: 'Export',
-      clear: 'Clear',
-      searchPlaceholder: 'Search queries...',
-      allDomains: 'All Domains',
-      allStatus: 'All Status',
-      success: 'Success',
-      partial: 'Partial',
-      failed: 'Failed',
-      last7Days: 'Last 7 Days',
-      last30Days: 'Last 30 Days',
-      last90Days: 'Last 90 Days',
-      allTime: 'All Time',
-      showing: 'Showing',
-      of: 'of',
-      queries: 'queries',
-      hoursAgo: 'hours ago',
-      yesterday: 'Yesterday',
-      daysAgo: 'days ago',
-      queryDetails: 'Query Details',
-      query: 'Query',
-      rerunQuery: 'Re-run Query',
-      modelRankings: 'Model Rankings',
-      runs: 'runs',
-      models: 'models'
-    },
-
-    // Settings
-    settings: {
-      title: 'Settings',
-      subtitle: 'Configure your ERA DAL preferences',
-      apiConfig: 'API Configuration',
-      apiKey: 'OpenRouter API Key',
-      getApiKey: 'Get your API key from',
-      baseUrl: 'API Base URL',
-      solverTimeout: 'Solver Timeout (seconds)',
-      arbiterTimeout: 'Arbiter Timeout (seconds)',
-      test: 'Test',
-      defaultSettings: 'Default Query Settings',
-      defaultDomain: 'Default Domain',
-      defaultMode: 'Default Mode',
-      defaultRepeats: 'Default Repeats',
-      rebuttalByDefault: 'Enable Rebuttal by Default',
-      rebuttalDesc: 'Models will critique each other\'s answers',
-      hardOnlyDefault: 'Hard Only Selection',
-      hardOnlyDesc: 'Only use hard-select mode for answers',
-      modelPreferences: 'Model Preferences',
-      notifications: 'Notifications',
-      emailNotifications: 'Email Notifications',
-      emailDesc: 'Receive updates about your queries',
-      usageAlerts: 'Usage Alerts',
-      usageAlertsDesc: 'Get notified when approaching limits',
-      weeklyReports: 'Weekly Reports',
-      weeklyReportsDesc: 'Receive weekly usage summaries',
-      marketingEmails: 'Marketing Emails',
-      marketingDesc: 'News about features and updates',
-      appearance: 'Appearance',
-      theme: 'Theme',
-      dark: 'Dark',
-      light: 'Light',
-      comingSoon: 'Coming soon',
-      language: 'Language',
-      resetDefaults: 'Reset to Defaults',
-      saveSettings: 'Save Settings'
-    },
-
-    // Pricing
-    pricing: {
-      title: 'Simple, <span class="gradient-text">Transparent</span> Pricing',
-      subtitle: 'Start free, scale as you grow. No hidden fees, no surprises.',
-      monthly: 'Monthly',
-      yearly: 'Yearly',
-      save20: 'Save 20%',
-      free: 'Free',
-      freeDesc: 'Perfect for trying out ERA DAL',
-      pro: 'Pro',
-      proDesc: 'For professionals and small teams',
-      enterprise: 'Enterprise',
-      enterpriseDesc: 'For large organizations',
-      custom: 'Custom',
-      month: '/month',
-      billedYearly: '/month (billed yearly)',
-      apiCallsMonth: 'API calls/month',
-      modelsPerQuery: 'models per query',
-      domainOnly: 'domain only',
-      allDomains: 'All 4 domains',
-      customDomains: 'Custom domains',
-      basicStability: 'Basic stability metrics',
-      fullStability: 'Full stability analysis',
-      noRebuttal: 'No rebuttal rounds',
-      rebuttalRounds: 'Rebuttal rounds',
-      noPriority: 'No priority support',
-      prioritySupport: 'Priority support',
-      customModels: 'Custom model pools',
-      selfHosted: 'Self-hosted option',
-      slaGuarantee: 'SLA guarantee',
-      dedicatedSupport: 'Dedicated support',
-      getStartedFree: 'Get Started Free',
-      startProTrial: 'Start Pro Trial',
-      contactSales: 'Contact Sales',
-      comparePlans: 'Compare Plans',
-      feature: 'Feature',
-      faq: 'Frequently Asked Questions',
-      faqApiCall: 'What counts as an API call?',
-      faqApiCallAnswer: 'Each query submission counts as one API call, regardless of how many models are used in the ensemble. Running multiple repeats for stability analysis does not increase your API call count.',
-      faqUpgrade: 'Can I upgrade or downgrade anytime?',
-      faqUpgradeAnswer: 'Yes! You can upgrade or downgrade your plan at any time. When upgrading, you\'ll be charged the prorated difference. When downgrading, the change takes effect at the next billing cycle.',
-      faqRefund: 'Do you offer refunds?',
-      faqRefundAnswer: 'We offer a 14-day money-back guarantee for all paid plans. If you\'re not satisfied, contact us within 14 days of your purchase for a full refund.',
-      faqExceed: 'What happens if I exceed my API limit?',
-      faqExceedAnswer: 'You\'ll receive a notification at 80% usage. If you exceed your limit, you can either upgrade your plan or purchase additional API calls as needed. We won\'t cut off your access without warning.',
-      faqSecurity: 'Is my data secure?',
-      faqSecurityAnswer: 'Yes. We use industry-standard encryption for all data in transit and at rest. Your queries are processed through secure APIs and are not stored longer than necessary. Enterprise customers can also opt for self-hosted deployments.',
-      readyToStart: 'Ready to get started?',
-      joinThousands: 'Join thousands of professionals making better decisions with ERA DAL.',
-      talkToSales: 'Talk to Sales'
-    },
-
-    // Docs
-    docs: {
-      title: 'ERA DAL Documentation',
-      subtitle: 'Learn how to use ERA DAL - API reference, examples, and guides.',
-      gettingStarted: 'Getting Started',
-      introduction: 'Introduction',
-      quickStart: 'Quick Start',
-      installation: 'Installation',
-      coreConcepts: 'Core Concepts',
-      apiReference: 'API Reference',
-      overview: 'Overview',
-      endpoints: 'Endpoints',
-      errorHandling: 'Error Handling',
-      examples: 'Examples',
-      scienceQuery: 'Science Query',
-      mathQuery: 'Math Query',
-      keyFeatures: 'Key Features',
-      multiModelEnsemble: 'Multi-Model Ensemble: 5-12 LLMs analyze each query in parallel',
-      automatedArbitration: 'Automated Arbitration: Intelligent ranking and quality assessment',
-      consensusSynthesis: 'Consensus Synthesis: Combines top answers into unified response',
-      stabilityMetrics: 'Stability Metrics: Wilson CI 95% confidence intervals',
-      requirements: 'Requirements',
-      dockerInstallation: 'Docker Installation',
-      manualInstallation: 'Manual Installation',
-      availableModels: 'Available Models',
-      domainPools: 'Domain Pools',
-      baseUrl: 'Base URL',
-      checkApiHealth: 'Check API health status',
-      getDashboardStats: 'Get dashboard statistics',
-      getRecentEvents: 'Get recent events',
-      getModelStats: 'Get model performance statistics',
-      response: 'Response',
-      queryParams: 'Query params',
-      pythonLibrary: 'Python Library Usage',
-      reportIssue: 'Report Issue'
-    },
-
-    // Footer
-    footer: {
-      description: 'Enterprise-grade decision making through LLM ensemble, arbitration, and consensus.',
-      product: 'Product',
-      resources: 'Resources',
-      apiReference: 'API Reference',
-      contact: 'Contact',
-      support: 'Support',
-      copyright: '© 2025 ERA DAL. All rights reserved. Built by Eugene Kundrotas.'
-    },
-
-    // Common
-    common: {
-      science: 'Science',
-      mathematics: 'Mathematics',
-      medical: 'Medical',
-      economics: 'Economics',
-      consensusTop2: 'Consensus Top-2',
-      consensusTop3: 'Consensus Top-3',
-      hardSelect: 'Hard Select',
-      english: 'English',
-      russian: 'Russian',
-      stable: 'stable',
-      excellent: 'Excellent',
-      improved: 'improved'
-    }
+  // Navigation
+  nav: {
+    features: { en: 'Features', ru: 'Возможности' },
+    howItWorks: { en: 'How it Works', ru: 'Как это работает' },
+    pricing: { en: 'Pricing', ru: 'Цены' },
+    docs: { en: 'Docs', ru: 'Документация' },
+    dashboard: { en: 'Dashboard', ru: 'Панель' },
+    tryNow: { en: 'Try Now', ru: 'Попробовать' },
   },
 
-  ru: {
-    // Navigation
-    nav: {
-      features: 'Функции',
-      howItWorks: 'Как это работает',
-      pricing: 'Цены',
-      docs: 'Документация',
-      dashboard: 'Панель управления',
-      tryNow: 'Попробовать',
-      profile: 'Профиль',
-      settings: 'Настройки',
-      history: 'История',
-      playground: 'Песочница',
-      logout: 'Выход'
+  // Sidebar
+  sidebar: {
+    dashboard: { en: 'Dashboard', ru: 'Панель управления' },
+    playground: { en: 'Playground', ru: 'Песочница' },
+    history: { en: 'History', ru: 'История' },
+    settings: { en: 'Settings', ru: 'Настройки' },
+    profile: { en: 'Profile', ru: 'Профиль' },
+    apiCalls: { en: 'API Calls', ru: 'API вызовы' },
+    upgradePlan: { en: 'Upgrade Plan', ru: 'Улучшить план' },
+    proPlan: { en: 'Pro Plan', ru: 'Pro план' },
+  },
+
+  // Landing Page
+  landing: {
+    badge: { en: 'v1.2.0 Released — Level 2 Upgrades Available', ru: 'Версия 1.2.0 — Доступны улучшения Level 2' },
+    heroTitle1: { en: 'Enterprise AI', ru: 'Корпоративный ИИ' },
+    heroTitle2: { en: 'Decision Making', ru: 'Принятие решений' },
+    heroSubtitle: { 
+      en: 'Get stable, reproducible, and quantified answers through LLM ensemble, arbitration, consensus synthesis, and self-critique. Built for scientific, medical, legal, and financial applications.',
+      ru: 'Получайте стабильные, воспроизводимые и количественные ответы через ансамбль LLM, арбитраж, синтез консенсуса и самокритику. Создано для научных, медицинских, юридических и финансовых приложений.'
+    },
+    tryPlayground: { en: 'Try Playground', ru: 'Попробовать' },
+    viewOnGithub: { en: 'View on GitHub', ru: 'GitHub' },
+    testsPassing: { en: 'Tests Passing', ru: 'Тестов пройдено' },
+    modules: { en: 'Modules', ru: 'Модулей' },
+
+    // Problem section
+    problemTitle: { en: 'The Problem with Single LLM Answers', ru: 'Проблема ответов от одной LLM' },
+    problemSubtitle: { 
+      en: 'Current AI solutions suffer from critical issues that make them unreliable for enterprise use.',
+      ru: 'Современные ИИ-решения страдают от критических проблем, делающих их ненадёжными для корпоративного использования.'
+    },
+    hallucinations: { en: 'Hallucinations', ru: 'Галлюцинации' },
+    hallucinationsDesc: { 
+      en: 'Single models confidently produce incorrect information with no way to verify.',
+      ru: 'Одиночные модели уверенно выдают неверную информацию без возможности проверки.'
+    },
+    inconsistency: { en: 'Inconsistency', ru: 'Нестабильность' },
+    inconsistencyDesc: { 
+      en: 'Same question, different answers each time. No reproducibility guarantees.',
+      ru: 'Один вопрос — разные ответы каждый раз. Никаких гарантий воспроизводимости.'
+    },
+    noConfidence: { en: 'No Confidence Metrics', ru: 'Нет метрик уверенности' },
+    noConfidenceDesc: { 
+      en: 'No way to know how reliable the answer is. Zero quantitative trust.',
+      ru: 'Невозможно узнать, насколько надёжен ответ. Нулевое количественное доверие.'
     },
 
-    // Landing Page
-    landing: {
-      badge: 'v1.2.0 Выпущен — Доступны обновления Level 2',
-      heroTitle1: 'Корпоративный ИИ',
-      heroTitle2: 'Принятие Решений',
-      heroDesc: 'Получайте <span class="text-white font-semibold">стабильные, воспроизводимые и количественные</span> ответы через ансамбль LLM, арбитраж, синтез консенсуса и самокритику. Создан для научных, медицинских, юридических и финансовых приложений.',
-      tryPlayground: 'Попробовать',
-      viewGitHub: 'Смотреть на GitHub',
-      testsPassing: 'Тестов пройдено',
-      modules: 'Модулей',
-      wilsonCI: 'Wilson CI',
-      
-      // Problem Section
-      problemTitle: 'Проблема с ответами одной LLM',
-      problemDesc: 'Текущие AI-решения страдают от критических проблем, делающих их ненадёжными для корпоративного использования.',
-      hallucinations: 'Галлюцинации',
-      hallucinationsDesc: 'Одиночные модели уверенно выдают неверную информацию без возможности проверки.',
-      inconsistency: 'Непоследовательность',
-      inconsistencyDesc: 'Один вопрос — разные ответы каждый раз. Никаких гарантий воспроизводимости.',
-      noConfidence: 'Нет метрик достоверности',
-      noConfidenceDesc: 'Невозможно узнать, насколько надёжен ответ. Нулевое количественное доверие.',
-      
-      // Solution Section
-      solutionTitle: 'Как ERA DAL решает это',
-      solutionDesc: 'Многоуровневая архитектура, обеспечивающая надёжные, воспроизводимые и количественные ответы.',
-      solverPool: 'Пул решателей',
-      solverPoolDesc: '5-12 LLM моделей работают параллельно, каждая предоставляет независимый анализ.',
-      arbiter: 'Арбитр-ранжировщик',
-      arbiterDesc: 'Оценивает каждый ответ по логике, полноте, рискам и качеству.',
-      consensus: 'Синтез консенсуса',
-      consensusDesc: 'Объединяет Top-K ответов в единый высококачественный ответ.',
-      rebuttal: 'Раунд опровержения',
-      rebuttalDesc: 'Модели критикуют ответы друг друга, выявляя ошибки и улучшая качество.',
-      stability: 'Анализ стабильности',
-      stabilityDesc: 'Многократное тестирование с доверительными интервалами Wilson CI 95%.',
-      modelMemory: 'Память моделей',
-      modelMemoryDesc: 'Отслеживает надёжность моделей во времени для взвешенного консенсуса.',
-      
-      // How it Works
-      howItWorksTitle: 'Как это работает',
-      howItWorksDesc: 'От вопроса до уверенного ответа за 5 шагов',
-      step1: 'Отправьте задачу',
-      step1Desc: 'Введите вопрос и выберите домен (наука, математика, медицина, экономика)',
-      step2: 'Пул решателей обрабатывает',
-      step2Desc: '5-12 LLM моделей анализируют ваш вопрос параллельно',
-      step3: 'Арбитр оценивает',
-      step3Desc: 'Оценка качества, ранжирование и обнаружение разногласий',
-      step4: 'Консенсус и опровержение',
-      step4Desc: 'Синтез лучших ответов, опциональный раунд самокритики',
-      step5: 'Проверка стабильности',
-      step5Desc: 'Многократный анализ с доверительными интервалами Wilson CI',
-      
-      // Use Cases
-      useCasesTitle: 'Сценарии использования',
-      useCasesDesc: 'Доверие предприятий для критических решений',
-      scientific: 'Научные исследования',
-      scientificDesc: 'Проверка гипотез с количественными метриками надёжности',
-      medical: 'Медицинская диагностика',
-      medicalDesc: 'Второе мнение от ансамбля медицинских AI-моделей',
-      legal: 'Юридический анализ',
-      legalDesc: 'Анализ договоров с валидацией консенсуса',
-      financial: 'Финансовое прогнозирование',
-      financialDesc: 'Оценка рисков с доверительными интервалами',
-      education: 'Образование',
-      educationDesc: 'Автоматическая оценка с объяснением',
-      moderation: 'Модерация контента',
-      moderationDesc: 'Надёжная классификация с аудиторским следом',
-      
-      // Stats
-      domainPools: 'Доменных пулов',
-      
-      // CTA
-      ctaTitle: 'Готовы принимать лучшие решения?',
-      ctaDesc: 'Начните использовать ERA DAL сегодня. Бесплатный тариф доступен.',
-      getStarted: 'Начать бесплатно',
-      readDocs: 'Читать документацию'
+    // Solution section
+    solutionTitle: { en: 'How ERA DAL Solves This', ru: 'Как ERA DAL решает это' },
+    solutionSubtitle: { 
+      en: 'A multi-layer architecture that ensures reliable, reproducible, and quantified answers.',
+      ru: 'Многоуровневая архитектура, обеспечивающая надёжные, воспроизводимые и количественные ответы.'
+    },
+    solverPool: { en: 'Solver Pool', ru: 'Пул решателей' },
+    solverPoolDesc: { 
+      en: '5-12 LLM models work in parallel, each providing independent analysis.',
+      ru: '5-12 LLM-моделей работают параллельно, каждая предоставляет независимый анализ.'
+    },
+    arbiterRanker: { en: 'Arbiter Ranker', ru: 'Арбитр-ранжировщик' },
+    arbiterRankerDesc: { 
+      en: 'Evaluates each answer on logic, completeness, risks, and quality.',
+      ru: 'Оценивает каждый ответ по логике, полноте, рискам и качеству.'
+    },
+    consensusSynthesis: { en: 'Consensus Synthesis', ru: 'Синтез консенсуса' },
+    consensusSynthesisDesc: { 
+      en: 'Combines top-K answers into a unified, high-quality response.',
+      ru: 'Объединяет top-K ответов в единый высококачественный ответ.'
+    },
+    rebuttalRound: { en: 'Rebuttal Round', ru: 'Раунд опровержений' },
+    rebuttalRoundDesc: { 
+      en: "Models critique each other's answers, catching errors and improving quality.",
+      ru: 'Модели критикуют ответы друг друга, выявляя ошибки и улучшая качество.'
+    },
+    stabilityAnalysis: { en: 'Stability Analysis', ru: 'Анализ стабильности' },
+    stabilityAnalysisDesc: { 
+      en: 'Multi-run testing with Wilson CI 95% confidence intervals.',
+      ru: 'Многократное тестирование с доверительными интервалами Wilson CI 95%.'
+    },
+    modelMemory: { en: 'Model Memory', ru: 'Память моделей' },
+    modelMemoryDesc: { 
+      en: 'Tracks model reliability over time for weighted consensus.',
+      ru: 'Отслеживает надёжность моделей для взвешенного консенсуса.'
     },
 
-    // Dashboard
-    dashboard: {
-      title: 'Панель управления',
-      subtitle: 'Мониторинг производительности и использования ERA DAL',
-      refresh: 'Обновить',
-      newQuery: 'Новый запрос',
-      totalProblems: 'Всего задач',
-      totalRuns: 'Всего запусков',
-      apiCallsToday: 'API вызовов сегодня',
-      activeModels: 'Активных моделей',
-      usageOverTime: 'Использование по времени',
-      modelPerformance: 'Производительность моделей',
-      recentActivity: 'Последняя активность',
-      viewAll: 'Смотреть все',
-      quickStats: 'Быстрая статистика',
-      avgConfidence: 'Ср. достоверность',
-      avgLatency: 'Ср. задержка',
-      successRate: 'Успешность',
-      topDomain: 'Топ домен',
-      topModel: 'Топ модель',
-      systemStatus: 'Статус системы',
-      apiServer: 'API сервер',
-      database: 'База данных',
-      cacheLayer: 'Слой кэша',
-      loading: 'Загрузка...',
-      noActivity: 'Нет недавней активности'
-    },
+    // How it works
+    howItWorksTitle: { en: 'How It Works', ru: 'Как это работает' },
+    howItWorksSubtitle: { en: 'From question to confident answer in 5 steps', ru: 'От вопроса до уверенного ответа за 5 шагов' },
+    step1Title: { en: 'Submit Problem', ru: 'Отправьте задачу' },
+    step1Desc: { en: 'Enter your question and select the domain (science, math, med, econ)', ru: 'Введите вопрос и выберите домен (наука, математика, медицина, экономика)' },
+    step2Title: { en: 'Solver Pool Processes', ru: 'Обработка пулом решателей' },
+    step2Desc: { en: '5-12 LLM models analyze your question in parallel', ru: '5-12 LLM-моделей анализируют ваш вопрос параллельно' },
+    step3Title: { en: 'Arbiter Evaluates', ru: 'Оценка арбитром' },
+    step3Desc: { en: 'Quality assessment, ranking, and disagreement detection', ru: 'Оценка качества, ранжирование и выявление разногласий' },
+    step4Title: { en: 'Consensus & Rebuttal', ru: 'Консенсус и опровержение' },
+    step4Desc: { en: 'Synthesis from top answers, optional self-critique round', ru: 'Синтез из лучших ответов, опциональный раунд самокритики' },
+    step5Title: { en: 'Stability Check', ru: 'Проверка стабильности' },
+    step5Desc: { en: 'Multi-run analysis with Wilson CI confidence intervals', ru: 'Многократный анализ с доверительными интервалами Wilson CI' },
 
-    // Profile
-    profile: {
-      title: 'Профиль',
-      subtitle: 'Управление аккаунтом и личными настройками',
-      editProfile: 'Редактировать',
-      accountInfo: 'Информация об аккаунте',
-      fullName: 'Полное имя',
-      email: 'Email',
-      company: 'Компания',
-      location: 'Местоположение',
-      saveChanges: 'Сохранить',
-      apiKeys: 'API ключи',
-      generateNew: 'Создать новый ключ',
-      productionKey: 'Продакшн ключ',
-      developmentKey: 'Dev ключ',
-      active: 'Активен',
-      revoke: 'Отозвать',
-      copy: 'Копировать',
-      securityWarning: 'Храните API ключи в безопасности',
-      securityWarningDesc: 'Никогда не публикуйте API ключи и не коммитьте их в систему контроля версий.',
-      subscription: 'Подписка',
-      currentPlan: 'Текущий план',
-      apiCalls: 'API вызовы',
-      used: 'использовано',
-      modelsAvailable: 'Доступно моделей',
-      maxParallel: 'Макс. параллельно',
-      unlimited: 'Без ограничений',
-      prioritySupport: 'Приоритетная поддержка',
-      upgradePlan: 'Улучшить план',
-      billingHistory: 'История платежей',
-      usageStats: 'Статистика использования',
-      thisMonth: 'Этот месяц',
-      totalAllTime: 'Всего за всё время',
-      avgResponseTime: 'Ср. время ответа',
-      dangerZone: 'Опасная зона',
-      dangerZoneDesc: 'Эти действия необратимы. Будьте осторожны.',
-      exportData: 'Экспорт данных',
-      deleteAccount: 'Удалить аккаунт',
-      memberSince: 'Участник с'
-    },
+    // Use cases
+    useCasesTitle: { en: 'Use Cases', ru: 'Примеры использования' },
+    useCasesSubtitle: { en: 'Trusted by enterprises for critical decisions', ru: 'Доверяют компании для критически важных решений' },
+    scientificResearch: { en: 'Scientific Research', ru: 'Научные исследования' },
+    scientificResearchDesc: { en: 'Hypothesis testing with quantitative reliability metrics', ru: 'Проверка гипотез с количественными метриками надёжности' },
+    medicalDiagnosis: { en: 'Medical Diagnosis', ru: 'Медицинская диагностика' },
+    medicalDiagnosisDesc: { en: 'Second opinion from ensemble of medical AI models', ru: 'Второе мнение от ансамбля медицинских ИИ-моделей' },
+    legalAnalysis: { en: 'Legal Analysis', ru: 'Юридический анализ' },
+    legalAnalysisDesc: { en: 'Contract analysis with consensus validation', ru: 'Анализ договоров с валидацией консенсусом' },
+    financialForecasting: { en: 'Financial Forecasting', ru: 'Финансовое прогнозирование' },
+    financialForecastingDesc: { en: 'Risk assessment with confidence intervals', ru: 'Оценка рисков с доверительными интервалами' },
+    education: { en: 'Education', ru: 'Образование' },
+    educationDesc: { en: 'Automated grading with explanation', ru: 'Автоматическая оценка с объяснением' },
+    contentModeration: { en: 'Content Moderation', ru: 'Модерация контента' },
+    contentModerationDesc: { en: 'Reliable classification with audit trail', ru: 'Надёжная классификация с журналом аудита' },
 
-    // Playground
-    playground: {
-      title: 'Песочница',
-      subtitle: 'Тестируйте ERA DAL со своими запросами',
-      yourQuestion: 'Ваш вопрос',
-      placeholder: 'Введите ваш вопрос... например, "Какие доказательства существования тёмной материи?"',
-      submit: 'Отправить',
-      advancedSettings: 'Расширенные настройки',
-      repeats: 'Повторов',
-      consensusTopK: 'Консенсус Top-K',
-      epsilon: 'Эпсилон',
-      enableRebuttal: 'Включить опровержение',
-      hardOnly: 'Только жёсткий выбор',
-      solverPool: 'Пул решателей',
-      ready: 'Готов',
-      quickExamples: 'Быстрые примеры',
-      darkMatter: 'Доказательства тёмной материи',
-      riemann: 'Гипотеза Римана',
-      mrna: 'Механизм мРНК вакцин',
-      inflation: 'Причины инфляции',
-      finalAnswer: 'Финальный ответ',
-      confidence: 'Достоверность',
-      majorityRate: 'Показатель большинства',
-      latency: 'Задержка',
-      modelsUsed: 'Использовано моделей',
-      modelResponses: 'Ответы отдельных моделей',
-      processing: 'Обработка запроса...',
-      initializingPool: 'Инициализация пула решателей...',
-      copyResult: 'Скопировано!'
-    },
+    // Stats
+    domainPools: { en: 'Domain Pools', ru: 'Доменных пулов' },
 
-    // History
-    history: {
-      title: 'История запросов',
-      subtitle: 'Просмотр и анализ прошлых запросов',
-      export: 'Экспорт',
-      clear: 'Очистить',
-      searchPlaceholder: 'Поиск запросов...',
-      allDomains: 'Все домены',
-      allStatus: 'Все статусы',
-      success: 'Успех',
-      partial: 'Частично',
-      failed: 'Ошибка',
-      last7Days: 'Последние 7 дней',
-      last30Days: 'Последние 30 дней',
-      last90Days: 'Последние 90 дней',
-      allTime: 'За всё время',
-      showing: 'Показано',
-      of: 'из',
-      queries: 'запросов',
-      hoursAgo: 'часов назад',
-      yesterday: 'Вчера',
-      daysAgo: 'дней назад',
-      queryDetails: 'Детали запроса',
-      query: 'Запрос',
-      rerunQuery: 'Повторить запрос',
-      modelRankings: 'Рейтинг моделей',
-      runs: 'запусков',
-      models: 'моделей'
-    },
+    // CTA
+    ctaTitle: { en: 'Ready to Make Better Decisions?', ru: 'Готовы принимать лучшие решения?' },
+    ctaSubtitle: { en: 'Start using ERA DAL today. Free tier available.', ru: 'Начните использовать ERA DAL сегодня. Есть бесплатный план.' },
+    getStartedFree: { en: 'Get Started Free', ru: 'Начать бесплатно' },
+    readDocumentation: { en: 'Read Documentation', ru: 'Читать документацию' },
+  },
 
-    // Settings
-    settings: {
-      title: 'Настройки',
-      subtitle: 'Настройте параметры ERA DAL',
-      apiConfig: 'Конфигурация API',
-      apiKey: 'API ключ OpenRouter',
-      getApiKey: 'Получите API ключ на',
-      baseUrl: 'Базовый URL API',
-      solverTimeout: 'Таймаут решателя (сек)',
-      arbiterTimeout: 'Таймаут арбитра (сек)',
-      test: 'Тест',
-      defaultSettings: 'Настройки по умолчанию',
-      defaultDomain: 'Домен по умолчанию',
-      defaultMode: 'Режим по умолчанию',
-      defaultRepeats: 'Повторов по умолчанию',
-      rebuttalByDefault: 'Опровержение по умолчанию',
-      rebuttalDesc: 'Модели будут критиковать ответы друг друга',
-      hardOnlyDefault: 'Только жёсткий выбор',
-      hardOnlyDesc: 'Использовать только режим жёсткого выбора',
-      modelPreferences: 'Настройки моделей',
-      notifications: 'Уведомления',
-      emailNotifications: 'Email уведомления',
-      emailDesc: 'Получать обновления о запросах',
-      usageAlerts: 'Оповещения об использовании',
-      usageAlertsDesc: 'Уведомления при приближении к лимитам',
-      weeklyReports: 'Еженедельные отчёты',
-      weeklyReportsDesc: 'Получать еженедельные сводки использования',
-      marketingEmails: 'Маркетинговые рассылки',
-      marketingDesc: 'Новости о функциях и обновлениях',
-      appearance: 'Внешний вид',
-      theme: 'Тема',
-      dark: 'Тёмная',
-      light: 'Светлая',
-      comingSoon: 'Скоро',
-      language: 'Язык',
-      resetDefaults: 'Сбросить настройки',
-      saveSettings: 'Сохранить настройки'
-    },
+  // Dashboard
+  dashboard: {
+    title: { en: 'Dashboard', ru: 'Панель управления' },
+    subtitle: { en: 'Monitor your ERA DAL performance and usage', ru: 'Мониторинг производительности и использования ERA DAL' },
+    refresh: { en: 'Refresh', ru: 'Обновить' },
+    newQuery: { en: 'New Query', ru: 'Новый запрос' },
+    totalProblems: { en: 'Total Problems', ru: 'Всего задач' },
+    totalRuns: { en: 'Total Runs', ru: 'Всего запусков' },
+    apiCallsToday: { en: 'API Calls Today', ru: 'API вызовов сегодня' },
+    activeModels: { en: 'Active Models', ru: 'Активных моделей' },
+    usageOverTime: { en: 'Usage Over Time', ru: 'Использование по времени' },
+    modelPerformance: { en: 'Model Performance', ru: 'Производительность моделей' },
+    recentActivity: { en: 'Recent Activity', ru: 'Недавняя активность' },
+    viewAll: { en: 'View All', ru: 'Смотреть все' },
+    quickStats: { en: 'Quick Stats', ru: 'Быстрая статистика' },
+    avgConfidence: { en: 'Avg. Confidence', ru: 'Сред. уверенность' },
+    avgLatency: { en: 'Avg. Latency', ru: 'Сред. задержка' },
+    successRate: { en: 'Success Rate', ru: 'Успешность' },
+    topDomain: { en: 'Top Domain', ru: 'Топ домен' },
+    topModel: { en: 'Top Model', ru: 'Топ модель' },
+    systemStatus: { en: 'System Status', ru: 'Статус системы' },
+    apiServer: { en: 'API Server', ru: 'API сервер' },
+    database: { en: 'Database', ru: 'База данных' },
+    cacheLayer: { en: 'Cache Layer', ru: 'Слой кэша' },
+    loading: { en: 'Loading...', ru: 'Загрузка...' },
+    noActivity: { en: 'No recent activity', ru: 'Нет недавней активности' },
+    stable: { en: 'stable', ru: 'стабильно' },
+    active: { en: 'Active', ru: 'Активно' },
+  },
 
-    // Pricing
-    pricing: {
-      title: 'Простые и <span class="gradient-text">прозрачные</span> цены',
-      subtitle: 'Начните бесплатно, масштабируйтесь по мере роста. Никаких скрытых платежей.',
-      monthly: 'Месяц',
-      yearly: 'Год',
-      save20: 'Скидка 20%',
-      free: 'Бесплатный',
-      freeDesc: 'Идеально для знакомства с ERA DAL',
-      pro: 'Pro',
-      proDesc: 'Для профессионалов и небольших команд',
-      enterprise: 'Enterprise',
-      enterpriseDesc: 'Для крупных организаций',
-      custom: 'Индивидуально',
-      month: '/месяц',
-      billedYearly: '/мес (оплата за год)',
-      apiCallsMonth: 'API вызовов/месяц',
-      modelsPerQuery: 'моделей на запрос',
-      domainOnly: 'только домен',
-      allDomains: 'Все 4 домена',
-      customDomains: 'Кастомные домены',
-      basicStability: 'Базовые метрики стабильности',
-      fullStability: 'Полный анализ стабильности',
-      noRebuttal: 'Без раундов опровержения',
-      rebuttalRounds: 'Раунды опровержения',
-      noPriority: 'Без приоритетной поддержки',
-      prioritySupport: 'Приоритетная поддержка',
-      customModels: 'Кастомные пулы моделей',
-      selfHosted: 'Возможность self-hosted',
-      slaGuarantee: 'Гарантия SLA',
-      dedicatedSupport: 'Выделенная поддержка',
-      getStartedFree: 'Начать бесплатно',
-      startProTrial: 'Попробовать Pro',
-      contactSales: 'Связаться с отделом продаж',
-      comparePlans: 'Сравнение планов',
-      feature: 'Функция',
-      faq: 'Часто задаваемые вопросы',
-      faqApiCall: 'Что считается API вызовом?',
-      faqApiCallAnswer: 'Каждая отправка запроса считается одним API вызовом, независимо от количества используемых моделей. Многократные запуски для анализа стабильности не увеличивают счётчик API вызовов.',
-      faqUpgrade: 'Можно ли изменить тариф в любое время?',
-      faqUpgradeAnswer: 'Да! Вы можете повысить или понизить тариф в любое время. При повышении взимается пропорциональная разница. При понижении изменение вступает в силу в следующем платёжном цикле.',
-      faqRefund: 'Есть ли возврат средств?',
-      faqRefundAnswer: 'Мы предлагаем 14-дневную гарантию возврата денег для всех платных планов. Если вы не удовлетворены, свяжитесь с нами в течение 14 дней для полного возврата.',
-      faqExceed: 'Что происходит при превышении лимита API?',
-      faqExceedAnswer: 'Вы получите уведомление при 80% использования. При превышении лимита вы можете повысить тариф или приобрести дополнительные вызовы. Мы не отключим доступ без предупреждения.',
-      faqSecurity: 'Безопасны ли мои данные?',
-      faqSecurityAnswer: 'Да. Мы используем отраслевое стандартное шифрование для всех данных при передаче и хранении. Ваши запросы обрабатываются через защищённые API и не хранятся дольше необходимого.',
-      readyToStart: 'Готовы начать?',
-      joinThousands: 'Присоединяйтесь к тысячам профессионалов, принимающих лучшие решения с ERA DAL.',
-      talkToSales: 'Связаться с отделом продаж'
-    },
+  // Profile
+  profile: {
+    title: { en: 'Profile', ru: 'Профиль' },
+    subtitle: { en: 'Manage your account and personal settings', ru: 'Управляйте аккаунтом и личными настройками' },
+    editProfile: { en: 'Edit Profile', ru: 'Редактировать' },
+    memberSince: { en: 'Member since', ru: 'Участник с' },
+    accountInfo: { en: 'Account Information', ru: 'Информация об аккаунте' },
+    fullName: { en: 'Full Name', ru: 'Полное имя' },
+    email: { en: 'Email', ru: 'Email' },
+    company: { en: 'Company', ru: 'Компания' },
+    location: { en: 'Location', ru: 'Местоположение' },
+    saveChanges: { en: 'Save Changes', ru: 'Сохранить' },
+    apiKeys: { en: 'API Keys', ru: 'API ключи' },
+    generateNewKey: { en: 'Generate New Key', ru: 'Создать новый ключ' },
+    productionKey: { en: 'Production Key', ru: 'Продакшен ключ' },
+    developmentKey: { en: 'Development Key', ru: 'Ключ разработки' },
+    keepSecure: { en: 'Keep your API keys secure', ru: 'Храните API ключи в безопасности' },
+    neverShare: { en: 'Never share your API keys publicly or commit them to version control.', ru: 'Никогда не публикуйте API ключи и не коммитьте их в системы контроля версий.' },
+    subscription: { en: 'Subscription', ru: 'Подписка' },
+    currentPlan: { en: 'Current Plan', ru: 'Текущий план' },
+    renews: { en: 'Renews', ru: 'Продление' },
+    modelsAvailable: { en: 'Models Available', ru: 'Доступно моделей' },
+    maxParallel: { en: 'Max Parallel', ru: 'Макс. параллельно' },
+    unlimited: { en: 'Unlimited', ru: 'Без ограничений' },
+    prioritySupport: { en: 'Priority Support', ru: 'Приоритетная поддержка' },
+    upgradePlan: { en: 'Upgrade Plan', ru: 'Улучшить план' },
+    billingHistory: { en: 'Billing History', ru: 'История платежей' },
+    usageStatistics: { en: 'Usage Statistics', ru: 'Статистика использования' },
+    thisMonth: { en: 'This Month', ru: 'В этом месяце' },
+    totalAllTime: { en: 'Total All Time', ru: 'Всего за всё время' },
+    avgResponseTime: { en: 'Avg. Response Time', ru: 'Сред. время ответа' },
+    dangerZone: { en: 'Danger Zone', ru: 'Опасная зона' },
+    dangerWarning: { en: 'These actions are irreversible. Please be careful.', ru: 'Эти действия необратимы. Будьте осторожны.' },
+    exportData: { en: 'Export Data', ru: 'Экспорт данных' },
+    deleteAccount: { en: 'Delete Account', ru: 'Удалить аккаунт' },
+    used: { en: 'used', ru: 'использовано' },
+    improved: { en: 'improved', ru: 'улучшено' },
+    excellent: { en: 'Excellent', ru: 'Отлично' },
+  },
 
-    // Docs
-    docs: {
-      title: 'Документация ERA DAL',
-      subtitle: 'Узнайте, как использовать ERA DAL - справочник API, примеры и руководства.',
-      gettingStarted: 'Начало работы',
-      introduction: 'Введение',
-      quickStart: 'Быстрый старт',
-      installation: 'Установка',
-      coreConcepts: 'Основные концепции',
-      apiReference: 'Справочник API',
-      overview: 'Обзор',
-      endpoints: 'Эндпоинты',
-      errorHandling: 'Обработка ошибок',
-      examples: 'Примеры',
-      scienceQuery: 'Научный запрос',
-      mathQuery: 'Математический запрос',
-      keyFeatures: 'Ключевые особенности',
-      multiModelEnsemble: 'Мульти-модельный ансамбль: 5-12 LLM анализируют каждый запрос параллельно',
-      automatedArbitration: 'Автоматический арбитраж: интеллектуальное ранжирование и оценка качества',
-      consensusSynthesis: 'Синтез консенсуса: объединяет лучшие ответы в единый ответ',
-      stabilityMetrics: 'Метрики стабильности: доверительные интервалы Wilson CI 95%',
-      requirements: 'Требования',
-      dockerInstallation: 'Установка Docker',
-      manualInstallation: 'Ручная установка',
-      availableModels: 'Доступные модели',
-      domainPools: 'Доменные пулы',
-      baseUrl: 'Базовый URL',
-      checkApiHealth: 'Проверка здоровья API',
-      getDashboardStats: 'Получение статистики дашборда',
-      getRecentEvents: 'Получение последних событий',
-      getModelStats: 'Получение статистики моделей',
-      response: 'Ответ',
-      queryParams: 'Параметры запроса',
-      pythonLibrary: 'Использование Python библиотеки',
-      reportIssue: 'Сообщить о проблеме'
-    },
+  // Playground
+  playground: {
+    title: { en: 'Playground', ru: 'Песочница' },
+    subtitle: { en: 'Test ERA DAL with your own queries', ru: 'Тестируйте ERA DAL своими запросами' },
+    yourQuestion: { en: 'Your Question', ru: 'Ваш вопрос' },
+    placeholder: { en: 'Enter your question here...', ru: 'Введите ваш вопрос здесь...' },
+    submit: { en: 'Submit', ru: 'Отправить' },
+    advancedSettings: { en: 'Advanced Settings', ru: 'Расширенные настройки' },
+    repeats: { en: 'Repeats', ru: 'Повторов' },
+    consensusTopK: { en: 'Consensus Top-K', ru: 'Консенсус Top-K' },
+    epsilon: { en: 'Epsilon', ru: 'Эпсилон' },
+    enableRebuttal: { en: 'Enable Rebuttal', ru: 'Включить опровержение' },
+    hardOnlySelection: { en: 'Hard Only Selection', ru: 'Только жёсткий выбор' },
+    solverPool: { en: 'Solver Pool', ru: 'Пул решателей' },
+    ready: { en: 'Ready', ru: 'Готово' },
+    quickExamples: { en: 'Quick Examples', ru: 'Быстрые примеры' },
+    darkMatterEvidence: { en: 'Dark matter evidence', ru: 'Доказательства тёмной материи' },
+    riemannHypothesis: { en: 'Riemann hypothesis', ru: 'Гипотеза Римана' },
+    mrnaVaccineMechanism: { en: 'mRNA vaccine mechanism', ru: 'Механизм мРНК вакцин' },
+    inflationCauses: { en: 'Inflation causes', ru: 'Причины инфляции' },
+    finalAnswer: { en: 'Final Answer', ru: 'Финальный ответ' },
+    confidence: { en: 'Confidence', ru: 'Уверенность' },
+    majorityRate: { en: 'Majority Rate', ru: 'Доля большинства' },
+    latency: { en: 'Latency', ru: 'Задержка' },
+    modelsUsed: { en: 'Models Used', ru: 'Использовано моделей' },
+    modelResponses: { en: 'Individual Model Responses', ru: 'Ответы отдельных моделей' },
+    processing: { en: 'Processing Query...', ru: 'Обработка запроса...' },
+    copied: { en: 'Copied to clipboard!', ru: 'Скопировано!' },
+    enterQuestion: { en: 'Please enter a question', ru: 'Пожалуйста, введите вопрос' },
+  },
 
-    // Footer
-    footer: {
-      description: 'Корпоративное принятие решений через ансамбль LLM, арбитраж и консенсус.',
-      product: 'Продукт',
-      resources: 'Ресурсы',
-      apiReference: 'Справочник API',
-      contact: 'Контакты',
-      support: 'Поддержка',
-      copyright: '© 2025 ERA DAL. Все права защищены. Создано Eugene Kundrotas.'
-    },
+  // History
+  history: {
+    title: { en: 'Query History', ru: 'История запросов' },
+    subtitle: { en: 'View and analyze your past queries', ru: 'Просматривайте и анализируйте прошлые запросы' },
+    export: { en: 'Export', ru: 'Экспорт' },
+    clear: { en: 'Clear', ru: 'Очистить' },
+    searchQueries: { en: 'Search queries...', ru: 'Поиск запросов...' },
+    allDomains: { en: 'All Domains', ru: 'Все домены' },
+    allStatus: { en: 'All Status', ru: 'Все статусы' },
+    success: { en: 'Success', ru: 'Успешно' },
+    partial: { en: 'Partial', ru: 'Частично' },
+    failed: { en: 'Failed', ru: 'Ошибка' },
+    last7Days: { en: 'Last 7 Days', ru: 'Последние 7 дней' },
+    last30Days: { en: 'Last 30 Days', ru: 'Последние 30 дней' },
+    last90Days: { en: 'Last 90 Days', ru: 'Последние 90 дней' },
+    allTime: { en: 'All Time', ru: 'За всё время' },
+    showing: { en: 'Showing', ru: 'Показано' },
+    of: { en: 'of', ru: 'из' },
+    queries: { en: 'queries', ru: 'запросов' },
+    queryDetails: { en: 'Query Details', ru: 'Детали запроса' },
+    query: { en: 'Query', ru: 'Запрос' },
+    rerunQuery: { en: 'Re-run Query', ru: 'Повторить запрос' },
+    copy: { en: 'Copy', ru: 'Копировать' },
+    models: { en: 'models', ru: 'моделей' },
+    runs: { en: 'runs', ru: 'запусков' },
+    hoursAgo: { en: 'hours ago', ru: 'часов назад' },
+    daysAgo: { en: 'days ago', ru: 'дней назад' },
+    yesterday: { en: 'Yesterday', ru: 'Вчера' },
+    modelRankings: { en: 'Model Rankings', ru: 'Рейтинг моделей' },
+  },
 
-    // Common
-    common: {
-      science: 'Наука',
-      mathematics: 'Математика',
-      medical: 'Медицина',
-      economics: 'Экономика',
-      consensusTop2: 'Консенсус Top-2',
-      consensusTop3: 'Консенсус Top-3',
-      hardSelect: 'Жёсткий выбор',
-      english: 'Английский',
-      russian: 'Русский',
-      stable: 'стабильно',
-      excellent: 'Отлично',
-      improved: 'улучшено'
-    }
+  // Settings
+  settings: {
+    title: { en: 'Settings', ru: 'Настройки' },
+    subtitle: { en: 'Configure your ERA DAL preferences', ru: 'Настройте параметры ERA DAL' },
+    apiConfiguration: { en: 'API Configuration', ru: 'Конфигурация API' },
+    openRouterApiKey: { en: 'OpenRouter API Key', ru: 'API ключ OpenRouter' },
+    getApiKey: { en: 'Get your API key from', ru: 'Получите API ключ на' },
+    apiBaseUrl: { en: 'API Base URL', ru: 'Базовый URL API' },
+    solverTimeout: { en: 'Solver Timeout (seconds)', ru: 'Таймаут решателя (секунды)' },
+    arbiterTimeout: { en: 'Arbiter Timeout (seconds)', ru: 'Таймаут арбитра (секунды)' },
+    test: { en: 'Test', ru: 'Тест' },
+    defaultQuerySettings: { en: 'Default Query Settings', ru: 'Настройки запросов по умолчанию' },
+    defaultDomain: { en: 'Default Domain', ru: 'Домен по умолчанию' },
+    defaultMode: { en: 'Default Mode', ru: 'Режим по умолчанию' },
+    defaultRepeats: { en: 'Default Repeats', ru: 'Повторов по умолчанию' },
+    enableRebuttalByDefault: { en: 'Enable Rebuttal by Default', ru: 'Включить опровержение по умолчанию' },
+    modelsWillCritique: { en: "Models will critique each other's answers", ru: 'Модели будут критиковать ответы друг друга' },
+    modelPreferences: { en: 'Model Preferences', ru: 'Настройки моделей' },
+    notifications: { en: 'Notifications', ru: 'Уведомления' },
+    emailNotifications: { en: 'Email Notifications', ru: 'Email уведомления' },
+    receiveUpdates: { en: 'Receive updates about your queries', ru: 'Получать обновления о запросах' },
+    usageAlerts: { en: 'Usage Alerts', ru: 'Уведомления об использовании' },
+    getNotifiedLimits: { en: 'Get notified when approaching limits', ru: 'Уведомление при приближении к лимитам' },
+    weeklyReports: { en: 'Weekly Reports', ru: 'Еженедельные отчёты' },
+    receiveWeekly: { en: 'Receive weekly usage summaries', ru: 'Получать еженедельные сводки' },
+    marketingEmails: { en: 'Marketing Emails', ru: 'Маркетинговые письма' },
+    newsAboutFeatures: { en: 'News about features and updates', ru: 'Новости о функциях и обновлениях' },
+    appearance: { en: 'Appearance', ru: 'Внешний вид' },
+    theme: { en: 'Theme', ru: 'Тема' },
+    dark: { en: 'Dark', ru: 'Тёмная' },
+    light: { en: 'Light', ru: 'Светлая' },
+    comingSoon: { en: 'Coming soon', ru: 'Скоро' },
+    language: { en: 'Language', ru: 'Язык' },
+    resetToDefaults: { en: 'Reset to Defaults', ru: 'Сбросить по умолчанию' },
+    saveSettings: { en: 'Save Settings', ru: 'Сохранить настройки' },
+    settingsSaved: { en: 'Settings saved successfully!', ru: 'Настройки сохранены!' },
+  },
+
+  // Pricing
+  pricing: {
+    title: { en: 'Simple, Transparent Pricing', ru: 'Простые и прозрачные цены' },
+    subtitle: { en: 'Start free, scale as you grow. No hidden fees, no surprises.', ru: 'Начните бесплатно, масштабируйтесь по мере роста. Без скрытых платежей.' },
+    monthly: { en: 'Monthly', ru: 'Ежемесячно' },
+    yearly: { en: 'Yearly', ru: 'Ежегодно' },
+    save20: { en: 'Save 20%', ru: 'Скидка 20%' },
+    free: { en: 'Free', ru: 'Бесплатно' },
+    freeDesc: { en: 'Perfect for trying out ERA DAL', ru: 'Идеально для знакомства с ERA DAL' },
+    pro: { en: 'Pro', ru: 'Pro' },
+    proDesc: { en: 'For professionals and small teams', ru: 'Для профессионалов и небольших команд' },
+    enterprise: { en: 'Enterprise', ru: 'Enterprise' },
+    enterpriseDesc: { en: 'For large organizations', ru: 'Для крупных организаций' },
+    mostPopular: { en: 'Most Popular', ru: 'Самый популярный' },
+    custom: { en: 'Custom', ru: 'По запросу' },
+    month: { en: 'month', ru: 'месяц' },
+    billedYearly: { en: 'billed yearly', ru: 'при годовой оплате' },
+    apiCallsMonth: { en: 'API calls/month', ru: 'API вызовов/месяц' },
+    modelsPerQuery: { en: 'models per query', ru: 'моделей на запрос' },
+    domainOnly: { en: 'domain only', ru: 'только домен' },
+    allDomains: { en: 'All 4 domains', ru: 'Все 4 домена' },
+    basicStability: { en: 'Basic stability metrics', ru: 'Базовые метрики стабильности' },
+    fullStability: { en: 'Full stability analysis', ru: 'Полный анализ стабильности' },
+    noRebuttal: { en: 'No rebuttal rounds', ru: 'Без раундов опровержения' },
+    rebuttalRounds: { en: 'Rebuttal rounds', ru: 'Раунды опровержения' },
+    noPrioritySupport: { en: 'No priority support', ru: 'Без приоритетной поддержки' },
+    prioritySupport: { en: 'Priority support', ru: 'Приоритетная поддержка' },
+    customModelPools: { en: 'Custom model pools', ru: 'Пользовательские пулы моделей' },
+    customDomains: { en: 'Custom domains', ru: 'Пользовательские домены' },
+    selfHosted: { en: 'Self-hosted option', ru: 'Возможность self-hosted' },
+    slaGuarantee: { en: 'SLA guarantee', ru: 'Гарантия SLA' },
+    dedicatedSupport: { en: 'Dedicated support', ru: 'Выделенная поддержка' },
+    getStartedFree: { en: 'Get Started Free', ru: 'Начать бесплатно' },
+    startProTrial: { en: 'Start Pro Trial', ru: 'Начать Pro пробный период' },
+    contactSales: { en: 'Contact Sales', ru: 'Связаться с продажами' },
+    comparePlans: { en: 'Compare Plans', ru: 'Сравнение планов' },
+    feature: { en: 'Feature', ru: 'Функция' },
+    faq: { en: 'Frequently Asked Questions', ru: 'Часто задаваемые вопросы' },
+    readyToStart: { en: 'Ready to get started?', ru: 'Готовы начать?' },
+    joinThousands: { en: 'Join thousands of professionals making better decisions with ERA DAL.', ru: 'Присоединяйтесь к тысячам профессионалов, принимающих лучшие решения с ERA DAL.' },
+    startFreeTrial: { en: 'Start Free Trial', ru: 'Начать бесплатный период' },
+    talkToSales: { en: 'Talk to Sales', ru: 'Связаться с продажами' },
+  },
+
+  // Docs
+  docs: {
+    title: { en: 'ERA DAL Documentation', ru: 'Документация ERA DAL' },
+    gettingStarted: { en: 'Getting Started', ru: 'Начало работы' },
+    introduction: { en: 'Introduction', ru: 'Введение' },
+    quickStart: { en: 'Quick Start', ru: 'Быстрый старт' },
+    installation: { en: 'Installation', ru: 'Установка' },
+    coreConcepts: { en: 'Core Concepts', ru: 'Ключевые концепции' },
+    apiReference: { en: 'API Reference', ru: 'API справочник' },
+    overview: { en: 'Overview', ru: 'Обзор' },
+    endpoints: { en: 'Endpoints', ru: 'Эндпоинты' },
+    errorHandling: { en: 'Error Handling', ru: 'Обработка ошибок' },
+    examples: { en: 'Examples', ru: 'Примеры' },
+    scienceQuery: { en: 'Science Query', ru: 'Научный запрос' },
+    mathQuery: { en: 'Math Query', ru: 'Математический запрос' },
+    keyFeatures: { en: 'Key Features', ru: 'Ключевые функции' },
+    requirements: { en: 'Requirements', ru: 'Требования' },
+    dockerInstallation: { en: 'Docker Installation', ru: 'Установка через Docker' },
+    manualInstallation: { en: 'Manual Installation', ru: 'Ручная установка' },
+    availableModels: { en: 'Available Models', ru: 'Доступные модели' },
+    domainPools: { en: 'Domain Pools', ru: 'Доменные пулы' },
+    baseUrl: { en: 'Base URL', ru: 'Базовый URL' },
+    checkApiHealth: { en: 'Check API health status', ru: 'Проверка статуса API' },
+    getDashboardStats: { en: 'Get dashboard statistics', ru: 'Получение статистики панели' },
+    getRecentEvents: { en: 'Get recent events', ru: 'Получение недавних событий' },
+    getModelStats: { en: 'Get model performance statistics', ru: 'Получение статистики моделей' },
+    pythonLibraryUsage: { en: 'Python Library Usage', ru: 'Использование Python библиотеки' },
+    reportIssue: { en: 'Report Issue', ru: 'Сообщить об ошибке' },
+  },
+
+  // Footer
+  footer: {
+    description: { en: 'Enterprise-grade decision making through LLM ensemble, arbitration, and consensus.', ru: 'Корпоративное принятие решений через ансамбль LLM, арбитраж и консенсус.' },
+    product: { en: 'Product', ru: 'Продукт' },
+    resources: { en: 'Resources', ru: 'Ресурсы' },
+    contact: { en: 'Contact', ru: 'Контакты' },
+    documentation: { en: 'Documentation', ru: 'Документация' },
+    apiReference: { en: 'API Reference', ru: 'API справочник' },
+    support: { en: 'Support', ru: 'Поддержка' },
+    allRightsReserved: { en: 'All rights reserved.', ru: 'Все права защищены.' },
+    builtBy: { en: 'Built by Eugene Kundrotas.', ru: 'Создано Eugene Kundrotas.' },
+  },
+
+  // Common
+  common: {
+    science: { en: 'Science', ru: 'Наука' },
+    math: { en: 'Mathematics', ru: 'Математика' },
+    med: { en: 'Medical', ru: 'Медицина' },
+    econ: { en: 'Economics', ru: 'Экономика' },
+    consensusTop2: { en: 'Consensus Top-2', ru: 'Консенсус Top-2' },
+    consensusTop3: { en: 'Consensus Top-3', ru: 'Консенсус Top-3' },
+    hardSelect: { en: 'Hard Select', ru: 'Жёсткий выбор' },
+    english: { en: 'English', ru: 'Английский' },
+    russian: { en: 'Russian', ru: 'Русский' },
+    close: { en: 'Close', ru: 'Закрыть' },
+    cancel: { en: 'Cancel', ru: 'Отмена' },
+    confirm: { en: 'Confirm', ru: 'Подтвердить' },
+    save: { en: 'Save', ru: 'Сохранить' },
+    delete: { en: 'Delete', ru: 'Удалить' },
+    edit: { en: 'Edit', ru: 'Редактировать' },
+    view: { en: 'View', ru: 'Просмотр' },
+    back: { en: 'Back', ru: 'Назад' },
+    next: { en: 'Next', ru: 'Далее' },
+    previous: { en: 'Previous', ru: 'Предыдущий' },
   }
 }
 
 // Helper function to get translation
-export function t(lang: Language, path: string): string {
-  const keys = path.split('.')
-  let result: any = translations[lang]
-  
-  for (const key of keys) {
-    if (result && typeof result === 'object' && key in result) {
-      result = result[key]
-    } else {
-      // Fallback to English
-      result = translations.en
-      for (const k of keys) {
-        if (result && typeof result === 'object' && k in result) {
-          result = result[k]
-        } else {
-          return path // Return path if not found
-        }
-      }
-      return result
-    }
+export const t = (key: string, lang: Language): string => {
+  const keys = key.split('.')
+  let value: any = translations
+  for (const k of keys) {
+    value = value?.[k]
+    if (!value) return key
   }
-  
-  return result
+  return value[lang] || value['en'] || key
 }
 
-// Generate i18n script for client-side
-export const i18nClientScript = `
-<script>
-  // i18n Client-side language management
-  const translations = ${JSON.stringify(translations)};
-  
-  function getLang() {
-    return localStorage.getItem('era-dal-lang') || 'en';
+// Get all translations for a section
+export const getSection = (section: keyof typeof translations, lang: Language): Record<string, string> => {
+  const sectionData = translations[section]
+  const result: Record<string, string> = {}
+  for (const [key, value] of Object.entries(sectionData)) {
+    result[key] = (value as any)[lang] || (value as any)['en'] || key
   }
-  
-  function setLang(lang) {
-    localStorage.setItem('era-dal-lang', lang);
-    location.reload();
-  }
-  
-  function t(path) {
-    const lang = getLang();
-    const keys = path.split('.');
-    let result = translations[lang];
-    
-    for (const key of keys) {
-      if (result && typeof result === 'object' && key in result) {
-        result = result[key];
-      } else {
-        result = translations.en;
-        for (const k of keys) {
-          if (result && typeof result === 'object' && k in result) {
-            result = result[k];
-          } else {
-            return path;
-          }
-        }
-        return result;
-      }
-    }
-    return result;
-  }
-  
-  // Update page title
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize language selector if exists
-    const langSelector = document.getElementById('lang-selector');
-    if (langSelector) {
-      langSelector.value = getLang();
-    }
-  });
-</script>
-`
+  return result
+}
