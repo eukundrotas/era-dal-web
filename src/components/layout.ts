@@ -22,6 +22,11 @@ export const head = (title: string, description: string = '', lang: Language = '
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
     .card-hover {
       transition: all 0.3s ease;
     }
@@ -220,6 +225,10 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
         </div>
         
+        <a href="/ai-config?lang=${lang}" class="sidebar-link ${activePage === 'ai-config' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-robot w-5 text-purple-400"></i>
+          <span>${lang === 'ru' ? 'AI Провайдеры' : 'AI Providers'}</span>
+        </a>
         <a href="/settings?lang=${lang}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-cog w-5"></i>
           <span>${sb.settings}</span>
