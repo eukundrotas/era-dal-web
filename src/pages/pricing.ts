@@ -1,13 +1,23 @@
 import { head, navbar, footer } from '../components/layout'
+import { Language, translations } from '../i18n/translations'
 
-export const pricingPage = () => `
+function t(lang: Language, path: string): string {
+  const keys = path.split('.')
+  let result: any = translations[lang]
+  for (const key of keys) {
+    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
+  }
+  return typeof result === 'string' ? result : path
+}
+
+export const pricingPage = (lang: Language = 'en') => `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
-  ${head('Pricing', 'Choose the right ERA DAL plan for your needs. Free tier available.')}
+  ${head(t(lang, 'nav.pricing'), lang === 'ru' ? 'Выберите подходящий тариф ERA DAL.' : 'Choose the right ERA DAL plan for your needs.', lang)}
 </head>
 <body class="bg-gray-950 text-white">
-  ${navbar()}
+  ${navbar(lang)}
   
   <main class="pt-20 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 py-16">
@@ -320,7 +330,7 @@ export const pricingPage = () => `
     </div>
   </main>
 
-  ${footer()}
+  ${footer(lang)}
 
   <script>
     function toggleBilling() {

@@ -1,13 +1,23 @@
 import { head, sidebar } from '../components/layout'
+import { Language, translations } from '../i18n/translations'
 
-export const settingsPage = () => `
+function t(lang: Language, path: string): string {
+  const keys = path.split('.')
+  let result: any = translations[lang]
+  for (const key of keys) {
+    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
+  }
+  return typeof result === 'string' ? result : path
+}
+
+export const settingsPage = (lang: Language = 'en') => `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
-  ${head('Settings', 'Configure your ERA DAL preferences, API settings, and notifications.')}
+  ${head(t(lang, 'nav.settings'), lang === 'ru' ? 'Настройте параметры ERA DAL.' : 'Configure your ERA DAL preferences, API settings, and notifications.', lang)}
 </head>
 <body class="bg-gray-950 text-white">
-  ${sidebar('settings')}
+  ${sidebar(lang, 'settings')}
   
   <main class="ml-64 pt-4 min-h-screen">
     <div class="p-6 max-w-4xl">

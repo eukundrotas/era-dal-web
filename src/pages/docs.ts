@@ -1,13 +1,23 @@
 import { head, navbar, footer } from '../components/layout'
+import { Language, translations } from '../i18n/translations'
 
-export const docsPage = () => `
+function t(lang: Language, path: string): string {
+  const keys = path.split('.')
+  let result: any = translations[lang]
+  for (const key of keys) {
+    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
+  }
+  return typeof result === 'string' ? result : path
+}
+
+export const docsPage = (lang: Language = 'en') => `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
-  ${head('Documentation', 'Learn how to use ERA DAL - API reference, examples, and guides.')}
+  ${head(t(lang, 'nav.docs'), lang === 'ru' ? 'Узнайте, как использовать ERA DAL - API, примеры и гайды.' : 'Learn how to use ERA DAL - API reference, examples, and guides.', lang)}
 </head>
 <body class="bg-gray-950 text-white">
-  ${navbar()}
+  ${navbar(lang)}
   
   <main class="pt-20 min-h-screen">
     <div class="flex">

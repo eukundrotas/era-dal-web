@@ -1,13 +1,23 @@
 import { head, sidebar } from '../components/layout'
+import { Language, translations } from '../i18n/translations'
 
-export const historyPage = () => `
+function t(lang: Language, path: string): string {
+  const keys = path.split('.')
+  let result: any = translations[lang]
+  for (const key of keys) {
+    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
+  }
+  return typeof result === 'string' ? result : path
+}
+
+export const historyPage = (lang: Language = 'en') => `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
-  ${head('History', 'View your query history, results, and analytics.')}
+  ${head(t(lang, 'nav.history'), lang === 'ru' ? 'Просмотр истории запросов и аналитики.' : 'View your query history, results, and analytics.', lang)}
 </head>
 <body class="bg-gray-950 text-white">
-  ${sidebar('history')}
+  ${sidebar(lang, 'history')}
   
   <main class="ml-64 pt-4 min-h-screen">
     <div class="p-6">

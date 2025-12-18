@@ -1,20 +1,30 @@
 import { head, sidebar } from '../components/layout'
+import { Language, translations } from '../i18n/translations'
 
-export const playgroundPage = () => `
+function t(lang: Language, path: string): string {
+  const keys = path.split('.')
+  let result: any = translations[lang]
+  for (const key of keys) {
+    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
+  }
+  return typeof result === 'string' ? result : path
+}
+
+export const playgroundPage = (lang: Language = 'en') => `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
-  ${head('Playground', 'Test ERA DAL with your own queries. Select models, configure settings, and see results.')}
+  ${head(t(lang, 'nav.playground'), lang === 'ru' ? 'Тестируйте ERA DAL со своими запросами.' : 'Test ERA DAL with your own queries.', lang)}
 </head>
 <body class="bg-gray-950 text-white">
-  ${sidebar('playground')}
+  ${sidebar(lang, 'playground')}
   
   <main class="ml-64 pt-4 min-h-screen">
     <div class="p-6">
       <!-- Header -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold">Playground</h1>
-        <p class="text-gray-400">Test ERA DAL with your own queries</p>
+        <h1 class="text-2xl font-bold">${t(lang, 'playground.title')}</h1>
+        <p class="text-gray-400">${t(lang, 'playground.subtitle')}</p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
