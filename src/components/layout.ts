@@ -229,6 +229,10 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           <i class="fas fa-robot w-5 text-purple-400"></i>
           <span>${lang === 'ru' ? 'AI Провайдеры' : 'AI Providers'}</span>
         </a>
+        <a href="/integrations?lang=${lang}" class="sidebar-link ${activePage === 'integrations' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-plug w-5 text-blue-400"></i>
+          <span>${lang === 'ru' ? 'Интеграции' : 'Integrations'}</span>
+        </a>
         <a href="/settings?lang=${lang}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-cog w-5"></i>
           <span>${sb.settings}</span>

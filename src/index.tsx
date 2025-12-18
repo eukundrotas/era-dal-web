@@ -13,10 +13,12 @@ import { settingsPage } from './pages/settings'
 import { pricingPage } from './pages/pricing'
 import { docsPage } from './pages/docs'
 import { aiConfigPage } from './pages/ai-config'
+import { integrationsPage } from './pages/integrations'
 
 // API Routes
 import { apiRoutes } from './api/routes'
 import { openRouterApi } from './api/openrouter'
+import { integrationsApi } from './api/integrations'
 
 type Bindings = {
   DB?: D1Database
@@ -53,12 +55,14 @@ app.get('/history', (c) => c.html(historyPage(getLang(c))))
 app.get('/settings', (c) => c.html(settingsPage(getLang(c))))
 app.get('/profile', (c) => c.html(profilePage(getLang(c))))
 app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
+app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
 
 // ============================================
 // API Routes
 // ============================================
 app.route('/api', apiRoutes)
 app.route('/api/openrouter', openRouterApi)
+app.route('/api/integrations', integrationsApi)
 
 // ============================================
 // 404 Handler

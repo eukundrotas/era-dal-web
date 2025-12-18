@@ -1,16 +1,16 @@
 # ERA DAL Web Frontend
 
-A modern web interface for the ERA Decision & Arbitration Layer system with full OpenRouter AI integration.
+A modern web interface for the ERA Decision & Arbitration Layer system with comprehensive AI integrations.
 
 ## Project Overview
 
 - **Name**: ERA DAL Web
-- **Goal**: Provide a user-friendly web interface for ERA DAL functionality with multi-model AI integration
-- **Stack**: Hono + TypeScript + TailwindCSS + Chart.js + OpenRouter API
+- **Goal**: Universal AI integration platform with multi-model support and external service connections
+- **Stack**: Hono + TypeScript + TailwindCSS + Chart.js + OpenRouter + MCP + Multi-Provider APIs
 
 ## Live URLs
 
-- **Production**: https://3000-i7wko3nccxkuw0hvvjjte-b9b802c4.sandbox.novita.ai
+- **Dev Server**: https://3000-i7wko3nccxkuw0hvvjjte-b9b802c4.sandbox.novita.ai
 - **GitHub Web**: https://github.com/eukundrotas/era-dal-web
 - **GitHub Backend**: https://github.com/eukundrotas/ERA-Decision-Arbitration-Layer
 
@@ -21,8 +21,23 @@ A modern web interface for the ERA Decision & Arbitration Layer system with full
 - **12 Free Models** including DeepSeek R1, Llama 3.2, Qwen 2.5, Gemma 2
 - **23+ Paid Models** from OpenAI, Anthropic, Google, Meta, Mistral
 - **Ensemble Queries** - Query multiple models in parallel
-- **Quality Gate** - Built-in response quality assessment
+- **Quality Gate** - Built-in response quality assessment (ALLOW/WARN/RETRY/BLOCK)
 - **Model Presets** - Pre-configured model sets for different use cases
+
+### 🆕 Multi-Platform Integrations
+- **MCP (Model Context Protocol)** - Anthropic's standard for AI-to-tool integration
+- **Ollama** - Local model execution
+- **OpenAI-Compatible APIs** - Connect to any OpenAI-compatible endpoint
+- **Groq** - Ultra-fast inference
+- **Anthropic Claude** - Direct API access
+- **Google Gemini** - Direct API access
+- **Hugging Face** - Thousands of models
+- **LangChain** - Agent frameworks
+- **LlamaIndex** - Data indexing
+- **LangGraph** - Multi-agent workflows
+- **CrewAI** - Role-playing AI agents
+- **AutoGen** - Multi-agent conversations
+- **Custom Webhooks** - Connect to any service
 
 ### Bilingual Interface (EN/RU)
 - Full English and Russian language support
@@ -43,7 +58,7 @@ A modern web interface for the ERA Decision & Arbitration Layer system with full
 - Model performance comparison
 - Recent activity feed
 
-### AI Providers Configuration (`/ai-config`) ⭐ NEW
+### AI Providers Configuration (`/ai-config`)
 - OpenRouter API key management
 - Model browser with filters (free/paid, provider, type)
 - Pre-configured model presets:
@@ -55,100 +70,95 @@ A modern web interface for the ERA Decision & Arbitration Layer system with full
 - Quick test functionality (single model & ensemble)
 - Credits balance display
 
-### Profile (`/profile`)
-- User information management
-- API keys management
-- Subscription details
-- Usage statistics
+### 🆕 Integrations Hub (`/integrations`)
+- **15+ Integration Providers**
+- Provider browser with filters (Protocol/Framework/Runtime/API)
+- Configuration forms with validation
+- Connection testing
+- MCP Explorer (Tools, Resources, Prompts)
+- Quick test panel for configured integrations
+- Active integrations summary
 
-### Playground (`/playground`)
-- Query input interface
-- Domain selection (science, math, med, econ)
-- Mode selection (consensus_top2, consensus_top3, hard_select)
-- Advanced settings
-
-### History (`/history`)
-- Query history with filtering
-- Search, filter by domain/status
-- Detailed view modal
-
-### Settings (`/settings`)
-- API configuration
-- Default query settings
-- Model preferences
-- Notifications
-
-### Pricing (`/pricing`)
-- Plan comparison (Free, Pro, Enterprise)
-- Feature comparison table
-
-### Documentation (`/docs`)
-- Getting started guide
-- Core concepts
-- API reference
+### Other Pages
+- **Profile** (`/profile`) - User info, API keys, subscription
+- **Playground** (`/playground`) - Query interface with domain/mode selection
+- **History** (`/history`) - Query history with filtering
+- **Settings** (`/settings`) - API config, preferences
+- **Pricing** (`/pricing`) - Plan comparison
+- **Documentation** (`/docs`) - Getting started guide
 
 ## API Endpoints
 
 ### Core API
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/health` | Health check |
 | GET | `/api/dashboard` | Dashboard statistics |
-| GET | `/api/events` | Recent events |
 | GET | `/api/models` | Model statistics |
 | GET | `/api/history` | Query history |
-| GET | `/api/query/:id` | Single query details |
-| GET | `/api/profile` | User profile |
 | POST | `/api/query` | Submit new query |
 | GET | `/api/settings` | User settings |
-| PUT | `/api/settings` | Update settings |
-| GET | `/api/usage` | Usage statistics |
 
 ### OpenRouter API
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/openrouter/models` | Available models (filters: type, provider, modelType) |
-| GET | `/api/openrouter/models/:id` | Single model info |
+| GET | `/api/openrouter/models` | Available models |
 | GET | `/api/openrouter/presets` | Model presets |
-| POST | `/api/openrouter/test-connection` | Test API key |
-| POST | `/api/openrouter/credits` | Get credits balance |
-| POST | `/api/openrouter/chat` | Single model chat completion |
-| POST | `/api/openrouter/ensemble` | Multi-model ensemble query |
-| POST | `/api/openrouter/quality-gate` | Quality assessment (ALLOW/WARN/RETRY/BLOCK) |
+| POST | `/api/openrouter/chat` | Single model chat |
+| POST | `/api/openrouter/ensemble` | Multi-model query |
+| POST | `/api/openrouter/quality-gate` | Quality assessment |
 
-## Available AI Models
+### 🆕 Integrations API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/integrations/providers` | List all providers |
+| GET | `/api/integrations/providers/:id` | Provider details |
+| POST | `/api/integrations/test-connection` | Test provider connection |
+| POST | `/api/integrations/mcp/tools` | List MCP tools |
+| POST | `/api/integrations/mcp/tools/call` | Execute MCP tool |
+| POST | `/api/integrations/mcp/resources` | List MCP resources |
+| POST | `/api/integrations/mcp/prompts` | List MCP prompts |
+| POST | `/api/integrations/ollama/models` | List Ollama models |
+| POST | `/api/integrations/ollama/chat` | Ollama chat |
+| POST | `/api/integrations/openai-compatible/chat` | OpenAI-compatible chat |
+| POST | `/api/integrations/groq/chat` | Groq chat |
+| POST | `/api/integrations/anthropic/chat` | Anthropic chat |
+| POST | `/api/integrations/google/chat` | Google AI chat |
+| POST | `/api/integrations/webhook/send` | Custom webhook |
 
-### Free Models (12)
-| Model | Provider | Context | Type |
-|-------|----------|---------|------|
-| Mistral Devstral 2 | Mistral | 32K | Code |
-| DeepSeek R1 | DeepSeek | 64K | Reasoning |
-| DeepSeek Chat | DeepSeek | 64K | Chat |
-| Gemma 2 9B | Google | 8K | Chat |
-| Llama 3.2 3B | Meta | 131K | Chat |
-| Llama 3.2 1B | Meta | 131K | Chat |
-| Qwen 2.5 7B | Alibaba | 32K | Chat |
-| Qwen 2.5 Coder 7B | Alibaba | 32K | Code |
-| Phi-3 Mini 128K | Microsoft | 128K | Chat |
-| Zephyr 7B | HuggingFace | 4K | Chat |
-| OpenChat 7B | OpenChat | 8K | Chat |
-| Nous Capybara 7B | NousResearch | 4K | Chat |
+## Integration Providers
 
-### Premium Models (Selection)
-| Model | Provider | Context | Price (input/output) |
-|-------|----------|---------|----------------------|
-| GPT-4o | OpenAI | 128K | $2.50/$10 |
-| GPT-4o Mini | OpenAI | 128K | $0.15/$0.60 |
-| O1 Preview | OpenAI | 128K | $15/$60 |
-| Claude 3.5 Sonnet | Anthropic | 200K | $3/$15 |
-| Claude 3 Opus | Anthropic | 200K | $15/$75 |
-| Gemini 2.0 Flash | Google | 1M | $0.075/$0.30 |
-| Gemini 1.5 Pro | Google | 2M | $1.25/$5 |
-| Llama 3.1 405B | Meta | 131K | $2.70/$2.70 |
-| Mistral Large | Mistral | 128K | $2/$6 |
-| DeepSeek R1 (paid) | DeepSeek | 64K | $0.55/$2.19 |
+### Protocols
+| Provider | Description | Status |
+|----------|-------------|--------|
+| **MCP** | Anthropic's Model Context Protocol for AI-to-tool integration | Stable |
+
+### Runtimes
+| Provider | Description | Status |
+|----------|-------------|--------|
+| **Ollama** | Local LLM execution (Llama, Mistral, CodeLlama) | Stable |
+
+### Frameworks
+| Provider | Description | Status |
+|----------|-------------|--------|
+| **LangChain** | Chain prompts, tools, and agents | Stable |
+| **LlamaIndex** | Document indexing and retrieval | Stable |
+| **LangGraph** | Stateful multi-actor workflows | Beta |
+| **CrewAI** | Role-playing AI agents | Beta |
+| **AutoGen** | Multi-agent conversations | Beta |
+
+### APIs
+| Provider | Description | Status |
+|----------|-------------|--------|
+| **OpenAI-Compatible** | Any OpenAI-compatible endpoint | Stable |
+| **Groq** | Ultra-fast inference (LPU) | Stable |
+| **Anthropic** | Claude models direct access | Stable |
+| **Google AI** | Gemini models direct access | Stable |
+| **Together AI** | Open-source models | Stable |
+| **Fireworks AI** | Fast inference, function calling | Stable |
+| **Hugging Face** | Inference API | Stable |
+| **Replicate** | Model marketplace | Stable |
+| **Custom Webhook** | Any HTTP endpoint | Stable |
 
 ## Project Structure
 
@@ -159,7 +169,8 @@ era-dal-web/
 │   ├── pages/
 │   │   ├── landing.ts     # Landing page
 │   │   ├── dashboard.ts   # Dashboard
-│   │   ├── ai-config.ts   # AI Providers Configuration ⭐
+│   │   ├── ai-config.ts   # AI Providers Configuration
+│   │   ├── integrations.ts # Integrations Hub ⭐
 │   │   ├── profile.ts     # Profile/Personal account
 │   │   ├── playground.ts  # Query playground
 │   │   ├── history.ts     # Query history
@@ -170,7 +181,8 @@ era-dal-web/
 │   │   └── layout.ts      # Shared components
 │   ├── api/
 │   │   ├── routes.ts      # Core API endpoints
-│   │   └── openrouter.ts  # OpenRouter API integration ⭐
+│   │   ├── openrouter.ts  # OpenRouter API
+│   │   └── integrations.ts # Multi-platform integrations ⭐
 │   └── i18n/
 │       └── translations.ts # EN/RU translations
 ├── public/                # Static assets
@@ -178,7 +190,6 @@ era-dal-web/
 ├── ecosystem.config.cjs   # PM2 configuration
 ├── wrangler.jsonc         # Cloudflare configuration
 ├── vite.config.ts         # Vite configuration
-├── tsconfig.json          # TypeScript configuration
 └── package.json           # Dependencies
 ```
 
@@ -191,31 +202,17 @@ npm install
 # Build project
 npm run build
 
-# Start development server (sandbox)
+# Start development server
 pm2 start ecosystem.config.cjs
 
 # Or with wrangler directly
 npm run dev:sandbox
 ```
 
-## OpenRouter Integration Usage
+## Usage Examples
 
-### 1. Get API Key
-1. Visit https://openrouter.ai/keys
-2. Create a new API key
-3. Copy the key
-
-### 2. Configure in App
-1. Go to `/ai-config` page
-2. Paste your API key
-3. Click "Test" to verify connection
-4. Select models or use a preset
-5. Save configuration
-
-### 3. API Usage Example
-
+### OpenRouter Chat
 ```javascript
-// Single model chat
 const response = await fetch('/api/openrouter/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -225,48 +222,54 @@ const response = await fetch('/api/openrouter/chat', {
     messages: [{ role: 'user', content: 'Hello!' }]
   })
 });
+```
 
-// Multi-model ensemble
-const ensemble = await fetch('/api/openrouter/ensemble', {
+### MCP Tool Execution
+```javascript
+const tools = await fetch('/api/integrations/mcp/tools', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    apiKey: 'sk-or-v1-...',
-    models: [
-      'openai/gpt-4o-mini',
-      'anthropic/claude-3-haiku',
-      'deepseek/deepseek-chat:free'
-    ],
-    query: 'What is the capital of France?'
+    serverUrl: 'http://localhost:3001',
+    apiKey: 'optional-key'
   })
 });
 
-// Quality Gate assessment
-const quality = await fetch('/api/openrouter/quality-gate', {
+const result = await fetch('/api/integrations/mcp/tools/call', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    apiKey: 'sk-or-v1-...',
-    judgeModel: 'openai/gpt-4o-mini',
-    userQuestion: 'What is 2+2?',
-    assistantAnswer: 'The answer is 4.'
+    serverUrl: 'http://localhost:3001',
+    toolName: 'search_documents',
+    arguments: { query: 'AI integration' }
   })
 });
-// Returns: { decision: "ALLOW", eqi: 95, scores: {...} }
 ```
 
-## Deployment
-
-### Local Development
-```bash
-npm run build
-pm2 start ecosystem.config.cjs
+### Ollama Local Model
+```javascript
+const response = await fetch('/api/integrations/ollama/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    baseUrl: 'http://localhost:11434',
+    model: 'llama3.2',
+    messages: [{ role: 'user', content: 'Hello!' }]
+  })
+});
 ```
 
-### Cloudflare Pages
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name era-dal-web
+### Groq Fast Inference
+```javascript
+const response = await fetch('/api/integrations/groq/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    apiKey: 'gsk_...',
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: 'Hello!' }]
+  })
+});
 ```
 
 ## Tech Stack
@@ -276,22 +279,23 @@ npx wrangler pages deploy dist --project-name era-dal-web
 - **Styling**: TailwindCSS (CDN)
 - **Icons**: Font Awesome
 - **Charts**: Chart.js
-- **HTTP Client**: Axios
-- **AI**: OpenRouter API (400+ models)
+- **AI**: OpenRouter + MCP + Multi-Provider APIs
 
 ## Status
 
 - ✅ Landing Page - Complete
 - ✅ Dashboard - Complete
-- ✅ AI Providers Configuration - Complete ⭐
+- ✅ AI Providers Configuration - Complete
+- ✅ Integrations Hub - Complete ⭐
 - ✅ Profile/Personal Account - Complete
 - ✅ Playground - Complete
 - ✅ History - Complete
 - ✅ Settings - Complete
 - ✅ Pricing - Complete
 - ✅ Documentation - Complete
-- ✅ API Routes - Complete
-- ✅ OpenRouter Integration - Complete ⭐
+- ✅ OpenRouter Integration - Complete
+- ✅ MCP Integration - Complete ⭐
+- ✅ Multi-Provider APIs - Complete ⭐
 - ✅ Bilingual Support (EN/RU) - Complete
 
 ## Next Steps
