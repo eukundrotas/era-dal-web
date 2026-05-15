@@ -15,6 +15,7 @@ import { docsPage } from './pages/docs'
 import { aiConfigPage } from './pages/ai-config'
 import { integrationsPage } from './pages/integrations'
 import { scraperPage } from './pages/scraper'
+import { contactsPage } from './pages/contacts'
 
 // API Routes
 import { apiRoutes } from './api/routes'
@@ -58,6 +59,7 @@ app.get('/profile', (c) => c.html(profilePage(getLang(c))))
 app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
 app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
 app.get('/scraper', (c) => c.html(scraperPage(getLang(c))))
+app.get('/contacts', (c) => c.html(contactsPage(getLang(c))))
 
 // ============================================
 // API Routes

@@ -225,9 +225,13 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
         </div>
         
+        <a href="/contacts?lang=${lang}" class="sidebar-link ${activePage === 'contacts' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-address-book w-5 text-blue-400"></i>
+          <span>${lang === 'ru' ? 'Контакты' : 'Contacts'}</span>
+        </a>
         <a href="/scraper?lang=${lang}" class="sidebar-link ${activePage === 'scraper' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-spider w-5 text-green-400"></i>
-          <span>${lang === 'ru' ? 'Парсер контактов' : 'Contact Scraper'}</span>
+          <span>${lang === 'ru' ? 'Парсер' : 'Scraper'}</span>
         </a>
         <a href="/ai-config?lang=${lang}" class="sidebar-link ${activePage === 'ai-config' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-robot w-5 text-purple-400"></i>
