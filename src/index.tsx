@@ -16,6 +16,7 @@ import { aiConfigPage } from './pages/ai-config'
 import { integrationsPage } from './pages/integrations'
 import { scraperPage } from './pages/scraper'
 import { contactsPage } from './pages/contacts'
+import { pipelinePage } from './pages/pipeline'
 
 // API Routes
 import { apiRoutes } from './api/routes'
@@ -60,6 +61,7 @@ app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
 app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
 app.get('/scraper', (c) => c.html(scraperPage(getLang(c))))
 app.get('/contacts', (c) => c.html(contactsPage(getLang(c))))
+app.get('/pipeline', (c) => c.html(pipelinePage(getLang(c))))
 
 // ============================================
 // API Routes

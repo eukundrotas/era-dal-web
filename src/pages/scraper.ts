@@ -95,6 +95,10 @@ export const scraperPage = (lang: Language = 'en') => {
             class="bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition text-sm">
             <i class="fas fa-file-csv mr-2"></i>${t.downloadCsv}
           </button>
+          <button id="btn-save-contacts" onclick="saveToContacts()" disabled
+            class="bg-blue-700 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition text-sm flex items-center gap-2">
+            <i class="fas fa-address-book"></i>${isRu ? 'В контакты' : 'Save to Contacts'}
+          </button>
         </div>
       </div>
 
@@ -390,11 +394,47 @@ python scraper/scraper.py \\
   }
 
   function finishScraping() {
+    const withContacts = allResults.filter(r => r.phones.length || r.emails.length).length;
     setStatus(allResults.length ? 'done' : 'idle');
     document.getElementById('btn-start').disabled = false;
     document.getElementById('btn-stop').disabled = true;
     document.getElementById('btn-csv').disabled = !allResults.length;
-    log(\`${isRu ? 'Готово. Найдено контактов:' : 'Done. Contacts found:'} \${allResults.filter(r => r.phones.length || r.emails.length).length}/\${allResults.length}\`);
+    document.getElementById('btn-save-contacts').disabled = !withContacts;
+    log(\`${isRu ? 'Готово. С контактами:' : 'Done. With contacts:'} \${withContacts}/\${allResults.length}\`);
+  }
+
+  async function saveToContacts() {
+    const rows = [];
+    allResults.forEach(r => {
+      if (!r.phones.length && !r.emails.length) return;
+      const phones = r.phones.length ? r.phones : [''];
+      phones.forEach(ph => {
+        rows.push({
+          phone: ph ? '+' + ph : '',
+          email: (r.emails[0] || ''),
+          source: r.url,
+          status: 'new',
+          name: '', company: '', tags: '${isRu ? 'парсер' : 'scraper'}', notes: '',
+        });
+      });
+    });
+    if (!rows.length) return;
+    const btn = document.getElementById('btn-save-contacts');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>${isRu ? 'Сохраняем...' : 'Saving...'}';
+    try {
+      const res = await fetch('/api/contacts/import', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ contacts: rows }),
+      });
+      const d = await res.json();
+      log(\`${isRu ? 'Сохранено в контакты:' : 'Saved to contacts:'} \${d.imported}\`, 'tag-phone');
+      btn.innerHTML = '<i class="fas fa-check mr-2"></i>${isRu ? 'Сохранено!' : 'Saved!'}';
+      btn.className = btn.className.replace('bg-blue-700 hover:bg-blue-600', 'bg-green-700');
+    } catch(e) {
+      log('${isRu ? 'Ошибка сохранения' : 'Save error'}: ' + e.message, 'tag-err');
+      btn.disabled = false;
+    }
   }
 
   function downloadCsv() {
@@ -423,6 +463,7 @@ python scraper/scraper.py \\
     setStatus('idle');
     document.getElementById('log-box').innerHTML = '';
     document.getElementById('btn-csv').disabled = true;
+    document.getElementById('btn-save-contacts').disabled = true;
     document.getElementById('progress-bar').style.width = '0%';
   }
 </script>

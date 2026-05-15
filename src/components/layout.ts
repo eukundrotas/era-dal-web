@@ -229,6 +229,10 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           <i class="fas fa-address-book w-5 text-blue-400"></i>
           <span>${lang === 'ru' ? 'Контакты' : 'Contacts'}</span>
         </a>
+        <a href="/pipeline?lang=${lang}" class="sidebar-link ${activePage === 'pipeline' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-columns w-5 text-purple-400"></i>
+          <span>${lang === 'ru' ? 'Пайплайн' : 'Pipeline'}</span>
+        </a>
         <a href="/scraper?lang=${lang}" class="sidebar-link ${activePage === 'scraper' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-spider w-5 text-green-400"></i>
           <span>${lang === 'ru' ? 'Парсер' : 'Scraper'}</span>
