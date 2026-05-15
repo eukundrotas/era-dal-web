@@ -261,6 +261,153 @@ apiRoutes.put('/settings', async (c) => {
   })
 })
 
+// ──────────────────────────────────────────────
+// Scraper API
+// ──────────────────────────────────────────────
+
+interface ScraperResult {
+  url: string
+  phones: string[]
+  emails: string[]
+  contact_page: string | null
+  status: 'ok' | 'error'
+  error: string | null
+}
+
+interface ScraperJob {
+  id: string
+  status: 'running' | 'done' | 'error' | 'stopped'
+  createdAt: string
+  urls: string[]
+  results: ScraperResult[]
+  log: string[]
+  config: {
+    proxy: string | null
+    concurrency: number
+    mobile_only: boolean
+    deep_search: boolean
+  }
+}
+
+const scraperJobs = new Map<string, ScraperJob>()
+
+// Start a new scraper job
+apiRoutes.post('/scraper/start', async (c) => {
+  const body = await c.req.json()
+  const { urls, proxy, concurrency = 5, mobile_only = true, deep_search = true } = body
+
+  if (!urls || !Array.isArray(urls) || urls.length === 0) {
+    return c.json({ error: 'urls array is required' }, 400)
+  }
+
+  const jobId = 'job_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+  const job: ScraperJob = {
+    id: jobId,
+    status: 'running',
+    createdAt: new Date().toISOString(),
+    urls,
+    results: [],
+    log: [`[→] Queued ${urls.length} URLs, concurrency=${concurrency}`],
+    config: { proxy: proxy || null, concurrency, mobile_only, deep_search },
+  }
+  scraperJobs.set(jobId, job)
+
+  // Simulate async processing (in production this would spawn the Python process)
+  simulateScraping(job)
+
+  return c.json({ job_id: jobId, status: 'running', total: urls.length })
+})
+
+// Get job status and results
+apiRoutes.get('/scraper/status/:jobId', (c) => {
+  const jobId = c.req.param('jobId')
+  const job = scraperJobs.get(jobId)
+  if (!job) return c.json({ error: 'Job not found' }, 404)
+
+  return c.json({
+    job_id: job.id,
+    status: job.status,
+    total: job.urls.length,
+    processed: job.results.length,
+    results: job.results,
+    log: job.log,
+  })
+})
+
+// Stop a running job
+apiRoutes.post('/scraper/stop/:jobId', (c) => {
+  const jobId = c.req.param('jobId')
+  const job = scraperJobs.get(jobId)
+  if (job) {
+    job.status = 'stopped'
+    job.log.push('[!] Stopped by user')
+  }
+  return c.json({ ok: true })
+})
+
+// List recent jobs
+apiRoutes.get('/scraper/jobs', (c) => {
+  const jobs = Array.from(scraperJobs.values())
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 20)
+    .map(j => ({
+      id: j.id,
+      status: j.status,
+      createdAt: j.createdAt,
+      total: j.urls.length,
+      processed: j.results.length,
+      withContacts: j.results.filter(r => r.phones.length || r.emails.length).length,
+    }))
+  return c.json({ jobs })
+})
+
+// Demo simulation — in production replace with actual Python subprocess call
+function simulateScraping(job: ScraperJob) {
+  const PHONE_RE = /(?:\+7|8)[\s\-_]?\(?\d{3}\)?[\s\-_]?\d{3}[\s\-_]?\d{2}[\s\-_]?\d{2}/g
+
+  let idx = 0
+  const tick = () => {
+    if (job.status === 'stopped') return
+    if (idx >= job.urls.length) {
+      job.status = 'done'
+      job.log.push(`[✓] Finished. ${job.results.filter(r => r.phones.length).length}/${job.urls.length} sites had phones.`)
+      return
+    }
+
+    const url = job.urls[idx++]
+    job.log.push(`[→] ${url}`)
+
+    // Simulated result (real impl calls Python scraper)
+    const hasMock = Math.random() > 0.5
+    const result: ScraperResult = {
+      url,
+      phones: hasMock ? ['7' + (900_000_0000 + Math.floor(Math.random() * 99_999_999)).toString()] : [],
+      emails: hasMock && Math.random() > 0.6 ? ['info@' + (new URL(url.startsWith('http') ? url : 'https://' + url)).hostname] : [],
+      contact_page: job.config.deep_search && !hasMock && Math.random() > 0.7 ? url + '/contacts' : null,
+      status: Math.random() > 0.1 ? 'ok' : 'error',
+      error: null,
+    }
+    if (result.status === 'error') {
+      result.phones = []
+      result.emails = []
+      result.error = 'Timeout'
+      job.log.push(`  [!] Error: Timeout`)
+    } else {
+      job.log.push(`  [✓] phones=${result.phones.length} emails=${result.emails.length}`)
+    }
+
+    job.results.push(result)
+
+    // Stagger per concurrency setting
+    const delay = Math.max(300, 800 / job.config.concurrency + Math.random() * 500)
+    setTimeout(tick, delay)
+  }
+
+  // Start concurrency workers
+  const workers = Math.min(job.config.concurrency, job.urls.length)
+  for (let i = 0; i < workers; i++) setTimeout(tick, i * 200)
+}
+
 // Usage statistics
 apiRoutes.get('/usage', (c) => {
   const period = c.req.query('period') || '30d'
