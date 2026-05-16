@@ -1,127 +1,59 @@
 import { Hono } from 'hono'
+import {
+  listContacts, getContact, createContact,
+  updateContact, deleteContact, importContacts,
+} from '../db/index'
 
-export const apiRoutes = new Hono()
+type Env = { Bindings: { DB?: unknown; KV?: unknown } }
 
-// ──────────────────────────────────────────────
-// Contacts store
-// ──────────────────────────────────────────────
+export const apiRoutes = new Hono<Env>()
 
-interface Contact {
-  id: string
-  name: string
-  company: string
-  phone: string
-  email: string
-  source: string
-  status: 'new' | 'called' | 'interested' | 'meeting' | 'client' | 'declined' | 'invalid'
-  tags: string
-  notes: string
-  createdAt: string
-  updatedAt: string
-}
+// helper — extract D1 binding if present
+const db = (c: { env: Env['Bindings'] }) => (c.env as { DB?: unknown }).DB as Parameters<typeof listContacts>[0]
 
-const contactsStore = new Map<string, Contact>([
-  ['c1', { id:'c1', name:'Алексей Морозов', company:'СтройМастер', phone:'+79161234567', email:'morozov@stroymaster.ru', source:'https://stroymaster.ru', status:'new', tags:'строительство,Москва', notes:'', createdAt:'2025-05-14T08:00:00Z', updatedAt:'2025-05-14T08:00:00Z' }],
-  ['c2', { id:'c2', name:'Елена Соколова', company:'ДомРемонт', phone:'+79037654321', email:'info@domremont.ru', source:'https://domremont.ru', status:'called', tags:'ремонт,СПб', notes:'Перезвонить во вторник', createdAt:'2025-05-13T10:30:00Z', updatedAt:'2025-05-14T09:00:00Z' }],
-  ['c3', { id:'c3', name:'Дмитрий Волков', company:'ПрофКровля', phone:'+79254445566', email:'d.volkov@profkrovlya.com', source:'https://profkrovlya.com', status:'interested', tags:'кровля,Екатеринбург', notes:'Интересует комплексное решение', createdAt:'2025-05-12T14:15:00Z', updatedAt:'2025-05-14T11:00:00Z' }],
-  ['c4', { id:'c4', name:'Ирина Николаева', company:'', phone:'+79887776655', email:'', source:'https://windows-master.ru', status:'meeting', tags:'окна', notes:'Встреча 17 мая 14:00', createdAt:'2025-05-11T09:00:00Z', updatedAt:'2025-05-13T16:00:00Z' }],
-  ['c5', { id:'c5', name:'Сергей Кузнецов', company:'АлюмТрейд', phone:'+79103332211', email:'s.kuznetsov@alumtrade.ru', source:'https://alumtrade.ru', status:'client', tags:'металл,Казань', notes:'Оплатил счёт 05-05', createdAt:'2025-05-10T11:00:00Z', updatedAt:'2025-05-12T10:00:00Z' }],
-  ['c6', { id:'c6', name:'Татьяна Павлова', company:'МебельПлюс', phone:'+79652223344', email:'tpavlova@mebelplus.ru', source:'https://mebelplus.ru', status:'declined', tags:'мебель', notes:'Уже есть подрядчик', createdAt:'2025-05-09T15:00:00Z', updatedAt:'2025-05-10T09:00:00Z' }],
-  ['c7', { id:'c7', name:'Андрей Громов', company:'ТехноСервис', phone:'+79311115566', email:'a.gromov@technoservice.ru', source:'https://technoservice.ru', status:'new', tags:'сервис,Новосибирск', notes:'', createdAt:'2025-05-14T07:00:00Z', updatedAt:'2025-05-14T07:00:00Z' }],
-  ['c8', { id:'c8', name:'Ольга Федорова', company:'ЭкоДом', phone:'+79457778899', email:'', source:'https://ecodom-spb.ru', status:'called', tags:'эко,СПб', notes:'Занята, просила написать email', createdAt:'2025-05-13T13:00:00Z', updatedAt:'2025-05-14T08:30:00Z' }],
-])
+// ── Contacts CRUD ─────────────────────────────────────────────────────────
 
-function newContactId() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2,5) }
-
-// Contacts CRUD
-apiRoutes.get('/contacts', (c) => {
-  const status = c.req.query('status')
-  const q = (c.req.query('q') || '').toLowerCase()
-  let list = Array.from(contactsStore.values())
-  if (status) list = list.filter(x => x.status === status)
-  if (q) list = list.filter(x =>
-    JSON.stringify([x.name, x.company, x.phone, x.email, x.tags]).toLowerCase().includes(q)
-  )
-  list.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-  return c.json({ contacts: list, total: list.length })
+apiRoutes.get('/contacts', async (c) => {
+  const contacts = await listContacts(db(c), {
+    status: c.req.query('status') || undefined,
+    q: c.req.query('q') || undefined,
+  })
+  return c.json({ contacts, total: contacts.length })
 })
 
 apiRoutes.post('/contacts', async (c) => {
   const body = await c.req.json()
-  const now = new Date().toISOString()
-  const contact: Contact = {
-    id: newContactId(),
-    name: body.name || '',
-    company: body.company || '',
-    phone: body.phone || '',
-    email: body.email || '',
-    source: body.source || '',
-    status: body.status || 'new',
-    tags: body.tags || '',
-    notes: body.notes || '',
-    createdAt: now,
-    updatedAt: now,
-  }
-  contactsStore.set(contact.id, contact)
+  const contact = await createContact(db(c), {
+    name: body.name ?? '', company: body.company ?? '',
+    phone: body.phone ?? '', email: body.email ?? '',
+    source: body.source ?? '', status: body.status ?? 'new',
+    tags: body.tags ?? '', notes: body.notes ?? '',
+  })
   return c.json({ contact }, 201)
 })
 
-apiRoutes.get('/contacts/:id', (c) => {
-  const contact = contactsStore.get(c.req.param('id'))
+apiRoutes.get('/contacts/:id', async (c) => {
+  const contact = await getContact(db(c), c.req.param('id'))
   if (!contact) return c.json({ error: 'Not found' }, 404)
   return c.json({ contact })
 })
 
 apiRoutes.put('/contacts/:id', async (c) => {
-  const id = c.req.param('id')
-  const existing = contactsStore.get(id)
-  if (!existing) return c.json({ error: 'Not found' }, 404)
   const body = await c.req.json()
-  const updated: Contact = {
-    ...existing,
-    name: body.name ?? existing.name,
-    company: body.company ?? existing.company,
-    phone: body.phone ?? existing.phone,
-    email: body.email ?? existing.email,
-    source: body.source ?? existing.source,
-    status: body.status ?? existing.status,
-    tags: body.tags ?? existing.tags,
-    notes: body.notes ?? existing.notes,
-    updatedAt: new Date().toISOString(),
-  }
-  contactsStore.set(id, updated)
-  return c.json({ contact: updated })
+  const contact = await updateContact(db(c), c.req.param('id'), body)
+  if (!contact) return c.json({ error: 'Not found' }, 404)
+  return c.json({ contact })
 })
 
-apiRoutes.delete('/contacts/:id', (c) => {
-  const id = c.req.param('id')
-  if (!contactsStore.has(id)) return c.json({ error: 'Not found' }, 404)
-  contactsStore.delete(id)
+apiRoutes.delete('/contacts/:id', async (c) => {
+  const ok = await deleteContact(db(c), c.req.param('id'))
+  if (!ok) return c.json({ error: 'Not found' }, 404)
   return c.json({ ok: true })
 })
 
 apiRoutes.post('/contacts/import', async (c) => {
   const body = await c.req.json()
-  const rows: Partial<Contact>[] = body.contacts || []
-  const now = new Date().toISOString()
-  const created: Contact[] = []
-  for (const row of rows) {
-    const contact: Contact = {
-      id: newContactId(),
-      name: row.name || '',
-      company: row.company || '',
-      phone: row.phone || '',
-      email: row.email || '',
-      source: row.source || '',
-      status: (row.status as Contact['status']) || 'new',
-      tags: row.tags || '',
-      notes: row.notes || '',
-      createdAt: now,
-      updatedAt: now,
-    }
-    contactsStore.set(contact.id, contact)
-    created.push(contact)
-  }
+  const created = await importContacts(db(c), body.contacts ?? [])
   return c.json({ imported: created.length, contacts: created })
 })
 
