@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    image: era-dal-web
+    container_name: era-dal-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Wrangler / D1 state persists across restarts
+      - wrangler_data:/data/.wrangler
+    environment:
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Optional: reverse proxy for SSL + custom domain
+  nginx:
+    image: nginx:alpine
+    container_name: era-dal-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - nginx_certs:/etc/letsencrypt
+    depends_on:
+      - app
+    profiles:
+      - production   # only starts with: docker compose --profile production up
+
+volumes:
+  wrangler_data:
+  nginx_certs:

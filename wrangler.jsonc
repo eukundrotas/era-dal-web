@@ -3,32 +3,18 @@
   "name": "era-dal-web",
   "compatibility_date": "2025-12-18",
   "pages_build_output_dir": "./dist",
-  "compatibility_flags": [
-    "nodejs_compat"
+  "compatibility_flags": ["nodejs_compat"],
+
+  // ── Cloudflare D1 — persistent SQLite database ───────────────────────────
+  // Step 1: wrangler d1 create era-dal-contacts
+  // Step 2: paste the returned database_id below
+  // Step 3: wrangler d1 execute era-dal-contacts --file=migrations/0001_init.sql --remote
+  // Step 4: npm run build && wrangler pages deploy dist
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "era-dal-contacts",
+      "database_id": "00000000-0000-0000-0000-000000000001"
+    }
   ]
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "MY_KV_NAMESPACE",
-  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
-  // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
-  // "ai": {
-  //   "binding": "AI"
-  // }
 }
