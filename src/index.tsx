@@ -26,7 +26,7 @@ import { openRouterApi } from './api/openrouter'
 import { integrationsApi } from './api/integrations'
 
 type Bindings = {
-  DB?: D1Database
+  DB: D1Database    // Cloudflare D1 — run: wrangler d1 create era-dal
   KV?: KVNamespace
 }
 
