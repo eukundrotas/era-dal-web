@@ -651,6 +651,13 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
     updateKeyStatus();
     loadRecentRuns();
 
+    // Pre-fill task from ?task= URL param (e.g. launched from Scenarios page)
+    const _urlTask = new URLSearchParams(location.search).get('task');
+    if (_urlTask) {
+      const el = document.getElementById('task-input');
+      if (el) el.value = _urlTask;
+    }
+
     document.addEventListener('click', e => {
       if (e.target === document.getElementById('api-key-modal')) {
         document.getElementById('api-key-modal').style.display = 'none';
