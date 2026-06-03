@@ -172,6 +172,21 @@ export async function updatePlanStatus(
   )
 }
 
+export async function confirmStep(
+  db: D1DB,
+  stepId: string,
+  confirmedOutput: string
+): Promise<void> {
+  const ts = now()
+  await dbRun(
+    db,
+    `UPDATE meta_plan_steps SET
+      status = 'done', output_data = ?, completed_at = ?
+     WHERE id = ? AND status = 'pending'`,
+    confirmedOutput, ts, stepId
+  )
+}
+
 // ─── Step queries ──────────────────────────────────────────────────────────
 
 export async function updateStep(

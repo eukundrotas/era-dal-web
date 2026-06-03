@@ -19,10 +19,14 @@ import {
   createPlanFromLLMResponse,
   getPlan,
   listPlans,
+  updatePlanStatus,
+  updateStep,
+  confirmStep,
 } from '../lib/db/meta-plans'
 import { logAction, listLogs, getTodayStats, confirmPendingAction } from '../lib/db/action-logs'
 import { now } from '../lib/db/index'
 import { META_SYSTEM_PROMPT } from '../lib/meta-system-prompt'
+import { applyThinkingMode } from '../types/thinking-modes'
 
 // ─── Constants for validation ──────────────────────────────────────────────
 
@@ -48,6 +52,85 @@ const VALID_AGENT_ROLES: AgentRole[] = [
 const VALID_AUTONOMY = ['SAFE', 'REQUIRES_CONFIRMATION', 'BLOCKED']
 
 const DEFAULT_PLANNING_MODEL = 'openai/gpt-4o-mini'
+const DEFAULT_EXECUTION_MODEL = 'openai/gpt-4o-mini'
+
+// ─── Default role instructions ─────────────────────────────────────────────
+
+const ROLE_INSTRUCTIONS: Partial<Record<AgentRole, string>> = {
+  lead_researcher:      'You are a Lead Researcher. Find, collect, and organise information about leads, companies, and contacts. Output structured, factual data. Cite sources where possible.',
+  market_analyst:       'You are a Market Analyst. Analyse market data, identify trends, segment audiences, and score opportunities. Produce clear, data-driven insights.',
+  copywriter:           'You are a Copywriter. Write compelling, clear, and audience-appropriate content. Adapt tone and format to the brief. Output polished, ready-to-use text.',
+  sales_director:       'You are a Sales Director. Develop outreach strategies, prioritise accounts, and craft persuasive sales messaging aligned with business goals.',
+  marketing_strategist: 'You are a Marketing Strategist. Design campaign strategies, channel plans, and positioning frameworks. Output actionable, measurable plans.',
+  quality_controller:   'You are a Quality Controller. Review outputs for completeness, accuracy, consistency, and compliance. Identify gaps and provide a structured quality report.',
+  crm_agent:            'You are a CRM Agent. Manage contact data, log interactions, and update records. Output precise data operations in a structured format.',
+  business_radar:       'You are a Business Radar agent. Monitor market signals, competitor moves, and industry news. Summarise findings with relevance scores.',
+  support_agent:        'You are a Support Agent. Resolve customer queries with empathy and accuracy. Escalate when needed. Output clear, friendly, helpful responses.',
+  project_manager:      'You are a Project Manager. Decompose tasks, assign owners, set milestones, and track risks. Output structured plans with owners and deadlines.',
+  legal_assistant:      'You are a Legal Assistant. Review documents for compliance and risk. Flag issues clearly. Do not give formal legal advice — summarise concerns for human review.',
+  technical_agent:      'You are a Technical Agent. Analyse technical requirements, write or review code, and diagnose issues. Output precise, working technical artefacts.',
+  hr_assistant:         'You are an HR Assistant. Draft job descriptions, evaluate profiles, and support HR processes. Output professional, fair, and clear HR documents.',
+  financial_analyst:    'You are a Financial Analyst. Build models, analyse data, and produce forecasts. Output structured financial insights with assumptions stated.',
+  innovation_strategist:'You are an Innovation Strategist. Identify breakthrough opportunities, challenge assumptions, and generate novel solutions. Output bold, creative, evidence-based ideas.',
+  custom:               'You are a specialised AI agent. Follow the task instructions precisely and produce high-quality, structured output.',
+}
+
+// ─── Execution helper — call OpenRouter for one step ───────────────────────
+
+async function executeStepWithLLM(params: {
+  apiKey: string
+  model: string
+  role: AgentRole
+  action: string
+  thinkingMode: ThinkingMode
+  agentInstructions?: string
+  contextFromPreviousSteps: string
+}): Promise<{ output: string; costUsd: number; durationMs: number }> {
+  const instructions = params.agentInstructions ?? ROLE_INSTRUCTIONS[params.role] ?? ROLE_INSTRUCTIONS.custom!
+
+  const contextBlock = params.contextFromPreviousSteps
+    ? `\n\n--- Context from previous steps ---\n${params.contextFromPreviousSteps}\n---`
+    : ''
+
+  const baseMessages: Array<{ role: string; content: string }> = [
+    { role: 'system', content: instructions },
+    { role: 'user', content: `${params.action}${contextBlock}` },
+  ]
+
+  const messages = applyThinkingMode(baseMessages, params.thinkingMode)
+
+  const startMs = Date.now()
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${params.apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://era-dal.pages.dev',
+      'X-Title': 'ERA DAL Execution',
+    },
+    body: JSON.stringify({
+      model: params.model,
+      messages,
+      temperature: 0.4,
+      max_tokens: 2048,
+    }),
+  })
+
+  const durationMs = Date.now() - startMs
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as any
+    throw new Error(err?.error?.message ?? `LLM HTTP ${res.status}`)
+  }
+
+  const data = await res.json() as any
+  const output = data?.choices?.[0]?.message?.content ?? ''
+  const totalTokens = data?.usage?.total_tokens ?? 0
+  const costUsd = totalTokens * 0.00000015 // gpt-4o-mini approx
+
+  return { output, costUsd, durationMs }
+}
 
 // ─── LLM response validator ────────────────────────────────────────────────
 
@@ -486,6 +569,285 @@ metaApi.post('/scenarios/:id/run', async (c) => {
     pausedAt,
     totalSteps: scenario.steps.length,
     completedSteps: stepResults.filter(s => s.status === 'success').length,
+  })
+})
+
+// ─── Plan execution ────────────────────────────────────────────────────────
+
+metaApi.post('/plans/:id/execute', async (c) => {
+  const db = c.env.DB
+  const planId = c.req.param('id')
+
+  const plan = await getPlan(db, planId)
+  if (!plan) return c.json({ error: 'Plan not found' }, 404)
+
+  if (plan.status === 'completed') return c.json({ error: 'Plan already completed' }, 409)
+  if (plan.status === 'running')   return c.json({ error: 'Plan already running' }, 409)
+  if (plan.status === 'failed')    return c.json({ error: 'Plan failed — create a new plan' }, 409)
+  if (plan.status === 'cancelled') return c.json({ error: 'Plan cancelled' }, 409)
+
+  let body: { apiKey?: string; model?: string; userId?: string } = {}
+  try { body = await c.req.json() } catch { /* all fields optional */ }
+
+  const apiKey = body.apiKey
+  if (!apiKey) return c.json({ error: 'apiKey is required to execute steps' }, 400)
+
+  const model = body.model ?? DEFAULT_EXECUTION_MODEL
+  const userId = body.userId ?? 'anonymous'
+
+  await updatePlanStatus(db, planId, 'running')
+
+  // Collect outputs from already-done steps for context chaining
+  const doneOutputs: string[] = plan.steps
+    .filter(s => s.status === 'done' && s.outputData)
+    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .map(s => `Step ${s.orderIndex} (${s.agentRole}): ${s.outputData}`)
+
+  const pendingSteps = plan.steps
+    .filter(s => s.status === 'pending')
+    .sort((a, b) => a.orderIndex - b.orderIndex)
+
+  if (pendingSteps.length === 0) {
+    await updatePlanStatus(db, planId, 'completed')
+    return c.json({ planId, status: 'completed', completedSteps: plan.steps.length, pendingSteps: 0 })
+  }
+
+  interface StepResult {
+    stepId: string
+    orderIndex: number
+    agentRole: string
+    action: string
+    autonomyLevel: string
+    status: 'done' | 'skipped' | 'failed' | 'pending_confirmation'
+    logId: string
+    outputData?: string
+    errorMessage?: string
+    costUsd?: number
+    durationMs?: number
+  }
+
+  const results: StepResult[] = []
+  let pausedAt: { stepId: string; logId: string; action: string; orderIndex: number } | null = null
+  let accumulatedCostUsd = 0
+
+  for (const step of pendingSteps) {
+    // ── BLOCKED ──────────────────────────────────────────────────────────
+    if (step.autonomyLevel === 'BLOCKED') {
+      await updateStep(db, step.id, { status: 'skipped', errorMessage: 'BLOCKED — requires manual execution' })
+      const logEntry = await logAction(db, {
+        planId,
+        agentId: step.agentId || 'unassigned',
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'cancelled',
+        errorMessage: 'BLOCKED — requires manual execution',
+        costUsd: 0,
+        durationMs: 0,
+        thinkingMode: step.thinkingMode,
+        completedAt: now(),
+      })
+      results.push({
+        stepId: step.id,
+        orderIndex: step.orderIndex,
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'skipped',
+        logId: logEntry.id,
+      })
+      continue
+    }
+
+    // ── REQUIRES_CONFIRMATION ─────────────────────────────────────────────
+    if (step.autonomyLevel === 'REQUIRES_CONFIRMATION') {
+      const logEntry = await logAction(db, {
+        planId,
+        agentId: step.agentId || 'unassigned',
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'pending_confirmation',
+        inputData: doneOutputs.length ? doneOutputs.join('\n') : undefined,
+        costUsd: 0,
+        durationMs: 0,
+        thinkingMode: step.thinkingMode,
+      })
+      await updatePlanStatus(db, planId, 'paused')
+      pausedAt = { stepId: step.id, logId: logEntry.id, action: step.action, orderIndex: step.orderIndex }
+      results.push({
+        stepId: step.id,
+        orderIndex: step.orderIndex,
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'pending_confirmation',
+        logId: logEntry.id,
+      })
+      break
+    }
+
+    // ── SAFE — call the LLM ───────────────────────────────────────────────
+    await updateStep(db, step.id, { status: 'running' })
+
+    // Try to fetch the stored agent config for richer instructions
+    let agentInstructions: string | undefined
+    if (step.agentId) {
+      const agent = await getAgent(db, step.agentId).catch(() => null)
+      if (agent) agentInstructions = agent.instructions
+    }
+
+    let stepOutput: string
+    let stepCost: number
+    let stepDuration: number
+
+    try {
+      const result = await executeStepWithLLM({
+        apiKey,
+        model,
+        role: step.agentRole,
+        action: step.action,
+        thinkingMode: step.thinkingMode,
+        agentInstructions,
+        contextFromPreviousSteps: doneOutputs.join('\n\n'),
+      })
+      stepOutput = result.output
+      stepCost = result.costUsd
+      stepDuration = result.durationMs
+    } catch (err: any) {
+      const errMsg = err?.message ?? 'LLM call failed'
+      await updateStep(db, step.id, { status: 'failed', errorMessage: errMsg })
+      await updatePlanStatus(db, planId, 'failed', { resultSummary: `Failed at step ${step.orderIndex}: ${errMsg}` })
+
+      const logEntry = await logAction(db, {
+        planId,
+        agentId: step.agentId || 'unassigned',
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'error',
+        errorMessage: errMsg,
+        costUsd: 0,
+        durationMs: 0,
+        thinkingMode: step.thinkingMode,
+        modelId: model,
+        completedAt: now(),
+      })
+
+      results.push({
+        stepId: step.id,
+        orderIndex: step.orderIndex,
+        agentRole: step.agentRole,
+        action: step.action,
+        autonomyLevel: step.autonomyLevel,
+        status: 'failed',
+        logId: logEntry.id,
+        errorMessage: errMsg,
+      })
+
+      return c.json({
+        planId,
+        status: 'failed',
+        failedAt: { stepId: step.id, orderIndex: step.orderIndex, error: errMsg },
+        completedSteps: results.filter(r => r.status === 'done').length,
+        steps: results,
+        accumulatedCostUsd,
+      }, 500)
+    }
+
+    accumulatedCostUsd += stepCost
+    doneOutputs.push(`Step ${step.orderIndex} (${step.agentRole}): ${stepOutput}`)
+
+    await updateStep(db, step.id, {
+      status: 'done',
+      outputData: stepOutput,
+      costUsd: stepCost,
+    })
+
+    const logEntry = await logAction(db, {
+      planId,
+      agentId: step.agentId || 'unassigned',
+      agentRole: step.agentRole,
+      action: step.action,
+      autonomyLevel: step.autonomyLevel,
+      status: 'success',
+      outputData: stepOutput,
+      costUsd: stepCost,
+      durationMs: stepDuration,
+      thinkingMode: step.thinkingMode,
+      modelId: model,
+      completedAt: now(),
+    })
+
+    results.push({
+      stepId: step.id,
+      orderIndex: step.orderIndex,
+      agentRole: step.agentRole,
+      action: step.action,
+      autonomyLevel: step.autonomyLevel,
+      status: 'done',
+      logId: logEntry.id,
+      outputData: stepOutput,
+      costUsd: stepCost,
+      durationMs: stepDuration,
+    })
+  }
+
+  // Determine final plan status
+  const freshPlan = await getPlan(db, planId)
+  const allDone = freshPlan?.steps.every(s => s.status === 'done' || s.status === 'skipped') ?? false
+
+  if (!pausedAt && allDone) {
+    await updatePlanStatus(db, planId, 'completed', {
+      actualCostUsd: accumulatedCostUsd,
+      resultSummary: doneOutputs.at(-1) ?? 'Completed',
+    })
+  }
+
+  const finalStatus = pausedAt ? 'paused' : allDone ? 'completed' : 'partial'
+
+  return c.json({
+    planId,
+    status: finalStatus,
+    steps: results,
+    pausedAt,
+    completedSteps: results.filter(r => r.status === 'done').length,
+    totalSteps: plan.steps.length,
+    accumulatedCostUsd,
+  })
+})
+
+// Approve a REQUIRES_CONFIRMATION step — mark it done and unblock the plan
+metaApi.post('/plans/:id/steps/:stepId/confirm', async (c) => {
+  const db = c.env.DB
+  const planId = c.req.param('id')
+  const stepId = c.req.param('stepId')
+
+  const plan = await getPlan(db, planId)
+  if (!plan) return c.json({ error: 'Plan not found' }, 404)
+  if (plan.status !== 'paused') return c.json({ error: 'Plan is not paused' }, 409)
+
+  const step = plan.steps.find(s => s.id === stepId)
+  if (!step) return c.json({ error: 'Step not found in this plan' }, 404)
+  if (step.autonomyLevel !== 'REQUIRES_CONFIRMATION') {
+    return c.json({ error: 'Step does not require confirmation' }, 409)
+  }
+
+  let body: { userId?: string; note?: string } = {}
+  try { body = await c.req.json() } catch { /* optional */ }
+
+  const confirmedOutput = body.note
+    ? `Approved by ${body.userId ?? 'user'}: ${body.note}`
+    : `Approved by ${body.userId ?? 'user'}`
+
+  await confirmStep(db, stepId, confirmedOutput)
+  await updatePlanStatus(db, planId, 'draft')
+
+  return c.json({
+    success: true,
+    stepId,
+    planId,
+    message: 'Step confirmed. Call POST /api/meta/plans/:id/execute to resume.',
   })
 })
 
