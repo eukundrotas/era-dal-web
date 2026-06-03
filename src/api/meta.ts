@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
-import type { AgentRole } from '../types/orchestration'
+import type { AgentRole, MetaPlanLLMResponse, OrchestrationStrategy } from '../types/orchestration'
+import type { ThinkingMode } from '../types/thinking-modes'
 import {
   getAgent,
   listAgents,
@@ -14,8 +15,92 @@ import {
   incrementRunCount,
   deleteScenario,
 } from '../lib/db/scenarios'
+import {
+  createPlanFromLLMResponse,
+  getPlan,
+  listPlans,
+} from '../lib/db/meta-plans'
 import { logAction, listLogs, getTodayStats, confirmPendingAction } from '../lib/db/action-logs'
 import { now } from '../lib/db/index'
+import { META_SYSTEM_PROMPT } from '../lib/meta-system-prompt'
+
+// ─── Constants for validation ──────────────────────────────────────────────
+
+const VALID_STRATEGIES: OrchestrationStrategy[] = [
+  'SINGLE', 'PARALLEL', 'FALLBACK', 'RELAY',
+  'VERIFIED', 'DEBATE', 'PLANNER', 'EXPERT_PANEL',
+]
+
+const VALID_MODES: ThinkingMode[] = [
+  'standard', 'triz', 'lateral', 'systems', 'design',
+  'first_principles', 'critical', 'divergent', 'convergent',
+  'bayesian', 'six_hats', 'quantum', 'abductive',
+  'metacognitive', 'synectics',
+]
+
+const VALID_AGENT_ROLES: AgentRole[] = [
+  'lead_researcher', 'market_analyst', 'copywriter', 'sales_director',
+  'marketing_strategist', 'quality_controller', 'crm_agent', 'business_radar',
+  'support_agent', 'project_manager', 'legal_assistant', 'technical_agent',
+  'hr_assistant', 'financial_analyst', 'innovation_strategist', 'custom',
+]
+
+const VALID_AUTONOMY = ['SAFE', 'REQUIRES_CONFIRMATION', 'BLOCKED']
+
+const DEFAULT_PLANNING_MODEL = 'openai/gpt-4o-mini'
+
+// ─── LLM response validator ────────────────────────────────────────────────
+
+function validateLLMResponse(raw: unknown): { ok: true; data: MetaPlanLLMResponse } | { ok: false; error: string } {
+  if (typeof raw !== 'object' || raw === null) return { ok: false, error: 'Response is not an object' }
+  const r = raw as Record<string, unknown>
+
+  if (!VALID_STRATEGIES.includes(r.strategy as OrchestrationStrategy))
+    return { ok: false, error: `Invalid strategy: ${r.strategy}` }
+
+  if (!VALID_MODES.includes(r.thinkingMode as ThinkingMode))
+    return { ok: false, error: `Invalid thinkingMode: ${r.thinkingMode}` }
+
+  if (typeof r.estimatedCostUsd !== 'number')
+    return { ok: false, error: 'estimatedCostUsd must be a number' }
+
+  if (typeof r.estimatedSeconds !== 'number')
+    return { ok: false, error: 'estimatedSeconds must be a number' }
+
+  if (typeof r.reasoning !== 'string' || !r.reasoning.trim())
+    return { ok: false, error: 'reasoning must be a non-empty string' }
+
+  if (!Array.isArray(r.steps) || r.steps.length === 0)
+    return { ok: false, error: 'steps must be a non-empty array' }
+
+  for (let i = 0; i < r.steps.length; i++) {
+    const s = r.steps[i] as Record<string, unknown>
+
+    if (s.orderIndex !== i + 1)
+      return { ok: false, error: `steps[${i}].orderIndex must be ${i + 1}, got ${s.orderIndex}` }
+
+    if (!VALID_AGENT_ROLES.includes(s.agentRole as AgentRole))
+      return { ok: false, error: `steps[${i}].agentRole invalid: ${s.agentRole}` }
+
+    if (typeof s.action !== 'string' || !s.action.trim())
+      return { ok: false, error: `steps[${i}].action must be a non-empty string` }
+
+    if (!VALID_AUTONOMY.includes(s.autonomyLevel as string))
+      return { ok: false, error: `steps[${i}].autonomyLevel invalid: ${s.autonomyLevel}` }
+
+    if (s.thinkingModeOverride !== null && s.thinkingModeOverride !== undefined &&
+        !VALID_MODES.includes(s.thinkingModeOverride as ThinkingMode))
+      return { ok: false, error: `steps[${i}].thinkingModeOverride invalid: ${s.thinkingModeOverride}` }
+
+    if (typeof s.estimatedSeconds !== 'number')
+      return { ok: false, error: `steps[${i}].estimatedSeconds must be a number` }
+
+    if (typeof s.estimatedCostUsd !== 'number')
+      return { ok: false, error: `steps[${i}].estimatedCostUsd must be a number` }
+  }
+
+  return { ok: true, data: r as unknown as MetaPlanLLMResponse }
+}
 
 type Env = {
   Bindings: {
@@ -25,6 +110,132 @@ type Env = {
 }
 
 export const metaApi = new Hono<Env>()
+
+// ─── Meta Plans ────────────────────────────────────────────────────────────
+
+metaApi.post('/plan', async (c) => {
+  const db = c.env.DB
+  let body: any
+  try {
+    body = await c.req.json()
+  } catch {
+    return c.json({ error: 'Invalid JSON' }, 400)
+  }
+
+  const {
+    userPrompt,
+    apiKey,
+    model = DEFAULT_PLANNING_MODEL,
+    userId = 'anonymous',
+    budgetUsd = null,
+    freeModelsOnly = false,
+    maxSteps = 10,
+  } = body
+
+  if (!userPrompt || typeof userPrompt !== 'string') {
+    return c.json({ error: 'userPrompt is required' }, 400)
+  }
+  if (!apiKey || typeof apiKey !== 'string') {
+    return c.json({ error: 'apiKey is required' }, 400)
+  }
+
+  const inputContext = {
+    userPrompt,
+    availableAgents: VALID_AGENT_ROLES.filter(r => r !== 'custom'),
+    availableThinkingModes: VALID_MODES,
+    availableStrategies: VALID_STRATEGIES,
+    budgetUsd,
+    projectPolicy: {
+      freeModelsOnly,
+      allowedAgents: null,
+      maxSteps,
+      requireConfirmationFor: ['email_send', 'crm_write', 'publish', 'delete'],
+    },
+    recentSuccessfulPlans: [],
+  }
+
+  let llmRaw: string
+  let modelUsed = model
+  let usage: unknown
+
+  try {
+    const llmRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://era-dal.pages.dev',
+        'X-Title': 'ERA DAL Meta-Orchestrator',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: META_SYSTEM_PROMPT },
+          { role: 'user', content: JSON.stringify(inputContext, null, 2) },
+        ],
+        temperature: 0.1,
+        max_tokens: 4096,
+      }),
+    })
+
+    if (!llmRes.ok) {
+      const errData = await llmRes.json().catch(() => ({})) as any
+      return c.json({
+        error: errData?.error?.message ?? `LLM API error: HTTP ${llmRes.status}`,
+      }, 502)
+    }
+
+    const llmData = await llmRes.json() as any
+    llmRaw = llmData?.choices?.[0]?.message?.content ?? ''
+    usage = llmData?.usage
+  } catch (err: any) {
+    return c.json({ error: `LLM request failed: ${err?.message ?? 'unknown'}` }, 502)
+  }
+
+  // Extract JSON even if the LLM accidentally wraps it in fences
+  const jsonMatch = llmRaw.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    return c.json({ error: 'LLM returned no JSON object', raw: llmRaw }, 502)
+  }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(jsonMatch[0])
+  } catch {
+    return c.json({ error: 'LLM JSON parse failed', raw: llmRaw }, 502)
+  }
+
+  const validation = validateLLMResponse(parsed)
+  if (!validation.ok) {
+    return c.json({ error: `LLM response invalid: ${validation.error}`, raw: llmRaw }, 502)
+  }
+
+  const plan = await createPlanFromLLMResponse(db, userId, userPrompt, validation.data)
+
+  return c.json({
+    plan,
+    reasoning: validation.data.reasoning,
+    modelUsed,
+    usage,
+  }, 201)
+})
+
+metaApi.get('/plans', async (c) => {
+  const db = c.env.DB
+  const userId = c.req.query('userId') ?? 'anonymous'
+  const limit = parseInt(c.req.query('limit') ?? '20')
+  const offset = parseInt(c.req.query('offset') ?? '0')
+
+  const plans = await listPlans(db, userId, limit, offset)
+  return c.json({ plans, total: plans.length })
+})
+
+metaApi.get('/plans/:id', async (c) => {
+  const db = c.env.DB
+  const plan = await getPlan(db, c.req.param('id'))
+  if (!plan) return c.json({ error: 'Plan not found' }, 404)
+  return c.json(plan)
+})
 
 // ─── Agents ────────────────────────────────────────────────────────────────
 
