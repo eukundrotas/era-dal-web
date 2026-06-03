@@ -1,0 +1,42 @@
+{
+  "name": "ERA DAL — Digital AI Layer",
+  "short_name": "ERA DAL",
+  "description": "Meta-Orchestrator AI Platform — цифровой диспетчер задач с мульти-агентным ИИ",
+  "start_url": "/meta",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#4f46e5",
+  "lang": "en",
+  "categories": ["productivity", "business", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Meta-Orchestrator",
+      "url": "/meta",
+      "description": "Запустить задачу через мета-оркестратор"
+    },
+    {
+      "name": "Agents",
+      "url": "/agents",
+      "description": "Управление AI-агентами"
+    },
+    {
+      "name": "Journal",
+      "url": "/journal",
+      "description": "Журнал действий"
+    }
+  ]
+}
