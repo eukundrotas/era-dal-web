@@ -1,6 +1,21 @@
 import { Hono } from 'hono'
+import { dbFirst, dbAll } from '../lib/db/index'
 
-export const apiRoutes = new Hono()
+type Bindings = { DB: D1Database }
+
+export const apiRoutes = new Hono<{ Bindings: Bindings }>()
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
+}
 
 // Mock data for demonstration
 const mockDashboardData = {
@@ -92,9 +107,62 @@ apiRoutes.get('/health', (c) => {
   })
 })
 
-// Dashboard statistics
-apiRoutes.get('/dashboard', (c) => {
-  return c.json(mockDashboardData)
+// Dashboard statistics — real D1 when available, mock fallback otherwise
+apiRoutes.get('/dashboard', async (c) => {
+  const db = c.env?.DB
+  if (!db) return c.json(mockDashboardData)
+
+  try {
+    const today = new Date().toISOString().slice(0, 10)
+
+    const [todayRow, totalPlansRow, totalLogsRow, modelRow, recentRows] = await Promise.all([
+      dbFirst<{ total: number; success: number; cost: number }>(
+        db,
+        `SELECT COUNT(*) as total,
+                SUM(CASE WHEN status='success' THEN 1 ELSE 0 END) as success,
+                SUM(cost_usd) as cost
+         FROM action_logs WHERE date(created_at) = ?`,
+        today
+      ),
+      dbFirst<{ cnt: number }>(db, 'SELECT COUNT(*) as cnt FROM meta_plans'),
+      dbFirst<{ cnt: number }>(db, 'SELECT COUNT(*) as cnt FROM action_logs'),
+      dbFirst<{ model_id: string | null }>(
+        db,
+        `SELECT model_id FROM action_logs
+         WHERE model_id IS NOT NULL AND date(created_at) = ?
+         GROUP BY model_id ORDER BY COUNT(*) DESC LIMIT 1`,
+        today
+      ),
+      dbAll<{ action: string; agent_role: string; status: string; created_at: string }>(
+        db,
+        'SELECT action, agent_role, status, created_at FROM action_logs ORDER BY created_at DESC LIMIT 5'
+      ),
+    ])
+
+    const totalToday = todayRow?.total ?? 0
+    const successToday = todayRow?.success ?? 0
+
+    return c.json({
+      problems: totalLogsRow?.cnt ?? 0,
+      runs: totalPlansRow?.cnt ?? 0,
+      apiCalls: totalToday,
+      models: 0,
+      avgConfidence: 0,
+      avgLatency: 0,
+      successRate: totalToday > 0 ? Math.round((successToday / totalToday) * 100) : 0,
+      topDomain: '',
+      topModel: modelRow?.model_id ?? '—',
+      costToday: todayRow?.cost ?? 0,
+      events: recentRows.map(r => ({
+        type: r.status === 'success' ? 'success' : r.status === 'error' ? 'error' : 'pending',
+        title: r.action.length > 70 ? r.action.slice(0, 67) + '…' : r.action,
+        description: r.agent_role,
+        time: relativeTime(r.created_at),
+      })),
+    })
+  } catch {
+    return c.json(mockDashboardData)
+  }
 })
 
 // Events
@@ -114,28 +182,69 @@ apiRoutes.get('/models', (c) => {
   })
 })
 
-// History
-apiRoutes.get('/history', (c) => {
-  const domain = c.req.query('domain')
-  const status = c.req.query('status')
-  const limit = parseInt(c.req.query('limit') || '20')
+// History — real meta_plans from D1, mock fallback
+apiRoutes.get('/history', async (c) => {
+  const db = c.env?.DB
+  if (!db) return c.json({ items: mockHistory, total: mockHistory.length, limit: 20, offset: 0 })
+
+  const status = c.req.query('status') || ''
+  const strategy = c.req.query('strategy') || ''
+  const search = c.req.query('search') || ''
+  const limit = Math.min(parseInt(c.req.query('limit') || '20'), 100)
   const offset = parseInt(c.req.query('offset') || '0')
 
-  let filtered = [...mockHistory]
-  
-  if (domain) {
-    filtered = filtered.filter(h => h.domain === domain)
-  }
-  if (status) {
-    filtered = filtered.filter(h => h.status === status)
-  }
+  const conds: string[] = []
+  const vals: unknown[] = []
+  if (status)   { conds.push('p.status = ?');        vals.push(status) }
+  if (strategy) { conds.push('p.strategy = ?');      vals.push(strategy) }
+  if (search)   { conds.push('p.user_prompt LIKE ?'); vals.push(`%${search}%`) }
+  const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''
 
-  return c.json({
-    items: filtered.slice(offset, offset + limit),
-    total: filtered.length,
-    limit,
-    offset
-  })
+  try {
+    const [countRow, rows] = await Promise.all([
+      dbFirst<{ cnt: number }>(db, `SELECT COUNT(*) as cnt FROM meta_plans p ${where}`, ...vals),
+      dbAll<{
+        id: string; user_prompt: string; status: string; strategy: string
+        global_thinking_mode: string; estimated_cost_usd: number; actual_cost_usd: number | null
+        created_at: string; completed_at: string | null
+        step_count: number; done_count: number
+      }>(
+        db,
+        `SELECT p.id, p.user_prompt, p.status, p.strategy, p.global_thinking_mode,
+                p.estimated_cost_usd, p.actual_cost_usd, p.created_at, p.completed_at,
+                COUNT(s.id) as step_count,
+                SUM(CASE WHEN s.status='done' THEN 1 ELSE 0 END) as done_count
+         FROM meta_plans p
+         LEFT JOIN meta_plan_steps s ON s.plan_id = p.id
+         ${where}
+         GROUP BY p.id
+         ORDER BY p.created_at DESC
+         LIMIT ? OFFSET ?`,
+        ...vals, limit, offset
+      ),
+    ])
+
+    return c.json({
+      items: rows.map(r => ({
+        id: r.id,
+        prompt: r.user_prompt,
+        status: r.status,
+        strategy: r.strategy,
+        thinkingMode: r.global_thinking_mode,
+        estimatedCostUsd: r.estimated_cost_usd,
+        actualCostUsd: r.actual_cost_usd,
+        stepCount: r.step_count,
+        doneCount: r.done_count ?? 0,
+        createdAt: r.created_at,
+        completedAt: r.completed_at,
+      })),
+      total: countRow?.cnt ?? 0,
+      limit,
+      offset,
+    })
+  } catch {
+    return c.json({ items: mockHistory, total: mockHistory.length, limit, offset })
+  }
 })
 
 // Single query details
