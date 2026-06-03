@@ -213,6 +213,7 @@ apiRoutes.post('/query', async (c) => {
     domain: body.domain || 'science',
     config: {
       mode: body.mode || 'consensus_top2',
+      thinking_mode: body.thinking_mode || 'standard',
       repeats: body.repeats || 3,
       consensusTopK: body.consensus_topk || 2,
       epsilon: body.epsilon || 0.05,
@@ -233,6 +234,7 @@ apiRoutes.get('/settings', (c) => {
     defaults: {
       domain: 'science',
       mode: 'consensus_top2',
+      thinking_mode: 'standard',
       repeats: 3,
       consensusTopK: 2,
       epsilon: 0.05,

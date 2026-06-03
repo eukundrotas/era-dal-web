@@ -113,6 +113,39 @@ export const playgroundPage = (lang: Language = 'en') => {
 
         <div class="space-y-6">
           <div class="glass rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-3">
+              <i class="fas fa-brain text-violet-400 mr-2"></i>
+              ${t.thinkingMode}
+            </h3>
+            <p class="text-gray-500 text-xs mb-3">${t.thinkingModeHint}</p>
+
+            <select id="thinking-mode-select"
+              onchange="updateThinkingModeDesc(this.value)"
+              class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500 transition mb-3">
+              <option value="standard"     data-icon="🧠">🧠 ${isRu ? 'Стандартное' : 'Standard'}</option>
+              <option value="triz"         data-icon="⚙️">⚙️ ${isRu ? 'ТРИЗ' : 'TRIZ'}</option>
+              <option value="lateral"      data-icon="🔀">🔀 ${isRu ? 'Латеральное' : 'Lateral Thinking'}</option>
+              <option value="systems"      data-icon="🌐">🌐 ${isRu ? 'Системное' : 'Systems Thinking'}</option>
+              <option value="design"       data-icon="🎨">🎨 ${isRu ? 'Дизайн-мышление' : 'Design Thinking'}</option>
+              <option value="first_principles" data-icon="🔬">🔬 ${isRu ? 'Первые принципы' : 'First Principles'}</option>
+              <option value="critical"     data-icon="⚖️">⚖️ ${isRu ? 'Критическое' : 'Critical Thinking'}</option>
+              <option value="divergent"    data-icon="💡">💡 ${isRu ? 'Дивергентное' : 'Divergent'}</option>
+              <option value="convergent"   data-icon="🎯">🎯 ${isRu ? 'Конвергентное' : 'Convergent'}</option>
+              <option value="bayesian"     data-icon="📊">📊 ${isRu ? 'Байесовское' : 'Bayesian'}</option>
+              <option value="six_hats"     data-icon="🎩">🎩 ${isRu ? 'Шесть шляп' : 'Six Thinking Hats'}</option>
+              <option value="quantum"      data-icon="⚛️">⚛️ ${isRu ? 'Квантовое' : 'Quantum Thinking'}</option>
+              <option value="abductive"    data-icon="🔍">🔍 ${isRu ? 'Абдуктивное' : 'Abductive'}</option>
+              <option value="metacognitive" data-icon="🪞">🪞 ${isRu ? 'Метакогнитивное' : 'Metacognitive'}</option>
+              <option value="synectics"    data-icon="🔗">🔗 ${isRu ? 'Синектическое' : 'Synectics'}</option>
+            </select>
+
+            <div id="thinking-mode-desc"
+              class="text-xs text-gray-400 bg-gray-800/60 rounded-lg px-3 py-2 border border-gray-700/50 min-h-[36px] leading-relaxed">
+              ${isRu ? 'Обычное рассуждение без специального фреймворка.' : 'Default reasoning, no special framework applied.'}
+            </div>
+          </div>
+
+          <div class="glass rounded-xl p-6">
             <h3 class="text-lg font-semibold mb-4">
               <i class="fas fa-sliders-h text-purple-500 mr-2"></i>
               ${t.advancedSettings}
@@ -245,6 +278,29 @@ export const playgroundPage = (lang: Language = 'en') => {
   <script>
     const lang = '${lang}';
     const isRu = lang === 'ru';
+
+    const THINKING_MODE_DESCS = {
+      standard:        isRu ? 'Обычное рассуждение без специального фреймворка.' : 'Default reasoning, no special framework applied.',
+      triz:            isRu ? 'Противоречия → изобретательские принципы → идеальный результат (ТРИЗ).' : 'Contradictions → inventive principles → ideal result (TRIZ).',
+      lateral:         isRu ? 'Разрыв шаблонов, провокации, неожиданные связи (Эдвард де Боно).' : 'Break patterns, provocations, unexpected connections (Edward de Bono).',
+      systems:         isRu ? 'Обратные связи, точки рычага, эмерджентность, первопричины.' : 'Feedback loops, leverage points, emergent behavior, root causes.',
+      design:          isRu ? 'Эмпатия → Определение → Идеи → Прототип → Тест (Stanford d.school).' : 'Empathize → Define → Ideate → Prototype → Test (Stanford d.school).',
+      first_principles:isRu ? 'Убрать все допущения. Строить решение только на доказанных фактах.' : 'Strip all assumptions. Rebuild from indisputable facts only.',
+      critical:        isRu ? 'Качество доказательств, логические ошибки, калибровка уверенности.' : 'Evidence quality, logical fallacies, calibrated confidence.',
+      divergent:       isRu ? 'Максимум разнообразия идей. Оценка полностью отложена.' : 'Maximum idea variety. Quantity first, judgment fully suspended.',
+      convergent:      isRu ? 'Систематическая оценка всех вариантов → одно лучшее решение.' : 'Systematic evaluation of all options → single best answer.',
+      bayesian:        isRu ? 'Априорные убеждения + данные → обновлённая вероятность. Без бинарных суждений.' : 'Prior beliefs + evidence → updated probability. No binary verdicts.',
+      six_hats:        isRu ? 'Шесть параллельных перспектив: факты, эмоции, риск, ценность, творчество, синтез.' : 'Six parallel perspectives: facts, emotion, risk, value, creativity, synthesis.',
+      quantum:         isRu ? 'Суперпозиция противоречий, эффект наблюдателя, коллапс к ответу.' : 'Superposition of contradictions, observer effect, collapse to answer.',
+      abductive:       isRu ? 'Вывод к лучшему объяснению. Детективное мышление (что объясняет факты лучше всего?).' : 'Inference to the best explanation. Think like a detective.',
+      metacognitive:   isRu ? 'Мышление о мышлении: аудит стратегий, предвзятостей, калибровки.' : 'Think about your thinking. Audit strategies, biases, calibration.',
+      synectics:       isRu ? 'Решение через аналогию: прямая, личная, символическая, фантастическая.' : 'Solve through analogy: direct, personal, symbolic, fantasy.'
+    };
+
+    function updateThinkingModeDesc(mode) {
+      const el = document.getElementById('thinking-mode-desc');
+      if (el) el.textContent = THINKING_MODE_DESCS[mode] || THINKING_MODE_DESCS.standard;
+    }
     
     const examples = {
       science: isRu ? 'Каковы текущие научные доказательства существования тёмной материи во Вселенной? Объясните ключевые наблюдения.' : 'What is the current scientific evidence for dark matter in the universe? Explain the key observations.',
@@ -284,6 +340,7 @@ export const playgroundPage = (lang: Language = 'en') => {
       }
 
       const domain = document.getElementById('domain-select').value;
+      const thinkingMode = document.getElementById('thinking-mode-select').value;
       showProcessing(true);
       
       const steps = isRu 
