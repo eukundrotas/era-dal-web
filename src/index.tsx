@@ -24,6 +24,7 @@ import { journalPage } from './pages/journal'
 import { apiRoutes } from './api/routes'
 import { openRouterApi } from './api/openrouter'
 import { integrationsApi } from './api/integrations'
+import { metaApi } from './api/meta'
 
 type Bindings = {
   DB: D1Database    // Cloudflare D1 — run: wrangler d1 create era-dal
@@ -73,6 +74,7 @@ app.get('/journal', (c) => c.html(journalPage(getLang(c))))
 app.route('/api', apiRoutes)
 app.route('/api/openrouter', openRouterApi)
 app.route('/api/integrations', integrationsApi)
+app.route('/api/meta', metaApi)
 
 // ============================================
 // 404 Handler
