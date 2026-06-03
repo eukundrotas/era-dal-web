@@ -14,6 +14,11 @@ import { pricingPage } from './pages/pricing'
 import { docsPage } from './pages/docs'
 import { aiConfigPage } from './pages/ai-config'
 import { integrationsPage } from './pages/integrations'
+// Meta-Orchestrator Layer
+import { metaOrchestratorPage } from './pages/meta-orchestrator'
+import { agentsPage } from './pages/agents'
+import { scenariosPage } from './pages/scenarios'
+import { journalPage } from './pages/journal'
 
 // API Routes
 import { apiRoutes } from './api/routes'
@@ -56,6 +61,11 @@ app.get('/settings', (c) => c.html(settingsPage(getLang(c))))
 app.get('/profile', (c) => c.html(profilePage(getLang(c))))
 app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
 app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
+// Meta-Orchestrator Layer
+app.get('/meta', (c) => c.html(metaOrchestratorPage(getLang(c))))
+app.get('/agents', (c) => c.html(agentsPage(getLang(c))))
+app.get('/scenarios', (c) => c.html(scenariosPage(getLang(c))))
+app.get('/journal', (c) => c.html(journalPage(getLang(c))))
 
 // ============================================
 // API Routes

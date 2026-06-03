@@ -208,6 +208,32 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
       
       <nav class="space-y-1">
+
+        <!-- Meta-Orchestrator section -->
+        <div class="px-3 pt-1 pb-1">
+          <p class="text-xs text-violet-400/70 uppercase tracking-wider font-semibold">Meta-Orchestrator</p>
+        </div>
+        <a href="/meta?lang=${lang}" class="sidebar-link ${activePage === 'meta' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-sitemap w-5 text-violet-400"></i>
+          <span>${lang === 'ru' ? 'Оркестратор' : 'Orchestrator'}</span>
+        </a>
+        <a href="/agents?lang=${lang}" class="sidebar-link ${activePage === 'agents' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-users w-5 text-blue-400"></i>
+          <span>${lang === 'ru' ? 'Агенты' : 'Agents'}</span>
+        </a>
+        <a href="/scenarios?lang=${lang}" class="sidebar-link ${activePage === 'scenarios' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-layer-group w-5 text-green-400"></i>
+          <span>${lang === 'ru' ? 'Сценарии' : 'Scenarios'}</span>
+        </a>
+        <a href="/journal?lang=${lang}" class="sidebar-link ${activePage === 'journal' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
+          <i class="fas fa-scroll w-5 text-gray-400"></i>
+          <span>${lang === 'ru' ? 'Журнал' : 'Journal'}</span>
+        </a>
+
+        <!-- Core section -->
+        <div class="pt-3 mt-3 border-t border-gray-800">
+          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">ERA DAL</p>
+        </div>
         <a href="/dashboard?lang=${lang}" class="sidebar-link ${activePage === 'dashboard' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-chart-pie w-5"></i>
           <span>${sb.dashboard}</span>
@@ -220,11 +246,11 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           <i class="fas fa-history w-5"></i>
           <span>${sb.history}</span>
         </a>
-        
-        <div class="pt-4 mt-4 border-t border-gray-800">
+
+        <!-- Settings section -->
+        <div class="pt-3 mt-3 border-t border-gray-800">
           <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
         </div>
-        
         <a href="/ai-config?lang=${lang}" class="sidebar-link ${activePage === 'ai-config' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
           <i class="fas fa-robot w-5 text-purple-400"></i>
           <span>${lang === 'ru' ? 'AI Провайдеры' : 'AI Providers'}</span>
