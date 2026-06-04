@@ -34,10 +34,12 @@ cp    package-lock.json "$OUT/package-lock.json" 2>/dev/null || true
 cp    wrangler.jsonc "$OUT/wrangler.jsonc"
 cp    vite.config.ts "$OUT/vite.config.ts"
 cp    tsconfig.json "$OUT/tsconfig.json"
-cp    start.sh      "$OUT/start.sh"
-cp    start.bat     "$OUT/start.bat"
-cp    setup.sh      "$OUT/setup.sh"
-cp    README.md     "$OUT/README.md" 2>/dev/null || true
+cp    start.sh           "$OUT/start.sh"
+cp    start.bat          "$OUT/start.bat"
+cp    setup.sh           "$OUT/setup.sh"
+cp    era-dal-launcher.vbs  "$OUT/era-dal-launcher.vbs"
+cp    install-windows.ps1   "$OUT/install-windows.ps1"
+cp    README.md          "$OUT/README.md" 2>/dev/null || true
 
 # Make scripts executable inside zip
 chmod +x "$OUT/start.sh" "$OUT/setup.sh"
