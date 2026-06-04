@@ -209,11 +209,19 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           </div>
           <span class="sb-label font-bold text-white text-sm tracking-wide whitespace-nowrap">ERA <span class="text-violet-400">DAL</span></span>
         </a>
-        <!-- Collapse sidebar button -->
-        <button onclick="sbCollapse()" title="${isRu ? 'Свернуть/развернуть' : 'Collapse/expand'}"
-            class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
-          <i id="sb-collapse-icon" class="fas fa-angles-left" style="font-size:11px"></i>
-        </button>
+        <div class="flex items-center gap-1">
+          <!-- Notification bell -->
+          <button id="notif-btn" onclick="toggleNotifs()" title="${isRu ? 'Уведомления' : 'Notifications'}"
+              class="relative flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
+            <i class="fas fa-bell" style="font-size:11px"></i>
+            <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-red-500 rounded-full text-white px-0.5 flex items-center justify-center leading-none" style="font-size:8px">0</span>
+          </button>
+          <!-- Collapse sidebar button -->
+          <button onclick="sbCollapse()" title="${isRu ? 'Свернуть/развернуть' : 'Collapse/expand'}"
+              class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
+            <i id="sb-collapse-icon" class="fas fa-angles-left" style="font-size:11px"></i>
+          </button>
+        </div>
       </div>
 
       <!-- User row -->
@@ -303,6 +311,27 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     </div>
   </aside>
 
+  <!-- ── Notifications Panel ── -->
+  <div id="notif-panel" class="hidden fixed left-56 top-0 bottom-0 w-72 bg-gray-900 border-r border-gray-700 z-30 flex flex-col shadow-2xl transition-all" style="transition:left 0.2s">
+    <div class="flex-shrink-0 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+      <span class="text-sm font-semibold text-white">${isRu ? 'Уведомления' : 'Notifications'}</span>
+      <div class="flex items-center gap-3">
+        <button onclick="clearAllNotifs()" class="text-xs text-gray-500 hover:text-gray-300">${isRu ? 'Прочитать всё' : 'Mark all read'}</button>
+        <button onclick="toggleNotifs()" class="text-gray-400 hover:text-white w-5 h-5 flex items-center justify-center">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+    </div>
+    <div id="notif-list" class="flex-1 overflow-y-auto divide-y divide-gray-800/60">
+      <div class="py-8 text-center text-gray-500 text-sm" id="notif-empty">
+        <i class="fas fa-bell-slash text-2xl mb-2 block text-gray-700"></i>
+        ${isRu ? 'Нет уведомлений' : 'No notifications'}
+      </div>
+    </div>
+  </div>
+  <!-- Click outside to close notif panel -->
+  <div id="notif-overlay" class="hidden fixed inset-0 z-20" onclick="toggleNotifs()"></div>
+
   <script>
   (function() {
     var SB_W  = '14rem';   // expanded  (w-56)
@@ -373,6 +402,107 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         sbCollapse();
       }
     });
+
+    /* ── Notifications ──────────────────────────────────────────────── */
+    var notifUnread = 0;
+    var notifData   = [];
+
+    var NOTIF_ICONS = {
+      success: { icon:'fa-check-circle', color:'text-green-400', bg:'bg-green-900/20' },
+      error:   { icon:'fa-times-circle', color:'text-red-400',   bg:'bg-red-900/20'   },
+      pending: { icon:'fa-clock',        color:'text-yellow-400',bg:'bg-yellow-900/20'},
+      info:    { icon:'fa-info-circle',  color:'text-blue-400',  bg:'bg-blue-900/20'  },
+    };
+
+    function toggleNotifs() {
+      var panel   = document.getElementById('notif-panel');
+      var overlay = document.getElementById('notif-overlay');
+      var isOpen  = !panel.classList.contains('hidden');
+      if (isOpen) {
+        panel.classList.add('hidden');
+        overlay.classList.add('hidden');
+      } else {
+        // Adjust panel position for collapsed sidebar
+        var sb = document.getElementById('app-sidebar');
+        panel.style.left = sb && sb.dataset.sbCollapsed === '1' ? '3rem' : '14rem';
+        panel.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        notifUnread = 0;
+        var badge = document.getElementById('notif-badge');
+        if (badge) badge.classList.add('hidden');
+        localStorage.setItem('era-notif-read', Date.now().toString());
+      }
+    }
+    window.toggleNotifs = toggleNotifs;
+
+    function renderNotifs() {
+      var list  = document.getElementById('notif-list');
+      var empty = document.getElementById('notif-empty');
+      if (!list) return;
+      if (!notifData.length) {
+        if (empty) empty.style.display = '';
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+      list.innerHTML = notifData.map(function(ev) {
+        var s = NOTIF_ICONS[ev.type] || NOTIF_ICONS.info;
+        return '<div class="flex items-start gap-3 px-4 py-3 hover:bg-gray-800/40 transition '+s.bg+'">'
+          + '<i class="fas '+s.icon+' '+s.color+' mt-0.5 flex-shrink-0" style="font-size:13px"></i>'
+          + '<div class="flex-1 min-w-0">'
+          + '<p class="text-xs font-medium text-white leading-tight">'+(ev.title||ev.type)+'</p>'
+          + '<p class="text-xs text-gray-400 mt-0.5 line-clamp-2">'+(ev.description||'')+'</p>'
+          + '<p class="text-xs text-gray-600 mt-1">'+(ev.time||'')+'</p>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    function clearAllNotifs() {
+      notifUnread = 0;
+      var badge = document.getElementById('notif-badge');
+      if (badge) badge.classList.add('hidden');
+      localStorage.setItem('era-notif-read', Date.now().toString());
+    }
+    window.clearAllNotifs = clearAllNotifs;
+
+    function loadNotifs() {
+      fetch('/api/events?limit=15')
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          notifData = data.events || [];
+          var lastRead = parseInt(localStorage.getItem('era-notif-read') || '0');
+          var newCount = notifData.filter(function(ev) {
+            var t = ev.timestamp ? new Date(ev.timestamp).getTime() : 0;
+            return t > lastRead;
+          }).length;
+          notifUnread = newCount || (notifData.length > 0 ? 0 : 0);
+          var badge = document.getElementById('notif-badge');
+          if (badge) {
+            if (notifUnread > 0) {
+              badge.textContent = notifUnread > 9 ? '9+' : notifUnread;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+          renderNotifs();
+        })
+        .catch(function() {
+          // Show mock events when no DB
+          notifData = [
+            { type:'success', title:'${isRu ? 'Задача завершена' : 'Task completed'}',    description:'${isRu ? 'Анализ конкурентов выполнен' : 'Competitor analysis done'}', time:'2m ago' },
+            { type:'success', title:'${isRu ? 'Консенсус достигнут' : 'Consensus reached'}', description:'5/7 ${isRu ? 'моделей согласны' : 'models agreed'}', time:'5m ago' },
+            { type:'pending', title:'${isRu ? 'Обработка' : 'Processing'}',              description:'${isRu ? 'Прогноз продаж...' : 'Sales forecast running...'}', time:'8m ago' },
+            { type:'error',   title:'${isRu ? 'Ошибка агента' : 'Agent timeout'}',        description:'Llama-3.1 ${isRu ? 'превысил лимит' : 'exceeded timeout'}', time:'22m ago' },
+          ];
+          renderNotifs();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadNotifs();
+      setInterval(loadNotifs, 60000); // refresh every 60s
+    });
+
   })();
   </script>
 `

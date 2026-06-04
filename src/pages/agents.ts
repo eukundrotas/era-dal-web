@@ -192,9 +192,13 @@ export const agentsPage = (lang: Language = 'en') => {
                   class="text-xs text-violet-400 hover:text-violet-300">
                   <i class="fas fa-plus mr-1"></i>${isRu ? 'Кастомизировать' : 'Customize'}
                 </button>
+                <button onclick="openTestModal('${a.role}', '${(isRu ? a.nameRu : a.nameEn).replace(/'/g,"\\'")}', '')"
+                  class="text-xs text-blue-400 hover:text-blue-300">
+                  <i class="fas fa-vial mr-1"></i>${isRu ? 'Тест' : 'Test'}
+                </button>
                 <button onclick="runBuiltinAgent('${a.role}')"
                   class="text-xs text-green-400 hover:text-green-300">
-                  <i class="fas fa-play mr-1"></i>${isRu ? 'Использовать' : 'Use'}
+                  <i class="fas fa-play mr-1"></i>${isRu ? 'Запустить' : 'Use'}
                 </button>
               </div>
             </div>
@@ -294,6 +298,40 @@ export const agentsPage = (lang: Language = 'en') => {
               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
           </div>
         </div>
+
+        <!-- Tools -->
+        <div>
+          <label class="block text-xs text-gray-400 mb-2">${isRu ? 'Инструменты' : 'Tools'}</label>
+          <div class="grid grid-cols-2 gap-1.5" id="tools-grid">
+            ${[
+              ['web_search',  isRu?'Веб-поиск':'Web Search',     'fa-globe'],
+              ['rag_docs',    isRu?'RAG документы':'RAG Docs',   'fa-database'],
+              ['code_gen',    isRu?'Генерация кода':'Code Gen',  'fa-code'],
+              ['sheets',      'Google Sheets',                    'fa-table'],
+              ['crm_read',    isRu?'CRM чтение':'CRM Read',      'fa-address-book'],
+              ['crm_write',   isRu?'CRM запись':'CRM Write',     'fa-pen'],
+              ['critic_llm',  isRu?'Критик LLM':'Critic LLM',   'fa-check-double'],
+              ['telegram',    'Telegram',                         'fa-paper-plane'],
+              ['calculator',  isRu?'Калькулятор':'Calculator',   'fa-calculator'],
+              ['summarizer',  isRu?'Суммаризатор':'Summarizer',  'fa-compress-alt'],
+              ['email',       'Email',                            'fa-envelope'],
+              ['mcp_tools',   'MCP Tools',                       'fa-plug'],
+            ].map(([val, lbl, icon]) =>
+              `<label class="flex items-center gap-2 px-2 py-1.5 rounded bg-gray-800 hover:bg-gray-750 cursor-pointer text-xs text-gray-300">
+                <input type="checkbox" name="tool" value="${val}" class="accent-violet-500 w-3 h-3">
+                <i class="fas ${icon} text-gray-500 w-3 text-center" style="font-size:11px"></i>${lbl}
+              </label>`
+            ).join('')}
+          </div>
+        </div>
+
+        <!-- Knowledge Bases -->
+        <div>
+          <label class="block text-xs text-gray-400 mb-2">${isRu ? 'Базы знаний (RAG)' : 'Knowledge Bases (RAG)'}</label>
+          <div id="kb-checkboxes" class="space-y-1 max-h-28 overflow-y-auto">
+            <p class="text-xs text-gray-600 italic">${isRu ? 'Загрузка баз знаний...' : 'Loading knowledge bases...'}</p>
+          </div>
+        </div>
       </div>
 
       <div id="modal-error" style="display:none;"
@@ -308,6 +346,44 @@ export const agentsPage = (lang: Language = 'en') => {
           class="flex-1 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-medium">
           ${isRu ? 'Создать' : 'Create'}
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Agent Modal -->
+  <div id="test-modal" style="display:none;"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-6 w-full max-w-xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4 flex-shrink-0">
+        <div>
+          <h3 class="text-lg font-semibold">${isRu ? 'Тест агента' : 'Test Agent'}</h3>
+          <p id="test-agent-name" class="text-sm text-gray-400 mt-0.5"></p>
+        </div>
+        <button onclick="closeTestModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="flex-shrink-0 mb-3">
+        <textarea id="test-prompt" rows="3"
+            placeholder="${isRu ? 'Введите тестовый запрос для агента...' : 'Enter a test prompt for this agent...'}"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500 resize-none"></textarea>
+        <div class="flex gap-2 mt-2">
+          <button onclick="runTest()"
+              class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+            <i id="test-icon" class="fas fa-play"></i>
+            <span id="test-btn-label">${isRu ? 'Запустить тест' : 'Run Test'}</span>
+          </button>
+          <button onclick="runFullMeta()"
+              class="border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg text-sm transition" title="${isRu ? 'Запустить через Meta-Orchestrator' : 'Run via Meta-Orchestrator'}">
+            <i class="fas fa-sitemap mr-1"></i>Meta
+          </button>
+        </div>
+      </div>
+      <div id="test-result-area" class="flex-1 overflow-y-auto min-h-0">
+        <div id="test-placeholder" class="py-8 text-center text-gray-600 text-sm">
+          <i class="fas fa-robot text-3xl mb-3 block text-gray-700"></i>
+          ${isRu ? 'Результат появится здесь' : 'Result will appear here'}
+        </div>
+        <div id="test-result" class="hidden bg-gray-800 rounded-xl p-4 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap font-mono"></div>
+        <div id="test-meta" class="hidden mt-2 flex items-center gap-3 text-xs text-gray-500"></div>
       </div>
     </div>
   </div>
@@ -382,6 +458,16 @@ export const agentsPage = (lang: Language = 'en') => {
           <div class="flex items-center justify-between text-xs text-gray-600 mt-2">
             <span>\${a.thinkingMode}</span>
             <span>\${a.outputFormat}</span>
+          </div>
+          <div class="flex gap-1.5 mt-3 pt-3 border-t border-gray-800">
+            <button onclick="event.stopPropagation();openTestModal('\${a.role}','\${a.nameEn}','\${(a.instructions||'').replace(/'/g,\\"'\\").substring(0,200)}')"
+                class="flex-1 text-xs bg-blue-900/60 hover:bg-blue-800 text-blue-300 py-1.5 rounded-lg transition">
+              <i class="fas fa-vial mr-1"></i>${isRu ? 'Тест' : 'Test'}
+            </button>
+            <button onclick="event.stopPropagation();openAgentDetail('\${a.id}')"
+                class="flex-1 text-xs bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white py-1.5 rounded-lg transition">
+              <i class="fas fa-cog mr-1"></i>${isRu ? 'Детали' : 'Details'}
+            </button>
           </div>
         </div>
       \`).join('');
@@ -503,12 +589,115 @@ export const agentsPage = (lang: Language = 'en') => {
       window.location.href = '/meta?lang=${lang}';
     }
 
+    // ─── Load KBs into modal ────────────────────────────────────────────────
+
+    async function loadKBsForModal() {
+      const el = document.getElementById('kb-checkboxes');
+      if (!el) return;
+      try {
+        const res  = await fetch('/api/business/knowledge-bases');
+        const data = await res.json();
+        const kbs  = data.knowledge_bases || [];
+        if (!kbs.length) {
+          el.innerHTML = '<p class="text-xs text-gray-600 italic">${isRu ? 'Нет баз знаний. Создайте в разделе Базы знаний.' : 'No knowledge bases. Create them in Knowledge Bases section.'}</p>';
+          return;
+        }
+        el.innerHTML = kbs.map(k => \`
+          <label class="flex items-center gap-2 px-2 py-1.5 rounded bg-gray-800 hover:bg-gray-750 cursor-pointer text-xs text-gray-300">
+            <input type="checkbox" name="kb" value="\${k.id}" class="accent-violet-500 w-3 h-3">
+            <i class="fas fa-database text-blue-400 w-3 text-center" style="font-size:11px"></i>
+            \${k.name}
+            <span class="ml-auto text-gray-600">\${k.document_count||0} docs</span>
+          </label>
+        \`).join('');
+      } catch {
+        el.innerHTML = '<p class="text-xs text-gray-600 italic">${isRu ? 'Не удалось загрузить базы знаний' : 'Could not load knowledge bases'}</p>';
+      }
+    }
+
+    // ─── Test Agent ─────────────────────────────────────────────────────────
+
+    let testAgentRole = '';
+    let testAgentInstructions = '';
+
+    function openTestModal(role, name, instructions) {
+      testAgentRole = role;
+      testAgentInstructions = instructions;
+      document.getElementById('test-agent-name').textContent = name + ' (' + role + ')';
+      document.getElementById('test-prompt').value = '';
+      document.getElementById('test-result').classList.add('hidden');
+      document.getElementById('test-meta').classList.add('hidden');
+      document.getElementById('test-placeholder').style.display = '';
+      document.getElementById('test-modal').style.display = 'flex';
+    }
+    window.openTestModal = openTestModal;
+
+    function closeTestModal() { document.getElementById('test-modal').style.display = 'none'; }
+    window.closeTestModal = closeTestModal;
+
+    function runFullMeta() {
+      const prompt = document.getElementById('test-prompt').value.trim();
+      if (!prompt) return;
+      window.location.href = '/meta?lang=${lang}&task=' + encodeURIComponent(prompt);
+    }
+    window.runFullMeta = runFullMeta;
+
+    async function runTest() {
+      const prompt = document.getElementById('test-prompt').value.trim();
+      if (!prompt) return;
+
+      const icon  = document.getElementById('test-icon');
+      const label = document.getElementById('test-btn-label');
+      icon.className  = 'fas fa-spinner fa-spin';
+      label.textContent = isRu ? 'Обработка...' : 'Running...';
+
+      document.getElementById('test-placeholder').style.display = 'none';
+      document.getElementById('test-result').classList.add('hidden');
+      document.getElementById('test-meta').classList.add('hidden');
+
+      const t0 = Date.now();
+      try {
+        const res  = await fetch('/api/query', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ query: prompt, agentRole: testAgentRole, singleAgent: true }),
+        });
+        const data = await res.json();
+        const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+        const resultEl = document.getElementById('test-result');
+        resultEl.textContent = data.result || data.answer || data.content
+          || (data.responses && data.responses[0]?.content)
+          || JSON.stringify(data, null, 2);
+        resultEl.classList.remove('hidden');
+
+        const metaEl = document.getElementById('test-meta');
+        metaEl.innerHTML = '<i class="fas fa-clock mr-1"></i>' + elapsed + 's'
+          + (data.model ? ' · <i class="fas fa-robot mr-1 ml-2"></i>' + data.model : '')
+          + (data.cost  ? ' · <i class="fas fa-dollar-sign mr-1 ml-2"></i>$' + (data.cost||0).toFixed(4) : '');
+        metaEl.classList.remove('hidden');
+      } catch(e) {
+        const resultEl = document.getElementById('test-result');
+        resultEl.textContent = '${isRu ? 'Ошибка:' : 'Error:'} ' + (e.message || 'network error')
+          + '\\n\\n${isRu ? 'Убедитесь что настроен OpenRouter API ключ в AI Настройки.' : 'Make sure OpenRouter API key is configured in AI Config.'}';
+        resultEl.classList.remove('hidden');
+      } finally {
+        icon.className  = 'fas fa-play';
+        label.textContent = isRu ? 'Запустить тест' : 'Run Test';
+      }
+    }
+    window.runTest = runTest;
+
     // ─── Init ───────────────────────────────────────────────────────────────
 
     loadCustomAgents();
+    loadKBsForModal();
 
     document.getElementById('create-modal').addEventListener('click', e => {
       if (e.target === document.getElementById('create-modal')) closeModal();
+    });
+    document.getElementById('test-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('test-modal')) closeTestModal();
     });
   </script>
 </body>
