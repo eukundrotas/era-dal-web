@@ -48,6 +48,18 @@ export type AgentRole =
   | 'hr_assistant'
   | 'financial_analyst'
   | 'innovation_strategist'
+  // ─── Scientific & experimental roles ───
+  | 'research_scientist'
+  | 'data_scientist'
+  | 'experiment_designer'
+  | 'peer_reviewer'
+  | 'literature_researcher'
+  // ─── AI & LLM engineering roles ───
+  | 'ml_engineer'
+  | 'prompt_engineer'
+  | 'llm_engineer'
+  | 'ai_architect'
+  | 'mlops_engineer'
   | 'custom'
 
 export interface AgentTool {

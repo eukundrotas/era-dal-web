@@ -680,6 +680,16 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
         marketing_strategist: 'text-pink-400 fa-bullseye',
         business_radar: 'text-teal-400 fa-satellite-dish',
         project_manager: 'text-indigo-400 fa-tasks',
+        research_scientist: 'text-rose-400 fa-flask',
+        data_scientist: 'text-fuchsia-400 fa-chart-area',
+        experiment_designer: 'text-pink-400 fa-vials',
+        peer_reviewer: 'text-red-400 fa-microscope',
+        literature_researcher: 'text-orange-400 fa-book-open',
+        ml_engineer: 'text-indigo-400 fa-brain',
+        prompt_engineer: 'text-violet-400 fa-terminal',
+        llm_engineer: 'text-purple-400 fa-robot',
+        ai_architect: 'text-blue-400 fa-sitemap',
+        mlops_engineer: 'text-cyan-400 fa-server',
         default: 'text-gray-400 fa-robot',
       };
 

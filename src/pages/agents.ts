@@ -100,6 +100,70 @@ export const agentsPage = (lang: Language = 'en') => {
       descEn: 'Identifies growth opportunities, applies TRIZ and systems thinking.',
       descRu: 'Находит точки роста, применяет ТРИЗ и системное мышление.',
       tools: ['Web Search', 'Thinking Modes', 'Sheets'] },
+
+    // ─── Scientific & experimental ───
+    { icon: 'fa-flask',         gradFrom: 'from-rose-600',    gradTo: 'to-rose-800',    role: 'research_scientist', group: 'science',
+      nameEn: 'Research Scientist',     nameRu: 'Учёный-исследователь',
+      roleEn: 'Scientific Research',    roleRu: 'Научные исследования',
+      descEn: 'Forms hypotheses, designs methodology, reasons via the scientific method.',
+      descRu: 'Формирует гипотезы, проектирует методологию, рассуждает научным методом.',
+      tools: ['Web Search', 'First Principles', 'Critic LLM'] },
+    { icon: 'fa-chart-area',    gradFrom: 'from-fuchsia-600', gradTo: 'to-fuchsia-800', role: 'data_scientist', group: 'science',
+      nameEn: 'Data Scientist',         nameRu: 'Дата-сайентист',
+      roleEn: 'Statistics & Modeling',  roleRu: 'Статистика и моделирование',
+      descEn: 'Runs statistical analysis, quantifies uncertainty, builds models.',
+      descRu: 'Проводит статанализ, оценивает неопределённость, строит модели.',
+      tools: ['Code Gen', 'Sheets', 'Calculator'] },
+    { icon: 'fa-vials',         gradFrom: 'from-pink-600',    gradTo: 'to-rose-700',    role: 'experiment_designer', group: 'science',
+      nameEn: 'Experiment Designer',    nameRu: 'Методолог экспериментов',
+      roleEn: 'Experimental Design',    roleRu: 'Дизайн экспериментов',
+      descEn: 'Designs A/B tests and controlled experiments: groups, power, metrics.',
+      descRu: 'Проектирует A/B-тесты и контролируемые эксперименты: группы, мощность, метрики.',
+      tools: ['Calculator', 'Critic LLM', 'Sheets'] },
+    { icon: 'fa-microscope',    gradFrom: 'from-red-600',     gradTo: 'to-rose-800',    role: 'peer_reviewer', group: 'science',
+      nameEn: 'Peer Reviewer',          nameRu: 'Научный рецензент',
+      roleEn: 'Review & Validation',    roleRu: 'Рецензия и валидация',
+      descEn: 'Critically evaluates methodology, statistics, validity, and bias.',
+      descRu: 'Критически оценивает методологию, статистику, валидность и предвзятость.',
+      tools: ['Critic LLM', 'RAG Docs', 'Web Check'] },
+    { icon: 'fa-book-open',     gradFrom: 'from-orange-600',  gradTo: 'to-rose-700',    role: 'literature_researcher', group: 'science',
+      nameEn: 'Literature Researcher',  nameRu: 'Литературный обзор',
+      roleEn: 'Systematic Review',      roleRu: 'Систематический обзор',
+      descEn: 'Searches, screens, and synthesises prior work; finds gaps and cites sources.',
+      descRu: 'Ищет, отбирает и синтезирует работы; находит пробелы и цитирует источники.',
+      tools: ['Web Search', 'RAG Docs', 'Summarizer'] },
+
+    // ─── AI & LLM engineering ───
+    { icon: 'fa-brain',         gradFrom: 'from-indigo-600',  gradTo: 'to-violet-800',  role: 'ml_engineer', group: 'ai_eng',
+      nameEn: 'ML Engineer',            nameRu: 'ML-инженер',
+      roleEn: 'Model Training',         roleRu: 'Обучение моделей',
+      descEn: 'Designs training pipelines, tunes models, defines evaluation metrics.',
+      descRu: 'Проектирует пайплайны обучения, тюнит модели, задаёт метрики оценки.',
+      tools: ['Code Gen', 'MCP Tools', 'Calculator'] },
+    { icon: 'fa-terminal',      gradFrom: 'from-violet-600',  gradTo: 'to-purple-800',  role: 'prompt_engineer', group: 'ai_eng',
+      nameEn: 'Prompt Engineer',        nameRu: 'Промпт-инженер',
+      roleEn: 'Prompt Design',          roleRu: 'Дизайн промптов',
+      descEn: 'Crafts, tests, and optimises prompts; defines eval criteria and edge cases.',
+      descRu: 'Создаёт, тестирует и оптимизирует промпты; задаёт критерии и крайние случаи.',
+      tools: ['Text Gen', 'Critic LLM', 'RAG Docs'] },
+    { icon: 'fa-robot',         gradFrom: 'from-purple-600',  gradTo: 'to-indigo-800',  role: 'llm_engineer', group: 'ai_eng',
+      nameEn: 'LLM Engineer',           nameRu: 'LLM-инженер',
+      roleEn: 'RAG & Fine-tuning',      roleRu: 'RAG и дообучение',
+      descEn: 'Builds RAG pipelines, fine-tuning, and LLM evaluations; mitigates hallucination.',
+      descRu: 'Строит RAG-пайплайны, дообучение и оценку LLM; снижает галлюцинации.',
+      tools: ['Code Gen', 'RAG Docs', 'MCP Tools'] },
+    { icon: 'fa-sitemap',       gradFrom: 'from-blue-600',    gradTo: 'to-indigo-800',  role: 'ai_architect', group: 'ai_eng',
+      nameEn: 'AI Architect',           nameRu: 'AI-архитектор',
+      roleEn: 'System Architecture',    roleRu: 'Архитектура систем',
+      descEn: 'Designs end-to-end AI systems: data flow, serving, scalability, safety.',
+      descRu: 'Проектирует AI-системы под ключ: потоки данных, инференс, масштаб, безопасность.',
+      tools: ['Thinking Modes', 'Code Gen', 'Web Search'] },
+    { icon: 'fa-server',        gradFrom: 'from-cyan-600',    gradTo: 'to-blue-800',    role: 'mlops_engineer', group: 'ai_eng',
+      nameEn: 'MLOps Engineer',         nameRu: 'MLOps-инженер',
+      roleEn: 'Deployment & Monitoring',roleRu: 'Деплой и мониторинг',
+      descEn: 'Handles deployment, CI/CD, monitoring, drift, versioning, and reliability.',
+      descRu: 'Отвечает за деплой, CI/CD, мониторинг, дрейф, версионирование и надёжность.',
+      tools: ['Code Gen', 'MCP Tools', 'API'] },
   ]
 
   return `
@@ -160,13 +224,8 @@ export const agentsPage = (lang: Language = 'en') => {
       </div>
 
       <!-- Built-in showcase -->
-      <div id="showcase-section">
-        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <i class="fas fa-layer-group text-blue-400"></i>
-          ${isRu ? 'Встроенные роли' : 'Built-in roles'}
-        </h2>
-        <div id="agent-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          ${SHOWCASE.map(a => `
+      ${(() => {
+        const card = (a: any) => `
             <div class="agent-card glass rounded-xl p-5 hover:border-gray-600 transition-all group"
                  data-name="${(isRu ? a.nameRu : a.nameEn).toLowerCase()}"
                  data-role="${a.role}"
@@ -185,7 +244,7 @@ export const agentsPage = (lang: Language = 'en') => {
               </div>
               <p class="text-xs text-gray-400 mb-3 leading-relaxed">${isRu ? a.descRu : a.descEn}</p>
               <div class="flex flex-wrap gap-1.5">
-                ${a.tools.map(t => `<span class="text-xs px-2 py-0.5 rounded border border-gray-700 text-gray-400">${t}</span>`).join('')}
+                ${a.tools.map((t: string) => `<span class="text-xs px-2 py-0.5 rounded border border-gray-700 text-gray-400">${t}</span>`).join('')}
               </div>
               <div class="mt-3 pt-3 border-t border-gray-800 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onclick="customizeRole('${a.role}', '${(isRu ? a.nameRu : a.nameEn).replace(/'/g,"\\'")}', '${a.gradFrom}', '${a.gradTo}', '${a.icon}')"
@@ -201,10 +260,35 @@ export const agentsPage = (lang: Language = 'en') => {
                   <i class="fas fa-play mr-1"></i>${isRu ? 'Запустить' : 'Use'}
                 </button>
               </div>
+            </div>`
+
+        const categories = [
+          { key: 'business', icon: 'fa-layer-group', color: 'text-blue-400',
+            label: isRu ? 'Бизнес-роли' : 'Business roles',
+            items: SHOWCASE.filter(a => !(a as any).group) },
+          { key: 'science', icon: 'fa-flask', color: 'text-rose-400',
+            label: isRu ? 'Наука и эксперименты' : 'Science & experiments',
+            items: SHOWCASE.filter(a => (a as any).group === 'science') },
+          { key: 'ai_eng', icon: 'fa-microchip', color: 'text-violet-400',
+            label: isRu ? 'AI и LLM инженерия' : 'AI & LLM engineering',
+            items: SHOWCASE.filter(a => (a as any).group === 'ai_eng') },
+        ]
+
+        return `<div id="showcase-section">
+          ${categories.map(cat => `
+            <div class="agent-category mb-8" data-category="${cat.key}">
+              <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <i class="fas ${cat.icon} ${cat.color}"></i>
+                ${cat.label}
+                <span class="text-xs text-gray-600 normal-case font-normal">· ${cat.items.length}</span>
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                ${cat.items.map(card).join('')}
+              </div>
             </div>
           `).join('')}
-        </div>
-      </div>
+        </div>`
+      })()}
     </div>
   </main>
 
@@ -250,6 +334,20 @@ export const agentsPage = (lang: Language = 'en') => {
             <option value="hr_assistant">hr_assistant</option>
             <option value="financial_analyst">financial_analyst</option>
             <option value="innovation_strategist">innovation_strategist</option>
+            <optgroup label="${isRu ? 'Наука и эксперименты' : 'Science & experiments'}">
+              <option value="research_scientist">research_scientist</option>
+              <option value="data_scientist">data_scientist</option>
+              <option value="experiment_designer">experiment_designer</option>
+              <option value="peer_reviewer">peer_reviewer</option>
+              <option value="literature_researcher">literature_researcher</option>
+            </optgroup>
+            <optgroup label="${isRu ? 'AI и LLM инженерия' : 'AI & LLM engineering'}">
+              <option value="ml_engineer">ml_engineer</option>
+              <option value="prompt_engineer">prompt_engineer</option>
+              <option value="llm_engineer">llm_engineer</option>
+              <option value="ai_architect">ai_architect</option>
+              <option value="mlops_engineer">mlops_engineer</option>
+            </optgroup>
             <option value="custom">custom</option>
           </select>
         </div>
@@ -582,6 +680,12 @@ export const agentsPage = (lang: Language = 'en') => {
         const nameMatch = !q || el.dataset.name.includes(q) || el.dataset.role.includes(q);
         const customMatch = !customOnly || el.dataset.custom === 'true';
         el.style.display = nameMatch && customMatch ? '' : 'none';
+      });
+
+      // Hide category sections that have no visible cards
+      document.querySelectorAll('.agent-category').forEach(cat => {
+        const visible = cat.querySelectorAll('.agent-card:not([style*="display: none"])').length;
+        cat.style.display = visible ? '' : 'none';
       });
     }
 
