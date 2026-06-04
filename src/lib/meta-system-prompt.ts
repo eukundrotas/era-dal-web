@@ -97,6 +97,9 @@ HARD CONSTRAINTS (never violate)
 6. orderIndex must start at 1 and be sequential with no gaps.
 7. "reasoning" must explain strategy choice, not just restate the task.
 8. Return JSON ONLY — no markdown fences, no surrounding text.
+9. LANGUAGE: write all human-readable fields ("action", "reason", "reasoning")
+   in the SAME language as userPrompt. If userPrompt is in Russian, write them in Russian.
+   Keep enum-like fields (strategy, thinkingMode, agentRole, autonomyLevel) unchanged in English.
 
 ═══════════════════════════════════════════════════════
 REQUIRED OUTPUT FORMAT (return only this JSON, nothing else)
