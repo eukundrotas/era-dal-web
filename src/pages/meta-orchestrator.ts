@@ -180,6 +180,9 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
                   <option value="PARALLEL">${isRu ? '⚡ Параллельно' : '⚡ Parallel'}</option>
                   <option value="VERIFIED">${isRu ? '✅ Верификация' : '✅ Verified'}</option>
                   <option value="EXPERT_PANEL">${isRu ? '👥 Экспертная комиссия' : '👥 Expert Panel'}</option>
+                  <option value="DEBATE">${isRu ? '🗣️ Дебаты' : '🗣️ Debate'}</option>
+                  <option value="FALLBACK">${isRu ? '🔁 Резервный' : '🔁 Fallback'}</option>
+                  <option value="SINGLE">${isRu ? '⚡ Одиночный' : '⚡ Single'}</option>
                 </select>
                 <select id="mode-select"
                   class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
@@ -918,11 +921,23 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
     updateModelBadge();
     updateSelectedChips();
 
-    // Pre-fill task from ?task= URL param (e.g. launched from Scenarios page)
-    const _urlTask = new URLSearchParams(location.search).get('task');
+    // Pre-fill task from ?task= URL param (e.g. launched from Scenarios / Meta-Agents pages)
+    const _params = new URLSearchParams(location.search);
+    const _urlTask = _params.get('task');
     if (_urlTask) {
       const el = document.getElementById('task-input');
       if (el) el.value = _urlTask;
+    }
+    // Pre-select strategy / thinking mode when launched from a Meta-Agent squad
+    const _urlStrategy = _params.get('strategy');
+    if (_urlStrategy) {
+      const sel = document.getElementById('strategy-select');
+      if (sel && [...sel.options].some(o => o.value === _urlStrategy)) sel.value = _urlStrategy;
+    }
+    const _urlMode = _params.get('mode');
+    if (_urlMode) {
+      const sel = document.getElementById('mode-select');
+      if (sel && [...sel.options].some(o => o.value === _urlMode)) sel.value = _urlMode;
     }
 
     document.addEventListener('click', e => {

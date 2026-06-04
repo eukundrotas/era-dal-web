@@ -253,6 +253,7 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       <div id="sbsec-meta" class="space-y-0.5">
         ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор'      : 'Orchestrator')}
         ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
+        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400',isRu ? 'Метаагенты'       : 'Meta-Agents')}
         ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'         : 'Scenarios')}
         ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',   isRu ? 'Базы знаний'      : 'Knowledge Bases')}
         ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'           : 'Journal')}

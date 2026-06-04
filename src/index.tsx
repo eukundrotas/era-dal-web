@@ -17,6 +17,7 @@ import { integrationsPage } from './pages/integrations'
 // Meta-Orchestrator Layer
 import { metaOrchestratorPage } from './pages/meta-orchestrator'
 import { agentsPage } from './pages/agents'
+import { metaAgentsPage } from './pages/meta-agents'
 import { scenariosPage } from './pages/scenarios'
 import { journalPage } from './pages/journal'
 // Business Layer
@@ -74,6 +75,7 @@ app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
 // Meta-Orchestrator Layer
 app.get('/meta', (c) => c.html(metaOrchestratorPage(getLang(c))))
 app.get('/agents', (c) => c.html(agentsPage(getLang(c))))
+app.get('/meta-agents', (c) => c.html(metaAgentsPage(getLang(c))))
 app.get('/scenarios', (c) => c.html(scenariosPage(getLang(c))))
 app.get('/journal', (c) => c.html(journalPage(getLang(c))))
 // Business Layer
