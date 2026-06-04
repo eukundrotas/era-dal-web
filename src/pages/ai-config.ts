@@ -15,7 +15,7 @@ ${head(isRu ? 'Настройка AI провайдеров | ERA DAL' : 'AI Pro
   <div class="flex">
     ${sidebar(lang)}
     
-    <main class="flex-1 ml-64 p-8">
+    <main class="flex-1 ml-56 p-8">
       <div class="max-w-6xl mx-auto">
         
         <!-- Header -->

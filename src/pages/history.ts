@@ -33,7 +33,7 @@ export const historyPage = (lang: Language = 'en') => {
 <body class="bg-gray-950 text-white">
   ${sidebar('history', lang)}
 
-  <main class="ml-64 pt-4 min-h-screen">
+  <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6 max-w-6xl">
 
       <!-- Header -->

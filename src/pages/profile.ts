@@ -14,7 +14,7 @@ export const profilePage = (lang: Language = 'en') => {
 <body class="bg-gray-950 text-white">
   ${sidebar('profile', lang)}
   
-  <main class="ml-64 pt-4 min-h-screen">
+  <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6 max-w-4xl">
       <!-- Header -->
       <div class="mb-8">

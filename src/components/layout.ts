@@ -179,111 +179,85 @@ export const navbar = (lang: Language = 'en') => {
 
 export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en') => {
   const sb = getSection('sidebar', lang)
-  
+  const isRu = lang === 'ru'
+
+  const link = (page: string, href: string, icon: string, iconColor: string, label: string) =>
+    `<a href="${href}?lang=${lang}" class="sidebar-link ${activePage === page ? 'active' : ''} flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-gray-300 hover:text-white text-sm">
+       <i class="${icon} w-4 text-center flex-shrink-0 ${iconColor}" style="font-size:13px"></i>
+       <span class="truncate">${label}</span>
+     </a>`
+
   return `
-  <aside class="fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-800 pt-16 z-40">
-    <div class="p-4">
-      <div class="flex items-center justify-between mb-4">
-        <!-- Language Switcher in Sidebar -->
-        <div class="lang-dropdown w-full">
-          <button class="flex items-center justify-between w-full glass rounded-lg px-3 py-2 text-gray-300 hover:text-white text-sm">
-            <span><i class="fas fa-globe mr-2"></i>${lang === 'ru' ? 'Русский' : 'English'}</span>
-            <i class="fas fa-chevron-down text-xs"></i>
+  <!-- ── Sidebar ── -->
+  <aside class="fixed left-0 top-0 h-screen w-56 bg-gray-900 border-r border-gray-800 z-40 flex flex-col select-none">
+
+    <!-- Top: brand + user -->
+    <div class="flex-shrink-0 px-3 pt-3 pb-2 border-b border-gray-800">
+      <!-- Brand -->
+      <a href="/dashboard?lang=${lang}" class="flex items-center gap-2 px-1 mb-3 group">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-sitemap text-white" style="font-size:11px"></i>
+        </div>
+        <span class="font-bold text-white text-sm tracking-wide">ERA <span class="text-violet-400">DAL</span></span>
+      </a>
+
+      <!-- User row -->
+      <div class="flex items-center gap-2 px-1">
+        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-user text-white" style="font-size:9px"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-white text-xs font-medium leading-tight truncate">Eugene</p>
+          <p class="text-gray-500 text-xs leading-tight">${sb.proPlan}</p>
+        </div>
+        <!-- Language toggle -->
+        <div class="lang-dropdown ml-auto">
+          <button class="text-gray-500 hover:text-gray-300 transition" title="${isRu ? 'Язык' : 'Language'}">
+            <span style="font-size:14px">${lang === 'ru' ? '🇷🇺' : '🇬🇧'}</span>
           </button>
-          <div class="lang-dropdown-content w-full" style="position: relative; margin-top: 4px;">
-            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">
-              <span class="mr-2">🇬🇧</span> English
-            </div>
-            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">
-              <span class="mr-2">🇷🇺</span> Русский
-            </div>
+          <div class="lang-dropdown-content" style="right:0;top:100%;min-width:110px">
+            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">🇬🇧 English</div>
+            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">🇷🇺 Русский</div>
           </div>
         </div>
       </div>
-      
-      <div class="flex items-center space-x-3 mb-8 p-3 glass rounded-lg">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-user text-white"></i>
-        </div>
-        <div>
-          <p class="text-white font-medium">Eugene</p>
-          <p class="text-gray-400 text-xs">${sb.proPlan}</p>
-        </div>
-      </div>
-      
-      <nav class="space-y-1">
+    </div>
 
-        <!-- Meta-Orchestrator section -->
-        <div class="px-3 pt-1 pb-1">
-          <p class="text-xs text-violet-400/70 uppercase tracking-wider font-semibold">Meta-Orchestrator</p>
-        </div>
-        <a href="/meta?lang=${lang}" class="sidebar-link ${activePage === 'meta' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-sitemap w-5 text-violet-400"></i>
-          <span>${lang === 'ru' ? 'Оркестратор' : 'Orchestrator'}</span>
-        </a>
-        <a href="/agents?lang=${lang}" class="sidebar-link ${activePage === 'agents' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-users w-5 text-blue-400"></i>
-          <span>${lang === 'ru' ? 'Агенты' : 'Agents'}</span>
-        </a>
-        <a href="/scenarios?lang=${lang}" class="sidebar-link ${activePage === 'scenarios' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-layer-group w-5 text-green-400"></i>
-          <span>${lang === 'ru' ? 'Сценарии' : 'Scenarios'}</span>
-        </a>
-        <a href="/journal?lang=${lang}" class="sidebar-link ${activePage === 'journal' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-scroll w-5 text-gray-400"></i>
-          <span>${lang === 'ru' ? 'Журнал' : 'Journal'}</span>
-        </a>
+    <!-- Middle: scrollable nav -->
+    <nav class="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 sidebar-scroll">
 
-        <!-- Core section -->
-        <div class="pt-3 mt-3 border-t border-gray-800">
-          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">ERA DAL</p>
-        </div>
-        <a href="/dashboard?lang=${lang}" class="sidebar-link ${activePage === 'dashboard' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-chart-pie w-5"></i>
-          <span>${sb.dashboard}</span>
-        </a>
-        <a href="/playground?lang=${lang}" class="sidebar-link ${activePage === 'playground' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-flask w-5"></i>
-          <span>${sb.playground}</span>
-        </a>
-        <a href="/history?lang=${lang}" class="sidebar-link ${activePage === 'history' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-history w-5"></i>
-          <span>${sb.history}</span>
-        </a>
+      <!-- Meta-Orchestrator -->
+      <p class="px-3 pt-2 pb-1 text-xs text-violet-400/60 uppercase tracking-wider font-semibold">Meta-Orchestrator</p>
+      ${link('meta',      '/meta',      'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор' : 'Orchestrator')}
+      ${link('agents',    '/agents',    'fas fa-users',      'text-blue-400',   isRu ? 'Агенты'      : 'Agents')}
+      ${link('scenarios', '/scenarios', 'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'    : 'Scenarios')}
+      ${link('journal',   '/journal',   'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'      : 'Journal')}
 
-        <!-- Settings section -->
-        <div class="pt-3 mt-3 border-t border-gray-800">
-          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
+      <!-- ERA DAL -->
+      <p class="px-3 pt-3 pb-1 text-xs text-gray-500 uppercase tracking-wider font-semibold border-t border-gray-800 mt-2">ERA DAL</p>
+      ${link('dashboard',  '/dashboard',  'fas fa-chart-pie', 'text-cyan-400',   sb.dashboard)}
+      ${link('playground', '/playground', 'fas fa-flask',     'text-yellow-400', sb.playground)}
+      ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
+
+      <!-- Settings -->
+      <p class="px-3 pt-3 pb-1 text-xs text-gray-500 uppercase tracking-wider font-semibold border-t border-gray-800 mt-2">${sb.settings}</p>
+      ${link('ai-config',    '/ai-config',    'fas fa-robot',       'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
+      ${link('integrations', '/integrations', 'fas fa-plug',        'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
+      ${link('settings',     '/settings',     'fas fa-cog',         'text-gray-400',   sb.settings)}
+      ${link('profile',      '/profile',      'fas fa-user-circle', 'text-gray-400',   sb.profile)}
+    </nav>
+
+    <!-- Bottom: API usage (never overlaps nav) -->
+    <div class="flex-shrink-0 px-3 py-2 border-t border-gray-800">
+      <div class="glass rounded-lg px-3 py-2">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-gray-400 text-xs">${sb.apiCalls}</span>
+          <span class="text-white text-xs font-medium">847/1k</span>
         </div>
-        <a href="/ai-config?lang=${lang}" class="sidebar-link ${activePage === 'ai-config' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-robot w-5 text-purple-400"></i>
-          <span>${lang === 'ru' ? 'AI Провайдеры' : 'AI Providers'}</span>
-        </a>
-        <a href="/integrations?lang=${lang}" class="sidebar-link ${activePage === 'integrations' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-plug w-5 text-blue-400"></i>
-          <span>${lang === 'ru' ? 'Интеграции' : 'Integrations'}</span>
-        </a>
-        <a href="/settings?lang=${lang}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-cog w-5"></i>
-          <span>${sb.settings}</span>
-        </a>
-        <a href="/profile?lang=${lang}" class="sidebar-link ${activePage === 'profile' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-user-circle w-5"></i>
-          <span>${sb.profile}</span>
-        </a>
-      </nav>
-      
-      <div class="absolute bottom-4 left-4 right-4">
-        <div class="glass rounded-lg p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-400 text-sm">${sb.apiCalls}</span>
-            <span class="text-white text-sm font-medium">847 / 1000</span>
-          </div>
-          <div class="w-full bg-gray-700 rounded-full h-2">
-            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: 84.7%"></div>
-          </div>
-          <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-2 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
+        <div class="w-full bg-gray-700 rounded-full h-1.5">
+          <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full" style="width:84.7%"></div>
         </div>
+        <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-1 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
       </div>
     </div>
   </aside>

@@ -15,7 +15,7 @@ export const playgroundPage = (lang: Language = 'en') => {
 <body class="bg-gray-950 text-white">
   ${sidebar('playground', lang)}
   
-  <main class="ml-64 pt-4 min-h-screen">
+  <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6">
       <div class="mb-6">
         <h1 class="text-2xl font-bold">${t.title}</h1>

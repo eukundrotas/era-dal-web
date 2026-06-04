@@ -14,7 +14,7 @@ export const dashboardPage = (lang: Language = 'en') => {
 <body class="bg-gray-950 text-white">
   ${sidebar('dashboard', lang)}
   
-  <main class="ml-64 pt-4 min-h-screen">
+  <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6">
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
