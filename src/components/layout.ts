@@ -244,7 +244,7 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70')}
       <div id="sbsec-meta" class="space-y-0.5">
         ${link('meta',      '/meta',      'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор' : 'Orchestrator')}
-        ${link('agents',    '/agents',    'fas fa-users',      'text-blue-400',   isRu ? 'Агенты'      : 'Agents')}
+        ${link('agents',    '/agents',    'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
         ${link('scenarios', '/scenarios', 'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'    : 'Scenarios')}
         ${link('journal',   '/journal',   'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'      : 'Journal')}
       </div>
@@ -255,6 +255,22 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         ${link('dashboard',  '/dashboard',  'fas fa-chart-pie', 'text-cyan-400',   sb.dashboard)}
         ${link('playground', '/playground', 'fas fa-flask',     'text-yellow-400', sb.playground)}
         ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
+      </div>
+
+      <!-- Tasks & Projects -->
+      ${sectionHeader('tasks', isRu ? 'Задачи и проекты' : 'Tasks & Projects', 'text-gray-500', true)}
+      <div id="sbsec-tasks" class="space-y-0.5">
+        ${link('tasks',    '/tasks',    'fas fa-list-check',  'text-blue-400',   isRu ? 'Задачи'   : 'Tasks')}
+        ${link('projects', '/projects', 'fas fa-folder-open', 'text-green-400',  isRu ? 'Проекты'  : 'Projects')}
+        ${link('goals',    '/goals',    'fas fa-bullseye',    'text-yellow-400', isRu ? 'Цели OKR' : 'Goals OKR')}
+      </div>
+
+      <!-- Company -->
+      ${sectionHeader('company', isRu ? 'Компания' : 'Company', 'text-gray-500', true)}
+      <div id="sbsec-company" class="space-y-0.5">
+        ${link('company',     '/company',     'fas fa-building',      'text-cyan-400',    isRu ? 'Оргструктура'   : 'Company')}
+        ${link('regulations', '/regulations', 'fas fa-book-open',     'text-orange-400',  isRu ? 'Регламенты'     : 'Regulations')}
+        ${link('expenses',    '/expenses',    'fas fa-receipt',       'text-red-400',     isRu ? 'Расходы'        : 'Expenses')}
       </div>
 
       <!-- Settings -->

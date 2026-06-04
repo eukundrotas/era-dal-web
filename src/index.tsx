@@ -19,6 +19,13 @@ import { metaOrchestratorPage } from './pages/meta-orchestrator'
 import { agentsPage } from './pages/agents'
 import { scenariosPage } from './pages/scenarios'
 import { journalPage } from './pages/journal'
+// Business Layer
+import { tasksPage } from './pages/tasks'
+import { projectsPage } from './pages/projects'
+import { goalsPage } from './pages/goals'
+import { regulationsPage } from './pages/regulations'
+import { expensesPage } from './pages/expenses'
+import { companyPage } from './pages/company'
 
 // API Routes
 import { apiRoutes } from './api/routes'
@@ -67,6 +74,13 @@ app.get('/meta', (c) => c.html(metaOrchestratorPage(getLang(c))))
 app.get('/agents', (c) => c.html(agentsPage(getLang(c))))
 app.get('/scenarios', (c) => c.html(scenariosPage(getLang(c))))
 app.get('/journal', (c) => c.html(journalPage(getLang(c))))
+// Business Layer
+app.get('/tasks',       (c) => c.html(tasksPage(getLang(c))))
+app.get('/projects',    (c) => c.html(projectsPage(getLang(c))))
+app.get('/goals',       (c) => c.html(goalsPage(getLang(c))))
+app.get('/regulations', (c) => c.html(regulationsPage(getLang(c))))
+app.get('/expenses',    (c) => c.html(expensesPage(getLang(c))))
+app.get('/company',     (c) => c.html(companyPage(getLang(c))))
 
 // ============================================
 // API Routes
