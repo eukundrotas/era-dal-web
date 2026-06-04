@@ -30,6 +30,11 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
     .fade-in { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .model-chip { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; cursor:pointer; border:1px solid; transition:all .15s; }
+    .model-chip.selected { background:rgba(139,92,246,.25); border-color:rgba(139,92,246,.6); color:#c4b5fd; }
+    .model-chip.unselected { background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.1); color:#9ca3af; }
+    .model-chip.unselected:hover { border-color:rgba(139,92,246,.4); color:#e2e8f0; }
+    .provider-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
   </style>
 </head>
 <body class="bg-gray-950 text-white">
@@ -68,9 +73,13 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
           <h3 class="font-semibold mb-1">${isRu ? 'OpenRouter API ключ' : 'OpenRouter API Key'}</h3>
-          <p class="text-xs text-gray-400 mb-4">${isRu
+          <p class="text-xs text-gray-400 mb-1">${isRu
             ? 'Ключ хранится только в вашем браузере (localStorage) и никогда не покидает вашего устройства.'
             : 'Key is stored only in your browser (localStorage) and never leaves your device.'}</p>
+          <a href="/ai-config?lang=${lang}" class="text-xs text-blue-400 hover:text-blue-300 mb-4 inline-block">
+            <i class="fas fa-sliders-h mr-1"></i>
+            ${isRu ? 'Управлять всеми провайдерами →' : 'Manage all providers →'}
+          </a>
           <input id="api-key-input" type="password"
             placeholder="sk-or-..."
             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white text-sm mb-4 focus:outline-none focus:border-violet-500">
@@ -110,6 +119,34 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
                 ? 'Например: «Найди 20 компаний в нише EdTech, оцени их потенциал, подготовь персональные КП и занеси в таблицу»'
                 : 'E.g. "Find 20 EdTech companies, assess their potential, prepare personalized proposals and add to spreadsheet"'}"
               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition resize-none text-sm leading-relaxed"></textarea>
+
+            <!-- Model Selector Panel -->
+            <div class="mt-3 mb-3 border border-gray-700/60 rounded-lg bg-gray-800/40" id="model-selector-wrap">
+              <button onclick="toggleModelPanel()" class="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-700/30 rounded-lg transition">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-robot text-violet-400 text-xs"></i>
+                  <span class="text-gray-300 font-medium">${isRu ? 'Модели оркестрации' : 'Orchestration Models'}</span>
+                  <span id="model-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">0/5</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">${isRu ? 'выберите 1–5 моделей' : 'select 1–5 models'}</span>
+                  <i id="model-panel-chevron" class="fas fa-chevron-down text-xs text-gray-500 transition-transform"></i>
+                </div>
+              </button>
+
+              <!-- Selected chips row -->
+              <div id="selected-model-chips" class="px-4 pb-2 flex flex-wrap gap-1.5 hidden"></div>
+
+              <!-- Model picker (expanded) -->
+              <div id="model-panel-body" class="hidden px-4 pb-4 pt-1">
+                <div id="model-panel-no-providers" class="text-xs text-gray-500 py-2">
+                  ${isRu
+                    ? '<i class="fas fa-key mr-1"></i> Настройте API ключи в <a href="/ai-config?lang=' + lang + '" class="text-blue-400 hover:text-blue-300">разделе AI Провайдеры</a>'
+                    : '<i class="fas fa-key mr-1"></i> Configure API keys in <a href="/ai-config?lang=' + lang + '" class="text-blue-400 hover:text-blue-300">AI Providers</a>'}
+                </div>
+                <div id="model-panel-providers" class="space-y-3"></div>
+              </div>
+            </div>
 
             <!-- Quick tasks -->
             <div class="flex flex-wrap gap-2 mt-3 mb-4">
@@ -314,9 +351,225 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
     let pausedStepId = null;
     let currentSteps = [];
 
+    // ─── Multi-provider model registry ─────────────────────────────────────
+    const PROVIDERS_META = [
+      { id:'openrouter', name:'OpenRouter', color:'#3b82f6', models:[
+        { id:'meta-llama/llama-3.3-70b-instruct:free', name:'Llama 3.3 70B', free:true },
+        { id:'google/gemini-2.0-flash-exp:free', name:'Gemini 2.0 Flash', free:true },
+        { id:'deepseek/deepseek-r1:free', name:'DeepSeek R1', free:true },
+        { id:'mistralai/mistral-7b-instruct:free', name:'Mistral 7B', free:true },
+        { id:'anthropic/claude-3.5-sonnet', name:'Claude 3.5 Sonnet', free:false },
+        { id:'openai/gpt-4o', name:'GPT-4o', free:false },
+        { id:'openai/gpt-4o-mini', name:'GPT-4o mini', free:false },
+        { id:'google/gemini-pro-1.5', name:'Gemini 1.5 Pro', free:false },
+        { id:'anthropic/claude-3-haiku', name:'Claude 3 Haiku', free:false },
+      ]},
+      { id:'anthropic', name:'Anthropic', color:'#f97316', models:[
+        { id:'claude-opus-4-8', name:'Claude Opus 4.8', free:false },
+        { id:'claude-sonnet-4-6', name:'Claude Sonnet 4.6', free:false },
+        { id:'claude-haiku-4-5-20251001', name:'Claude Haiku 4.5', free:false },
+        { id:'claude-3-5-sonnet-20241022', name:'Claude 3.5 Sonnet', free:false },
+      ]},
+      { id:'openai', name:'OpenAI', color:'#10b981', models:[
+        { id:'gpt-4o', name:'GPT-4o', free:false },
+        { id:'gpt-4o-mini', name:'GPT-4o mini', free:false },
+        { id:'o1', name:'o1', free:false },
+        { id:'o1-mini', name:'o1-mini', free:false },
+        { id:'o3-mini', name:'o3-mini', free:false },
+      ]},
+      { id:'gemini', name:'Google Gemini', color:'#8b5cf6', models:[
+        { id:'gemini-2.0-flash-exp', name:'Gemini 2.0 Flash', free:true },
+        { id:'gemini-1.5-pro-latest', name:'Gemini 1.5 Pro', free:false },
+        { id:'gemini-1.5-flash-latest', name:'Gemini 1.5 Flash', free:true },
+      ]},
+      { id:'groq', name:'Groq', color:'#f59e0b', models:[
+        { id:'llama-3.3-70b-versatile', name:'Llama 3.3 70B', free:true },
+        { id:'llama-3.1-8b-instant', name:'Llama 3.1 8B', free:true },
+        { id:'mixtral-8x7b-32768', name:'Mixtral 8x7B', free:true },
+        { id:'gemma2-9b-it', name:'Gemma 2 9B', free:true },
+      ]},
+      { id:'mistral', name:'Mistral', color:'#ec4899', models:[
+        { id:'mistral-large-latest', name:'Mistral Large', free:false },
+        { id:'mistral-medium-latest', name:'Mistral Medium', free:false },
+        { id:'mistral-small-latest', name:'Mistral Small', free:false },
+      ]},
+      { id:'cohere', name:'Cohere', color:'#06b6d4', models:[
+        { id:'command-r-plus', name:'Command R+', free:false },
+        { id:'command-r', name:'Command R', free:false },
+      ]},
+      { id:'together', name:'Together AI', color:'#84cc16', models:[
+        { id:'meta-llama/Llama-3.3-70B-Instruct-Turbo', name:'Llama 3.3 70B Turbo', free:false },
+        { id:'mistralai/Mixtral-8x7B-Instruct-v0.1', name:'Mixtral 8x7B', free:false },
+      ]},
+      { id:'perplexity', name:'Perplexity', color:'#6366f1', models:[
+        { id:'llama-3.1-sonar-large-128k-online', name:'Sonar Large', free:false },
+        { id:'llama-3.1-sonar-small-128k-online', name:'Sonar Small', free:false },
+      ]},
+    ];
+
+    // ─── Model selector state ───────────────────────────────────────────────
+    let selectedModels = new Set(
+      JSON.parse(localStorage.getItem('era_orchestrator_models') || '[]')
+    );
+    let modelPanelOpen = false;
+
+    function getProviderKey(providerId) {
+      if (providerId === 'openrouter') {
+        return localStorage.getItem('era_key_openrouter')
+          || localStorage.getItem('openrouter_api_key')
+          || localStorage.getItem('ora_api_key')
+          || '';
+      }
+      return localStorage.getItem('era_key_' + providerId) || '';
+    }
+
+    function toggleModelPanel() {
+      modelPanelOpen = !modelPanelOpen;
+      const body = document.getElementById('model-panel-body');
+      const chips = document.getElementById('selected-model-chips');
+      const chevron = document.getElementById('model-panel-chevron');
+      if (modelPanelOpen) {
+        body.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+        renderModelPanel();
+      } else {
+        body.classList.add('hidden');
+        chevron.style.transform = '';
+      }
+      if (selectedModels.size > 0) chips.classList.remove('hidden');
+    }
+
+    function renderModelPanel() {
+      const customModels = JSON.parse(localStorage.getItem('era_custom_models') || '[]');
+      const noProviders = document.getElementById('model-panel-no-providers');
+      const providersDiv = document.getElementById('model-panel-providers');
+
+      // Build list of providers with configured keys
+      const configuredProviders = PROVIDERS_META.filter(p => getProviderKey(p.id));
+
+      // Add custom models to their providers
+      const customByProvider = {};
+      customModels.forEach(m => {
+        if (!customByProvider[m.provider]) customByProvider[m.provider] = [];
+        customByProvider[m.provider].push(m);
+      });
+      Object.keys(customByProvider).forEach(pid => {
+        if (!configuredProviders.find(p => p.id === pid)) {
+          const base = PROVIDERS_META.find(p => p.id === pid);
+          if (base && getProviderKey(pid)) configuredProviders.push(base);
+        }
+      });
+
+      if (!configuredProviders.length) {
+        noProviders.classList.remove('hidden');
+        providersDiv.innerHTML = '';
+        return;
+      }
+      noProviders.classList.add('hidden');
+
+      providersDiv.innerHTML = configuredProviders.map(p => {
+        const allModels = [
+          ...p.models,
+          ...(customByProvider[p.id] || []).map(m => ({ ...m, custom: true }))
+        ];
+        const chips = allModels.map(m => {
+          const sel = selectedModels.has(p.id + '|' + m.id);
+          return \`<span class="model-chip \${sel ? 'selected' : 'unselected'}"
+                        onclick="toggleOrcModel('\${p.id}', '\${m.id.replace(/'/g,"\\\\'")}', '\${(m.name||m.id).replace(/'/g,"\\\\'")}', '\${p.name}', '\${p.color}')"
+                        title="\${m.id}">
+            <span class="provider-dot" style="background:\${p.color}"></span>
+            \${m.name || m.id}
+            \${m.free ? '<span style="color:#4ade80;font-size:9px">free</span>' : ''}
+            \${m.custom ? '<span style="color:#c084fc;font-size:9px">custom</span>' : ''}
+          </span>\`;
+        }).join('');
+
+        return \`
+          <div>
+            <div class="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style="color:\${p.color}">
+              <span class="provider-dot" style="background:\${p.color}"></span>
+              \${p.name}
+            </div>
+            <div class="flex flex-wrap gap-1.5">\${chips}</div>
+          </div>
+        \`;
+      }).join('');
+    }
+
+    function toggleOrcModel(providerId, modelId, modelName, providerName, color) {
+      const key = providerId + '|' + modelId;
+      if (selectedModels.has(key)) {
+        selectedModels.delete(key);
+      } else {
+        if (selectedModels.size >= 5) {
+          const msg = isRu ? 'Можно выбрать не более 5 моделей' : 'You can select at most 5 models';
+          const t = document.createElement('div');
+          t.className = 'fixed bottom-4 right-4 bg-yellow-600 text-white px-4 py-2 rounded-lg z-50 text-sm';
+          t.textContent = msg;
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2500);
+          return;
+        }
+        selectedModels.add(key);
+        // Store extra info for display
+        localStorage.setItem('era_orc_model_meta_' + key, JSON.stringify({ modelName, providerName, color }));
+      }
+      localStorage.setItem('era_orchestrator_models', JSON.stringify(Array.from(selectedModels)));
+      updateModelBadge();
+      updateSelectedChips();
+      if (modelPanelOpen) renderModelPanel();
+    }
+
+    function updateModelBadge() {
+      document.getElementById('model-count-badge').textContent = selectedModels.size + '/5';
+    }
+
+    function updateSelectedChips() {
+      const container = document.getElementById('selected-model-chips');
+      if (!selectedModels.size) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+      container.classList.remove('hidden');
+      container.innerHTML = Array.from(selectedModels).map(key => {
+        const meta = JSON.parse(localStorage.getItem('era_orc_model_meta_' + key) || '{}');
+        const [, modelId] = key.split('|');
+        const name = meta.modelName || modelId.split('/').pop() || modelId;
+        const color = meta.color || '#888';
+        return \`<span class="model-chip selected" style="background:\${color}22;border-color:\${color}66;color:#e2e8f0">
+          <span class="provider-dot" style="background:\${color}"></span>
+          \${name}
+          <button onclick="event.stopPropagation();removeOrcModel('\${key.replace(/'/g,"\\\\'")}')">
+            <i class="fas fa-times" style="font-size:9px;opacity:.7"></i>
+          </button>
+        </span>\`;
+      }).join('');
+    }
+
+    function removeOrcModel(key) {
+      selectedModels.delete(key);
+      localStorage.setItem('era_orchestrator_models', JSON.stringify(Array.from(selectedModels)));
+      updateModelBadge();
+      updateSelectedChips();
+      if (modelPanelOpen) renderModelPanel();
+    }
+
+    function getSelectedModelsForApi() {
+      return Array.from(selectedModels).map(key => {
+        const [providerId, modelId] = key.split('|');
+        return { providerId, modelId, apiKey: getProviderKey(providerId) };
+      });
+    }
+
     // ─── API key helpers ────────────────────────────────────────────────────
 
-    function getApiKey() { return localStorage.getItem('ora_api_key') || ''; }
+    function getApiKey() {
+      return localStorage.getItem('era_key_openrouter')
+        || localStorage.getItem('openrouter_api_key')
+        || localStorage.getItem('ora_api_key')
+        || '';
+    }
     function getFreeOnly() { return localStorage.getItem('ora_free_only') === 'true'; }
 
     function updateKeyStatus() {
@@ -374,6 +627,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
       document.getElementById('plan-container').style.display = 'none';
 
       try {
+        const orchModels = getSelectedModelsForApi();
         const res = await fetch('/api/meta/plan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -382,6 +636,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
             apiKey,
             freeModelsOnly: getFreeOnly(),
             userId: 'user',
+            selectedModels: orchModels.length ? orchModels : undefined,
           }),
         });
 
@@ -650,6 +905,8 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
 
     updateKeyStatus();
     loadRecentRuns();
+    updateModelBadge();
+    updateSelectedChips();
 
     // Pre-fill task from ?task= URL param (e.g. launched from Scenarios page)
     const _urlTask = new URLSearchParams(location.search).get('task');
