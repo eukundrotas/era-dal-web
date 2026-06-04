@@ -14,14 +14,30 @@ import { pricingPage } from './pages/pricing'
 import { docsPage } from './pages/docs'
 import { aiConfigPage } from './pages/ai-config'
 import { integrationsPage } from './pages/integrations'
+// Meta-Orchestrator Layer
+import { metaOrchestratorPage } from './pages/meta-orchestrator'
+import { agentsPage } from './pages/agents'
+import { metaAgentsPage } from './pages/meta-agents'
+import { scenariosPage } from './pages/scenarios'
+import { journalPage } from './pages/journal'
+// Business Layer
+import { tasksPage } from './pages/tasks'
+import { projectsPage } from './pages/projects'
+import { goalsPage } from './pages/goals'
+import { regulationsPage } from './pages/regulations'
+import { expensesPage } from './pages/expenses'
+import { companyPage } from './pages/company'
+import { knowledgeBasePage } from './pages/knowledge-base'
 
 // API Routes
 import { apiRoutes } from './api/routes'
 import { openRouterApi } from './api/openrouter'
 import { integrationsApi } from './api/integrations'
+import { metaApi } from './api/meta'
+import { businessApi } from './api/business'
 
 type Bindings = {
-  DB?: D1Database
+  DB: D1Database    // Cloudflare D1 — run: wrangler d1 create era-dal
   KV?: KVNamespace
 }
 
@@ -56,6 +72,20 @@ app.get('/settings', (c) => c.html(settingsPage(getLang(c))))
 app.get('/profile', (c) => c.html(profilePage(getLang(c))))
 app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
 app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
+// Meta-Orchestrator Layer
+app.get('/meta', (c) => c.html(metaOrchestratorPage(getLang(c))))
+app.get('/agents', (c) => c.html(agentsPage(getLang(c))))
+app.get('/meta-agents', (c) => c.html(metaAgentsPage(getLang(c))))
+app.get('/scenarios', (c) => c.html(scenariosPage(getLang(c))))
+app.get('/journal', (c) => c.html(journalPage(getLang(c))))
+// Business Layer
+app.get('/tasks',       (c) => c.html(tasksPage(getLang(c))))
+app.get('/projects',    (c) => c.html(projectsPage(getLang(c))))
+app.get('/goals',       (c) => c.html(goalsPage(getLang(c))))
+app.get('/regulations', (c) => c.html(regulationsPage(getLang(c))))
+app.get('/expenses',        (c) => c.html(expensesPage(getLang(c))))
+app.get('/company',         (c) => c.html(companyPage(getLang(c))))
+app.get('/knowledge-base',  (c) => c.html(knowledgeBasePage(getLang(c))))
 
 // ============================================
 // API Routes
@@ -63,6 +93,8 @@ app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
 app.route('/api', apiRoutes)
 app.route('/api/openrouter', openRouterApi)
 app.route('/api/integrations', integrationsApi)
+app.route('/api/meta', metaApi)
+app.route('/api/business', businessApi)
 
 // ============================================
 // 404 Handler

@@ -1,697 +1,744 @@
 import { head, sidebar, footer } from '../components/layout'
-import { Language, t, getSection } from '../i18n/translations'
+import { Language, getSection } from '../i18n/translations'
 
 export const aiConfigPage = (lang: Language = 'en') => {
   const isRu = lang === 'ru'
-  const sidebarT = getSection('sidebar', lang)
-  const commonT = getSection('common', lang)
-  
+
   return `
 <!DOCTYPE html>
 <html lang="${lang}">
-${head(isRu ? 'Настройка AI провайдеров | ERA DAL' : 'AI Providers Configuration | ERA DAL', 
-       isRu ? 'Настройте интеграцию с OpenRouter и выберите AI модели' : 'Configure OpenRouter integration and select AI models')}
+${head(
+  isRu ? 'Настройка AI провайдеров | ERA DAL' : 'AI Providers Configuration | ERA DAL',
+  isRu ? 'Управляйте ключами всех AI провайдеров' : 'Manage API keys for all AI providers'
+)}
 <body class="bg-gray-900 text-white min-h-screen">
   <div class="flex">
     ${sidebar(lang)}
-    
-    <main class="flex-1 ml-64 p-8">
+    <main class="flex-1 ml-56 p-8">
       <div class="max-w-6xl mx-auto">
-        
+
         <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
-          <div>
-            <h1 class="text-3xl font-bold gradient-text">${isRu ? 'Настройка AI провайдеров' : 'AI Providers Configuration'}</h1>
-            <p class="text-gray-400 mt-2">${isRu ? 'Интеграция с OpenRouter для доступа к 400+ моделям' : 'OpenRouter integration for access to 400+ models'}</p>
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold gradient-text mb-2">
+            ${isRu ? 'AI Провайдеры' : 'AI Providers'}
+          </h1>
+          <p class="text-gray-400">
+            ${isRu
+              ? 'Ключи хранятся только в вашем браузере (localStorage) и никогда не покидают вашего устройства'
+              : 'Keys are stored only in your browser (localStorage) and never leave your device'}
+          </p>
+          <div class="flex items-center gap-2 mt-2 text-xs text-green-400">
+            <i class="fas fa-shield-alt"></i>
+            <span>${isRu ? 'Полная конфиденциальность — сервер не видит ваши ключи' : 'Full privacy — server never sees your keys'}</span>
           </div>
-          <a href="https://openrouter.ai/keys" target="_blank" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-            <i class="fas fa-key"></i>
-            ${isRu ? 'Получить API ключ' : 'Get API Key'}
-          </a>
         </div>
 
-        <!-- API Key Configuration -->
-        <div class="glass-card rounded-xl p-6 mb-8">
-          <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <i class="fas fa-shield-alt text-green-400"></i>
-            ${isRu ? 'API Ключ OpenRouter' : 'OpenRouter API Key'}
-          </h2>
-          
-          <div class="space-y-4">
+        <!-- Stats bar -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+              <i class="fas fa-check-circle text-green-400"></i>
+            </div>
             <div>
-              <label class="block text-sm text-gray-400 mb-2">${isRu ? 'Ваш API ключ' : 'Your API Key'}</label>
-              <div class="flex gap-2">
-                <input type="password" id="apiKey" placeholder="sk-or-v1-..." 
-                       class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none">
-                <button onclick="toggleKeyVisibility()" class="bg-gray-700 hover:bg-gray-600 px-4 rounded-lg transition-colors">
-                  <i class="fas fa-eye" id="eyeIcon"></i>
-                </button>
-                <button onclick="testConnection()" class="bg-green-600 hover:bg-green-500 px-6 rounded-lg transition-colors flex items-center gap-2">
-                  <i class="fas fa-plug"></i>
-                  ${isRu ? 'Тест' : 'Test'}
-                </button>
-              </div>
-              <p class="text-xs text-gray-500 mt-2">
-                ${isRu ? 'Ключ хранится только в браузере (localStorage)' : 'Key is stored only in browser (localStorage)'}
-              </p>
+              <div id="stat-configured" class="text-2xl font-bold text-green-400">0</div>
+              <div class="text-xs text-gray-500">${isRu ? 'Провайдеров настроено' : 'Providers configured'}</div>
             </div>
-            
-            <div id="connectionStatus" class="hidden">
-              <!-- Status will be shown here -->
+          </div>
+          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+              <i class="fas fa-robot text-blue-400"></i>
             </div>
-            
-            <!-- Credits Info -->
-            <div id="creditsInfo" class="hidden bg-gray-800 rounded-lg p-4">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-400">${isRu ? 'Остаток кредитов' : 'Credits Balance'}</span>
-                <span id="creditsBalance" class="text-xl font-bold text-green-400">-</span>
-              </div>
+            <div>
+              <div id="stat-models" class="text-2xl font-bold text-blue-400">0</div>
+              <div class="text-xs text-gray-500">${isRu ? 'Моделей доступно' : 'Models available'}</div>
+            </div>
+          </div>
+          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+              <i class="fas fa-plus text-purple-400"></i>
+            </div>
+            <div>
+              <div id="stat-custom" class="text-2xl font-bold text-purple-400">0</div>
+              <div class="text-xs text-gray-500">${isRu ? 'Кастомных моделей' : 'Custom models'}</div>
             </div>
           </div>
         </div>
 
-        <!-- Model Presets -->
+        <!-- Provider Cards -->
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-plug text-blue-400"></i>
+          ${isRu ? 'Провайдеры' : 'Providers'}
+        </h2>
+        <div id="providers-grid" class="grid md:grid-cols-2 gap-4 mb-8">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Custom Models -->
         <div class="glass-card rounded-xl p-6 mb-8">
-          <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <i class="fas fa-magic text-purple-400"></i>
-            ${isRu ? 'Готовые наборы моделей' : 'Model Presets'}
+          <h2 class="text-xl font-semibold mb-1 flex items-center gap-2">
+            <i class="fas fa-plus-circle text-purple-400"></i>
+            ${isRu ? 'Добавить модель вручную' : 'Add Custom Model'}
           </h2>
-          
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="presetsGrid">
-            <!-- Presets will be loaded here -->
+          <p class="text-sm text-gray-500 mb-4">
+            ${isRu
+              ? 'Добавьте любой ID модели от любого провайдера'
+              : 'Add any model ID from any provider'}
+          </p>
+          <div class="flex gap-3 mb-4">
+            <select id="custom-provider-select" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm w-40">
+              <!-- Populated by JS -->
+            </select>
+            <input id="custom-model-id" type="text"
+              placeholder="${isRu ? 'ID модели (напр. gpt-4-turbo)' : 'Model ID (e.g. gpt-4-turbo)'}"
+              class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:border-purple-500 focus:outline-none">
+            <input id="custom-model-name" type="text"
+              placeholder="${isRu ? 'Название (необязательно)' : 'Display name (optional)'}"
+              class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:border-purple-500 focus:outline-none">
+            <button onclick="addCustomModel()"
+              class="bg-purple-600 hover:bg-purple-500 px-5 py-2 rounded-lg text-sm transition flex items-center gap-2">
+              <i class="fas fa-plus"></i>
+              ${isRu ? 'Добавить' : 'Add'}
+            </button>
+          </div>
+          <div id="custom-models-list" class="flex flex-wrap gap-2">
+            <span class="text-xs text-gray-600">${isRu ? 'Нет кастомных моделей' : 'No custom models yet'}</span>
           </div>
         </div>
 
-        <!-- Model Selection -->
+        <!-- All Available Models Summary -->
         <div class="glass-card rounded-xl p-6 mb-8">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold flex items-center gap-2">
-              <i class="fas fa-robot text-blue-400"></i>
-              ${isRu ? 'Выбор моделей' : 'Model Selection'}
+              <i class="fas fa-layer-group text-yellow-400"></i>
+              ${isRu ? 'Все доступные модели' : 'All Available Models'}
             </h2>
-            <div class="flex gap-2">
-              <button onclick="filterModels('all')" class="model-filter-btn active px-4 py-2 rounded-lg bg-gray-700" data-filter="all">
-                ${isRu ? 'Все' : 'All'}
-              </button>
-              <button onclick="filterModels('free')" class="model-filter-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700" data-filter="free">
-                <i class="fas fa-gift text-green-400 mr-1"></i>
-                ${isRu ? 'Бесплатные' : 'Free'}
-              </button>
-              <button onclick="filterModels('paid')" class="model-filter-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700" data-filter="paid">
-                <i class="fas fa-coins text-yellow-400 mr-1"></i>
-                ${isRu ? 'Платные' : 'Paid'}
-              </button>
-            </div>
+            <input id="models-search" type="text" placeholder="${isRu ? 'Поиск...' : 'Search...'}"
+              oninput="renderAllModels()"
+              class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-yellow-500 w-48">
           </div>
-          
-          <!-- Provider Filter -->
-          <div class="flex flex-wrap gap-2 mb-4">
-            <select id="providerFilter" onchange="applyFilters()" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2">
-              <option value="">${isRu ? 'Все провайдеры' : 'All Providers'}</option>
-            </select>
-            <select id="typeFilter" onchange="applyFilters()" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2">
-              <option value="">${isRu ? 'Все типы' : 'All Types'}</option>
-            </select>
-            <input type="text" id="modelSearch" placeholder="${isRu ? 'Поиск моделей...' : 'Search models...'}"
-                   onkeyup="applyFilters()"
-                   class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 flex-1 min-w-[200px]">
-          </div>
-
-          <!-- Selected Models -->
-          <div class="bg-gray-800 rounded-lg p-4 mb-4">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-gray-400">${isRu ? 'Выбрано моделей' : 'Selected Models'}: <span id="selectedCount" class="text-white font-bold">0</span></span>
-              <button onclick="clearSelection()" class="text-red-400 hover:text-red-300 text-sm">
-                <i class="fas fa-times mr-1"></i>${isRu ? 'Очистить' : 'Clear'}
-              </button>
-            </div>
-            <div id="selectedModels" class="flex flex-wrap gap-2">
-              <span class="text-gray-500 text-sm">${isRu ? 'Модели не выбраны' : 'No models selected'}</span>
-            </div>
-          </div>
-
-          <!-- Models Grid -->
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto" id="modelsGrid">
-            <!-- Models will be loaded here -->
+          <div id="all-models-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-96 overflow-y-auto">
+            <p class="text-sm text-gray-600 col-span-3">${isRu ? 'Настройте хотя бы одного провайдера' : 'Configure at least one provider to see models'}</p>
           </div>
         </div>
 
         <!-- Quick Test -->
         <div class="glass-card rounded-xl p-6 mb-8">
           <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <i class="fas fa-flask text-yellow-400"></i>
-            ${isRu ? 'Быстрый тест' : 'Quick Test'}
+            <i class="fas fa-flask text-green-400"></i>
+            ${isRu ? 'Быстрый тест модели' : 'Quick Model Test'}
           </h2>
-          
-          <div class="space-y-4">
+          <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-400 mb-2">${isRu ? 'Тестовый запрос' : 'Test Query'}</label>
-              <textarea id="testQuery" rows="3" 
-                        placeholder="${isRu ? 'Введите вопрос для теста...' : 'Enter a question to test...'}"
-                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none resize-none">What is the capital of France?</textarea>
-            </div>
-            
-            <div class="flex gap-2">
-              <button onclick="runSingleTest()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+              <label class="block text-xs text-gray-500 mb-1">${isRu ? 'Выберите модель' : 'Select model'}</label>
+              <select id="test-model-select" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3">
+                <option value="">${isRu ? 'Нет настроенных моделей' : 'No configured models'}</option>
+              </select>
+              <textarea id="test-query" rows="3"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm resize-none focus:border-green-500 focus:outline-none"
+                placeholder="${isRu ? 'Тестовый запрос...' : 'Test query...'}"
+              >What is 2+2?</textarea>
+              <button onclick="runModelTest()"
+                class="mt-2 w-full bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-sm transition flex items-center justify-center gap-2">
                 <i class="fas fa-play"></i>
-                ${isRu ? 'Тест одной модели' : 'Single Model Test'}
-              </button>
-              <button onclick="runEnsembleTest()" class="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                <i class="fas fa-layer-group"></i>
-                ${isRu ? 'Тест ансамбля' : 'Ensemble Test'}
+                ${isRu ? 'Запустить тест' : 'Run Test'}
               </button>
             </div>
-            
-            <div id="testResults" class="hidden">
-              <!-- Test results will appear here -->
+            <div id="test-result" class="bg-gray-800 rounded-lg p-4 text-sm text-gray-500 flex items-center justify-center">
+              ${isRu ? 'Результат появится здесь' : 'Result will appear here'}
             </div>
           </div>
         </div>
 
-        <!-- Save Configuration -->
-        <div class="flex justify-end gap-4">
-          <button onclick="resetConfig()" class="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg transition-colors">
-            <i class="fas fa-undo mr-2"></i>
-            ${isRu ? 'Сбросить' : 'Reset'}
+        <!-- Save -->
+        <div class="flex justify-end gap-3">
+          <button onclick="clearAllKeys()"
+            class="bg-red-900/40 hover:bg-red-900/60 border border-red-500/30 text-red-400 px-6 py-2.5 rounded-lg text-sm transition">
+            <i class="fas fa-trash mr-2"></i>
+            ${isRu ? 'Очистить все ключи' : 'Clear All Keys'}
           </button>
-          <button onclick="saveConfig()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-8 py-3 rounded-lg transition-all font-semibold">
+          <button onclick="saveAllToStorage()"
+            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-8 py-2.5 rounded-lg text-sm font-semibold transition">
             <i class="fas fa-save mr-2"></i>
-            ${isRu ? 'Сохранить конфигурацию' : 'Save Configuration'}
+            ${isRu ? 'Сохранить всё' : 'Save All'}
           </button>
         </div>
 
       </div>
     </main>
   </div>
-
   ${footer(lang)}
 
   <script>
-    const LANG = '${lang}';
-    const isRu = LANG === 'ru';
-    
-    let allModels = [];
-    let selectedModels = new Set();
-    let currentFilter = 'all';
-    
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      loadSavedConfig();
-      loadModels();
-      loadPresets();
-    });
-    
-    // Load saved configuration
-    function loadSavedConfig() {
-      const savedKey = localStorage.getItem('openrouter_api_key');
-      const savedModels = localStorage.getItem('era_selected_models');
-      
-      if (savedKey) {
-        document.getElementById('apiKey').value = savedKey;
-      }
-      
-      if (savedModels) {
-        try {
-          selectedModels = new Set(JSON.parse(savedModels));
-        } catch (e) {}
-      }
-    }
-    
-    // Toggle API key visibility
-    function toggleKeyVisibility() {
-      const input = document.getElementById('apiKey');
-      const icon = document.getElementById('eyeIcon');
-      
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-      } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-      }
-    }
-    
-    // Test OpenRouter connection
-    async function testConnection() {
-      const apiKey = document.getElementById('apiKey').value.trim();
-      const statusDiv = document.getElementById('connectionStatus');
-      
-      if (!apiKey) {
-        showStatus('error', isRu ? 'Введите API ключ' : 'Enter API key');
-        return;
-      }
-      
-      showStatus('loading', isRu ? 'Проверка соединения...' : 'Testing connection...');
-      
-      try {
-        const response = await fetch('/api/openrouter/test-connection', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ apiKey })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          showStatus('success', isRu 
-            ? \`Подключено! Доступно \${data.modelsAvailable} моделей\`
-            : \`Connected! \${data.modelsAvailable} models available\`);
-          
-          // Save key
-          localStorage.setItem('openrouter_api_key', apiKey);
-          
-          // Get credits
-          getCredits(apiKey);
-        } else {
-          showStatus('error', data.error || (isRu ? 'Ошибка подключения' : 'Connection failed'));
-        }
-      } catch (error) {
-        showStatus('error', error.message);
-      }
-    }
-    
-    // Get credits balance
-    async function getCredits(apiKey) {
-      try {
-        const response = await fetch('/api/openrouter/credits', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ apiKey })
-        });
-        
-        const data = await response.json();
-        
-        if (data.data) {
-          document.getElementById('creditsInfo').classList.remove('hidden');
-          document.getElementById('creditsBalance').textContent = '$' + (data.data.limit - data.data.usage).toFixed(2);
-        }
-      } catch (error) {
-        console.error('Failed to get credits:', error);
-      }
-    }
-    
-    // Show connection status
-    function showStatus(type, message) {
-      const statusDiv = document.getElementById('connectionStatus');
-      statusDiv.classList.remove('hidden');
-      
-      const icons = {
-        success: 'check-circle text-green-400',
-        error: 'times-circle text-red-400',
-        loading: 'spinner fa-spin text-blue-400'
-      };
-      
-      const bgColors = {
-        success: 'bg-green-900/30 border-green-500/30',
-        error: 'bg-red-900/30 border-red-500/30',
-        loading: 'bg-blue-900/30 border-blue-500/30'
-      };
-      
-      statusDiv.innerHTML = \`
-        <div class="flex items-center gap-3 p-4 rounded-lg border \${bgColors[type]}">
-          <i class="fas fa-\${icons[type]}"></i>
-          <span>\${message}</span>
+  const isRu = ${isRu};
+
+  // ─── Provider definitions ───────────────────────────────────────────────
+  const PROVIDERS = [
+    {
+      id: 'openrouter',
+      name: 'OpenRouter',
+      icon: 'fa-route',
+      color: '#3b82f6',
+      tagColor: 'blue',
+      desc: isRu ? '400+ моделей — Anthropic, OpenAI, Google и др. через единый API' : '400+ models — Anthropic, OpenAI, Google and more via unified API',
+      placeholder: 'sk-or-v1-...',
+      docsUrl: 'https://openrouter.ai/keys',
+      models: [
+        { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', free: true },
+        { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0 Flash', free: true },
+        { id: 'deepseek/deepseek-r1:free', name: 'DeepSeek R1', free: true },
+        { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B', free: true },
+        { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', free: false },
+        { id: 'openai/gpt-4o', name: 'GPT-4o', free: false },
+        { id: 'google/gemini-pro-1.5', name: 'Gemini 1.5 Pro', free: false },
+        { id: 'anthropic/claude-3-haiku', name: 'Claude 3 Haiku', free: false },
+        { id: 'openai/gpt-4o-mini', name: 'GPT-4o mini', free: false },
+        { id: 'cohere/command-r-plus', name: 'Command R+', free: false },
+      ]
+    },
+    {
+      id: 'anthropic',
+      name: 'Anthropic',
+      icon: 'fa-brain',
+      color: '#f97316',
+      tagColor: 'orange',
+      desc: isRu ? 'Claude Opus, Sonnet, Haiku — прямой доступ к API Anthropic' : 'Claude Opus, Sonnet, Haiku — direct access to Anthropic API',
+      placeholder: 'sk-ant-api03-...',
+      docsUrl: 'https://console.anthropic.com/settings/keys',
+      models: [
+        { id: 'claude-opus-4-8', name: 'Claude Opus 4.8', free: false },
+        { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', free: false },
+        { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5', free: false },
+        { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', free: false },
+        { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', free: false },
+      ]
+    },
+    {
+      id: 'openai',
+      name: 'OpenAI',
+      icon: 'fa-circle',
+      color: '#10b981',
+      tagColor: 'emerald',
+      desc: isRu ? 'GPT-4o, o1, o3-mini — API OpenAI' : 'GPT-4o, o1, o3-mini — OpenAI API',
+      placeholder: 'sk-proj-...',
+      docsUrl: 'https://platform.openai.com/api-keys',
+      models: [
+        { id: 'gpt-4o', name: 'GPT-4o', free: false },
+        { id: 'gpt-4o-mini', name: 'GPT-4o mini', free: false },
+        { id: 'o1', name: 'o1', free: false },
+        { id: 'o1-mini', name: 'o1-mini', free: false },
+        { id: 'o3-mini', name: 'o3-mini', free: false },
+        { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', free: false },
+      ]
+    },
+    {
+      id: 'gemini',
+      name: 'Google Gemini',
+      icon: 'fa-gem',
+      color: '#8b5cf6',
+      tagColor: 'violet',
+      desc: isRu ? 'Gemini 2.0 Flash, 1.5 Pro — Google AI Studio' : 'Gemini 2.0 Flash, 1.5 Pro — Google AI Studio',
+      placeholder: 'AIza...',
+      docsUrl: 'https://aistudio.google.com/app/apikey',
+      models: [
+        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', free: true },
+        { id: 'gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro', free: false },
+        { id: 'gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash', free: true },
+        { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro', free: false },
+      ]
+    },
+    {
+      id: 'groq',
+      name: 'Groq',
+      icon: 'fa-bolt',
+      color: '#f59e0b',
+      tagColor: 'amber',
+      desc: isRu ? 'Сверхбыстрый инференс — Llama, Mixtral, Gemma' : 'Ultra-fast inference — Llama, Mixtral, Gemma',
+      placeholder: 'gsk_...',
+      docsUrl: 'https://console.groq.com/keys',
+      models: [
+        { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', free: true },
+        { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', free: true },
+        { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', free: true },
+        { id: 'gemma2-9b-it', name: 'Gemma 2 9B', free: true },
+        { id: 'llama3-70b-8192', name: 'Llama 3 70B', free: true },
+      ]
+    },
+    {
+      id: 'mistral',
+      name: 'Mistral AI',
+      icon: 'fa-wind',
+      color: '#ec4899',
+      tagColor: 'pink',
+      desc: isRu ? 'Mistral Large, Medium, Small — прямой API' : 'Mistral Large, Medium, Small — direct API',
+      placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      docsUrl: 'https://console.mistral.ai/api-keys/',
+      models: [
+        { id: 'mistral-large-latest', name: 'Mistral Large', free: false },
+        { id: 'mistral-medium-latest', name: 'Mistral Medium', free: false },
+        { id: 'mistral-small-latest', name: 'Mistral Small', free: false },
+        { id: 'open-mixtral-8x22b', name: 'Mixtral 8x22B', free: false },
+        { id: 'open-mistral-7b', name: 'Mistral 7B', free: false },
+      ]
+    },
+    {
+      id: 'cohere',
+      name: 'Cohere',
+      icon: 'fa-vector-square',
+      color: '#06b6d4',
+      tagColor: 'cyan',
+      desc: isRu ? 'Command R+ — специализация на RAG и enterprise' : 'Command R+ — specialised for RAG and enterprise',
+      placeholder: '...',
+      docsUrl: 'https://dashboard.cohere.com/api-keys',
+      models: [
+        { id: 'command-r-plus', name: 'Command R+', free: false },
+        { id: 'command-r', name: 'Command R', free: false },
+        { id: 'command', name: 'Command', free: false },
+      ]
+    },
+    {
+      id: 'together',
+      name: 'Together AI',
+      icon: 'fa-object-group',
+      color: '#84cc16',
+      tagColor: 'lime',
+      desc: isRu ? 'Open-source модели с высокой скоростью' : 'Open-source models at high throughput',
+      placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      docsUrl: 'https://api.together.xyz/settings/api-keys',
+      models: [
+        { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Turbo', free: false },
+        { id: 'mistralai/Mixtral-8x7B-Instruct-v0.1', name: 'Mixtral 8x7B', free: false },
+        { id: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Qwen 2.5 72B', free: false },
+        { id: 'google/gemma-2-27b-it', name: 'Gemma 2 27B', free: false },
+      ]
+    },
+    {
+      id: 'perplexity',
+      name: 'Perplexity',
+      icon: 'fa-search',
+      color: '#6366f1',
+      tagColor: 'indigo',
+      desc: isRu ? 'Sonar — поиск в реальном времени + LLM' : 'Sonar — real-time search + LLM',
+      placeholder: 'pplx-...',
+      docsUrl: 'https://www.perplexity.ai/settings/api',
+      models: [
+        { id: 'llama-3.1-sonar-large-128k-online', name: 'Sonar Large Online', free: false },
+        { id: 'llama-3.1-sonar-small-128k-online', name: 'Sonar Small Online', free: false },
+        { id: 'llama-3.1-sonar-huge-128k-online', name: 'Sonar Huge Online', free: false },
+      ]
+    },
+    {
+      id: 'ollama',
+      name: 'Ollama (Local)',
+      icon: 'fa-server',
+      color: '#64748b',
+      tagColor: 'slate',
+      desc: isRu ? 'Локальные модели — укажите URL вашего сервера Ollama' : 'Local models — specify your Ollama server URL',
+      placeholder: 'http://localhost:11434',
+      docsUrl: 'https://ollama.com/download',
+      isUrl: true,
+      models: [
+        { id: 'llama3.2', name: 'Llama 3.2', free: true },
+        { id: 'mistral', name: 'Mistral 7B', free: true },
+        { id: 'gemma2', name: 'Gemma 2', free: true },
+        { id: 'qwen2.5', name: 'Qwen 2.5', free: true },
+        { id: 'phi4', name: 'Phi-4', free: true },
+      ]
+    },
+  ];
+
+  let customModels = [];
+
+  // ─── Init ───────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    customModels = JSON.parse(localStorage.getItem('era_custom_models') || '[]');
+    renderProviders();
+    renderAllModels();
+    renderCustomModels();
+    updateStats();
+    populateTestSelect();
+    populateCustomProviderSelect();
+  });
+
+  // ─── Render provider cards ──────────────────────────────────────────────
+  function renderProviders() {
+    const grid = document.getElementById('providers-grid');
+    grid.innerHTML = PROVIDERS.map(p => {
+      const savedKey = getSavedKey(p.id);
+      const hasKey = !!savedKey;
+      const keyLabel = p.isUrl ? (isRu ? 'URL сервера' : 'Server URL') : (isRu ? 'API ключ' : 'API key');
+      return \`
+        <div class="glass-card rounded-xl p-5 border \${hasKey ? 'border-green-500/30' : 'border-gray-700/50'} transition-all" id="card-\${p.id}">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:\${p.color}22">
+                <i class="fas \${p.icon}" style="color:\${p.color}"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold">\${p.name}</h3>
+                <p class="text-xs text-gray-500">\${p.desc}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="status-\${p.id}" class="text-xs px-2 py-0.5 rounded-full \${hasKey ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-500'}">
+                \${hasKey ? (isRu ? '✓ Настроен' : '✓ Configured') : (isRu ? 'Не настроен' : 'Not set')}
+              </span>
+              <a href="\${p.docsUrl}" target="_blank" class="text-xs text-blue-400 hover:text-blue-300" title="\${isRu ? 'Получить ключ' : 'Get key'}">
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="flex gap-2 mb-3">
+            <div class="flex-1 relative">
+              <input type="password" id="key-\${p.id}"
+                placeholder="\${p.placeholder}"
+                value="\${savedKey ? '••••••••' + savedKey.slice(-4) : ''}"
+                data-real-value="\${savedKey || ''}"
+                onfocus="this.type='text'; this.value=this.dataset.realValue; this.dataset.focused='1'"
+                onblur="blurKey('\${p.id}')"
+                oninput="this.dataset.realValue=this.value"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none pr-8">
+              <button onclick="toggleKeyVis('\${p.id}')" class="absolute right-2 top-2.5 text-gray-500 hover:text-gray-300">
+                <i class="fas fa-eye text-xs"></i>
+              </button>
+            </div>
+            <button onclick="saveKey('\${p.id}')"
+              class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-xs transition">
+              <i class="fas fa-save"></i>
+            </button>
+            \${!p.isUrl ? \`<button onclick="testKey('\${p.id}')"
+              class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-xs transition" title="\${isRu ? 'Тест' : 'Test'}">
+              <i class="fas fa-plug"></i>
+            </button>\` : ''}
+          </div>
+
+          <!-- Models chips -->
+          <div class="flex flex-wrap gap-1">
+            \${p.models.slice(0, 5).map(m => \`
+              <span class="text-xs px-2 py-0.5 rounded \${m.free ? 'bg-green-900/40 text-green-400' : 'bg-gray-800 text-gray-400'}
+                \${hasKey ? '' : 'opacity-40'}">
+                \${m.name}
+                \${m.free ? '<span class="text-green-600 ml-0.5">free</span>' : ''}
+              </span>
+            \`).join('')}
+            \${p.models.length > 5 ? \`<span class="text-xs text-gray-600">+\${p.models.length - 5} more</span>\` : ''}
+          </div>
         </div>
       \`;
-    }
-    
-    // Load models from API
-    async function loadModels() {
-      try {
-        const response = await fetch('/api/openrouter/models');
-        const data = await response.json();
-        
-        allModels = data.models;
-        
-        // Populate provider filter
-        const providerSelect = document.getElementById('providerFilter');
-        data.providers.forEach(provider => {
-          providerSelect.innerHTML += \`<option value="\${provider}">\${provider}</option>\`;
-        });
-        
-        // Populate type filter
-        const typeSelect = document.getElementById('typeFilter');
-        data.types.forEach(type => {
-          typeSelect.innerHTML += \`<option value="\${type}">\${type}</option>\`;
-        });
-        
-        renderModels(allModels);
-      } catch (error) {
-        console.error('Failed to load models:', error);
+    }).join('');
+  }
+
+  function blurKey(id) {
+    const input = document.getElementById('key-' + id);
+    if (input.dataset.focused) {
+      delete input.dataset.focused;
+      const val = input.dataset.realValue || '';
+      if (val) {
+        input.type = 'password';
+        input.value = '••••••••' + val.slice(-4);
+      } else {
+        input.type = 'password';
+        input.value = '';
       }
     }
-    
-    // Load presets
-    async function loadPresets() {
-      try {
-        const response = await fetch('/api/openrouter/presets');
-        const data = await response.json();
-        
-        const presetsGrid = document.getElementById('presetsGrid');
-        presetsGrid.innerHTML = data.presets.map(preset => \`
-          <div class="bg-gray-800 hover:bg-gray-750 rounded-lg p-4 cursor-pointer transition-colors border border-transparent hover:border-blue-500"
-               onclick="applyPreset('\${preset.id}', \${JSON.stringify(preset.models).replace(/"/g, '&quot;')})">
-            <h3 class="font-semibold mb-1">\${preset.name}</h3>
-            <p class="text-sm text-gray-400 mb-2">\${preset.description}</p>
-            <div class="flex items-center gap-2 text-xs text-gray-500">
-              <i class="fas fa-robot"></i>
-              <span>\${preset.models.length} \${isRu ? 'моделей' : 'models'}</span>
-            </div>
-          </div>
-        \`).join('');
-      } catch (error) {
-        console.error('Failed to load presets:', error);
-      }
+  }
+
+  function toggleKeyVis(id) {
+    const input = document.getElementById('key-' + id);
+    if (input.type === 'password') {
+      input.type = 'text';
+      input.value = input.dataset.realValue || '';
+    } else {
+      input.type = 'password';
+      const val = input.dataset.realValue || '';
+      input.value = val ? '••••••••' + val.slice(-4) : '';
     }
-    
-    // Apply preset
-    function applyPreset(presetId, models) {
-      selectedModels = new Set(models);
-      updateSelectedDisplay();
-      renderModels(allModels);
+  }
+
+  function getSavedKey(providerId) {
+    // OpenRouter: also check legacy key names
+    if (providerId === 'openrouter') {
+      return localStorage.getItem('era_key_openrouter')
+        || localStorage.getItem('openrouter_api_key')
+        || localStorage.getItem('ora_api_key')
+        || '';
     }
-    
-    // Filter models
-    function filterModels(filter) {
-      currentFilter = filter;
-      
-      // Update button styles
-      document.querySelectorAll('.model-filter-btn').forEach(btn => {
-        btn.classList.remove('active', 'bg-gray-700');
-        btn.classList.add('bg-gray-800');
+    return localStorage.getItem('era_key_' + providerId) || '';
+  }
+
+  function saveKey(providerId) {
+    const input = document.getElementById('key-' + providerId);
+    const val = input.dataset.realValue || '';
+    if (!val) {
+      showToast(isRu ? 'Введите значение' : 'Enter a value', 'error');
+      return;
+    }
+    localStorage.setItem('era_key_' + providerId, val);
+    // Backward compat for OpenRouter
+    if (providerId === 'openrouter') {
+      localStorage.setItem('openrouter_api_key', val);
+      localStorage.setItem('ora_api_key', val);
+    }
+    // Update card status
+    const status = document.getElementById('status-' + providerId);
+    if (status) {
+      status.textContent = isRu ? '✓ Настроен' : '✓ Configured';
+      status.className = 'text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400';
+    }
+    const card = document.getElementById('card-' + providerId);
+    if (card) card.classList.replace('border-gray-700/50', 'border-green-500/30');
+    updateStats();
+    renderAllModels();
+    populateTestSelect();
+    showToast(isRu ? 'Ключ сохранён!' : 'Key saved!', 'success');
+  }
+
+  async function testKey(providerId) {
+    if (providerId !== 'openrouter') {
+      showToast(isRu ? 'Тест доступен только для OpenRouter' : 'Test available for OpenRouter only', 'info');
+      return;
+    }
+    const input = document.getElementById('key-' + providerId);
+    const key = input.dataset.realValue || getSavedKey(providerId);
+    if (!key) { showToast(isRu ? 'Введите ключ' : 'Enter key', 'error'); return; }
+
+    showToast(isRu ? 'Проверка...' : 'Testing...', 'info');
+    try {
+      const res = await fetch('/api/openrouter/test-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: key }),
       });
-      document.querySelector(\`[data-filter="\${filter}"]\`).classList.add('active', 'bg-gray-700');
-      document.querySelector(\`[data-filter="\${filter}"]\`).classList.remove('bg-gray-800');
-      
-      applyFilters();
-    }
-    
-    // Apply all filters
-    function applyFilters() {
-      const provider = document.getElementById('providerFilter').value;
-      const type = document.getElementById('typeFilter').value;
-      const search = document.getElementById('modelSearch').value.toLowerCase();
-      
-      let filtered = allModels;
-      
-      // Filter by free/paid
-      if (currentFilter === 'free') {
-        filtered = filtered.filter(m => m.id.includes(':free'));
-      } else if (currentFilter === 'paid') {
-        filtered = filtered.filter(m => !m.id.includes(':free'));
-      }
-      
-      // Filter by provider
-      if (provider) {
-        filtered = filtered.filter(m => m.provider === provider);
-      }
-      
-      // Filter by type
-      if (type) {
-        filtered = filtered.filter(m => m.type === type);
-      }
-      
-      // Filter by search
-      if (search) {
-        filtered = filtered.filter(m => 
-          m.name.toLowerCase().includes(search) || 
-          m.id.toLowerCase().includes(search) ||
-          m.provider.toLowerCase().includes(search)
-        );
-      }
-      
-      renderModels(filtered);
-    }
-    
-    // Render models grid
-    function renderModels(models) {
-      const grid = document.getElementById('modelsGrid');
-      
-      grid.innerHTML = models.map(model => {
-        const isFree = model.id.includes(':free');
-        const isSelected = selectedModels.has(model.id);
-        
-        return \`
-          <div class="model-card p-4 rounded-lg cursor-pointer transition-all border-2 \${isSelected ? 'bg-blue-900/30 border-blue-500' : 'bg-gray-800 border-transparent hover:border-gray-600'}"
-               onclick="toggleModel('\${model.id}')">
-            <div class="flex items-start justify-between mb-2">
-              <div>
-                <span class="font-semibold">\${model.name}</span>
-                <span class="ml-2 text-xs px-2 py-0.5 rounded \${isFree ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}">
-                  \${isFree ? (isRu ? 'Бесплатно' : 'Free') : model.price || 'Paid'}
-                </span>
-              </div>
-              <div class="w-5 h-5 rounded border-2 flex items-center justify-center \${isSelected ? 'bg-blue-500 border-blue-500' : 'border-gray-600'}">
-                \${isSelected ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
-              </div>
-            </div>
-            <div class="text-sm text-gray-400">\${model.provider}</div>
-            <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
-              <span><i class="fas fa-memory mr-1"></i>\${(model.context / 1000).toFixed(0)}K</span>
-              <span class="px-2 py-0.5 bg-gray-700 rounded">\${model.type}</span>
-            </div>
-          </div>
-        \`;
-      }).join('');
-    }
-    
-    // Toggle model selection
-    function toggleModel(modelId) {
-      if (selectedModels.has(modelId)) {
-        selectedModels.delete(modelId);
+      const data = await res.json();
+      if (data.success) {
+        showToast(isRu ? \`OK · \${data.modelsAvailable} моделей\` : \`OK · \${data.modelsAvailable} models\`, 'success');
       } else {
-        selectedModels.add(modelId);
+        showToast(data.error || 'Failed', 'error');
       }
-      
-      updateSelectedDisplay();
-      renderModels(allModels.filter(m => {
-        // Reapply current filters
-        const provider = document.getElementById('providerFilter').value;
-        const type = document.getElementById('typeFilter').value;
-        const search = document.getElementById('modelSearch').value.toLowerCase();
-        
-        let match = true;
-        if (currentFilter === 'free') match = match && m.id.includes(':free');
-        if (currentFilter === 'paid') match = match && !m.id.includes(':free');
-        if (provider) match = match && m.provider === provider;
-        if (type) match = match && m.type === type;
-        if (search) match = match && (m.name.toLowerCase().includes(search) || m.id.toLowerCase().includes(search));
-        
-        return match;
-      }));
+    } catch (e) {
+      showToast(e.message, 'error');
     }
-    
-    // Update selected models display
-    function updateSelectedDisplay() {
-      const container = document.getElementById('selectedModels');
-      const count = document.getElementById('selectedCount');
-      
-      count.textContent = selectedModels.size;
-      
-      if (selectedModels.size === 0) {
-        container.innerHTML = \`<span class="text-gray-500 text-sm">\${isRu ? 'Модели не выбраны' : 'No models selected'}</span>\`;
-        return;
-      }
-      
-      container.innerHTML = Array.from(selectedModels).map(modelId => {
-        const model = allModels.find(m => m.id === modelId);
-        const name = model?.name || modelId.split('/').pop();
-        
-        return \`
-          <span class="bg-blue-900/50 border border-blue-500/50 px-3 py-1 rounded-full text-sm flex items-center gap-2">
-            \${name}
-            <button onclick="event.stopPropagation(); toggleModel('\${modelId}')" class="hover:text-red-400">
-              <i class="fas fa-times text-xs"></i>
-            </button>
-          </span>
+  }
+
+  // ─── Custom models ──────────────────────────────────────────────────────
+  function populateCustomProviderSelect() {
+    const sel = document.getElementById('custom-provider-select');
+    sel.innerHTML = PROVIDERS.map(p => \`<option value="\${p.id}">\${p.name}</option>\`).join('');
+  }
+
+  function addCustomModel() {
+    const providerId = document.getElementById('custom-provider-select').value;
+    const modelId = document.getElementById('custom-model-id').value.trim();
+    const modelName = document.getElementById('custom-model-name').value.trim();
+    if (!modelId) { showToast(isRu ? 'Введите ID модели' : 'Enter model ID', 'error'); return; }
+
+    const exists = customModels.some(m => m.id === modelId && m.provider === providerId);
+    if (exists) { showToast(isRu ? 'Модель уже добавлена' : 'Model already added', 'error'); return; }
+
+    customModels.push({ id: modelId, name: modelName || modelId, provider: providerId, custom: true });
+    localStorage.setItem('era_custom_models', JSON.stringify(customModels));
+    document.getElementById('custom-model-id').value = '';
+    document.getElementById('custom-model-name').value = '';
+    renderCustomModels();
+    renderAllModels();
+    populateTestSelect();
+    updateStats();
+    showToast(isRu ? 'Модель добавлена!' : 'Model added!', 'success');
+  }
+
+  function removeCustomModel(idx) {
+    customModels.splice(idx, 1);
+    localStorage.setItem('era_custom_models', JSON.stringify(customModels));
+    renderCustomModels();
+    renderAllModels();
+    populateTestSelect();
+    updateStats();
+  }
+
+  function renderCustomModels() {
+    const container = document.getElementById('custom-models-list');
+    if (!customModels.length) {
+      container.innerHTML = \`<span class="text-xs text-gray-600">\${isRu ? 'Нет кастомных моделей' : 'No custom models yet'}</span>\`;
+      return;
+    }
+    container.innerHTML = customModels.map((m, i) => {
+      const p = PROVIDERS.find(x => x.id === m.provider);
+      return \`
+        <span class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300">
+          \${p ? \`<i class="fas \${p.icon} text-xs"></i>\` : ''}
+          \${m.name}
+          <button onclick="removeCustomModel(\${i})" class="hover:text-red-400 ml-1">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </span>
+      \`;
+    }).join('');
+  }
+
+  // ─── All models grid ────────────────────────────────────────────────────
+  function renderAllModels() {
+    const query = (document.getElementById('models-search')?.value || '').toLowerCase();
+    const grid = document.getElementById('all-models-grid');
+
+    let allModels = [];
+    PROVIDERS.forEach(p => {
+      const key = getSavedKey(p.id);
+      if (!key) return;
+      p.models.forEach(m => {
+        allModels.push({ ...m, provider: p.name, providerId: p.id, color: p.color, icon: p.icon });
+      });
+    });
+    customModels.forEach(m => {
+      const p = PROVIDERS.find(x => x.id === m.provider);
+      allModels.push({ ...m, provider: p?.name || m.provider, providerId: m.provider, color: p?.color || '#888', icon: p?.icon || 'fa-robot', custom: true });
+    });
+
+    if (query) {
+      allModels = allModels.filter(m =>
+        m.name.toLowerCase().includes(query) ||
+        m.id.toLowerCase().includes(query) ||
+        m.provider.toLowerCase().includes(query)
+      );
+    }
+
+    if (!allModels.length) {
+      grid.innerHTML = \`<p class="text-sm text-gray-600 col-span-3">\${isRu ? 'Настройте хотя бы одного провайдера' : 'Configure at least one provider to see models'}</p>\`;
+      return;
+    }
+
+    grid.innerHTML = allModels.map(m => \`
+      <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-800/50 text-sm">
+        <i class="fas \${m.icon} text-xs flex-shrink-0" style="color:\${m.color}"></i>
+        <div class="flex-1 min-w-0">
+          <div class="font-medium truncate">\${m.name}</div>
+          <div class="text-xs text-gray-500 truncate">\${m.id}</div>
+        </div>
+        \${m.free ? '<span class="text-xs text-green-400 flex-shrink-0">free</span>' : ''}
+        \${m.custom ? '<span class="text-xs text-purple-400 flex-shrink-0">custom</span>' : ''}
+      </div>
+    \`).join('');
+  }
+
+  // ─── Quick test ─────────────────────────────────────────────────────────
+  function populateTestSelect() {
+    const sel = document.getElementById('test-model-select');
+    let options = '';
+    PROVIDERS.forEach(p => {
+      const key = getSavedKey(p.id);
+      if (!key) return;
+      p.models.forEach(m => {
+        options += \`<option value="\${p.id}|\${m.id}">\${p.name} — \${m.name}</option>\`;
+      });
+    });
+    customModels.forEach((m, i) => {
+      options += \`<option value="\${m.provider}|\${m.id}">[Custom] \${m.name}</option>\`;
+    });
+    sel.innerHTML = options || \`<option value="">\${isRu ? 'Нет настроенных моделей' : 'No configured models'}</option>\`;
+  }
+
+  async function runModelTest() {
+    const sel = document.getElementById('test-model-select').value;
+    const query = document.getElementById('test-query').value.trim();
+    const resultDiv = document.getElementById('test-result');
+
+    if (!sel) { showToast(isRu ? 'Нет доступных моделей — сначала настройте провайдера' : 'No models — configure a provider first', 'error'); return; }
+    if (!query) { showToast(isRu ? 'Введите запрос' : 'Enter a query', 'error'); return; }
+
+    const [providerId, modelId] = sel.split('|');
+    const apiKey = getSavedKey(providerId);
+    if (!apiKey) { showToast(isRu ? 'Ключ провайдера не найден' : 'Provider key not found', 'error'); return; }
+
+    resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin text-blue-400 mr-2"></i>' + (isRu ? 'Запрос...' : 'Running...');
+
+    try {
+      // Use OpenRouter for test (other providers need backend support)
+      const endpoint = providerId === 'openrouter' ? '/api/openrouter/chat' : '/api/openrouter/chat';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: providerId === 'openrouter' ? apiKey : getSavedKey('openrouter'),
+          model: providerId === 'openrouter' ? modelId : modelId,
+          messages: [{ role: 'user', content: query }]
+        })
+      });
+      const data = await res.json();
+      if (data.error) {
+        resultDiv.innerHTML = \`<span class="text-red-400">\${data.error}</span>\`;
+      } else {
+        const content = data.choices?.[0]?.message?.content || 'No response';
+        const tokens = data.usage?.total_tokens;
+        resultDiv.innerHTML = \`
+          <div class="text-xs text-gray-500 mb-2">\${modelId} \${tokens ? '· ' + tokens + ' tokens' : ''}</div>
+          <div class="text-sm text-gray-200 whitespace-pre-wrap">\${escHtml(content)}</div>
         \`;
-      }).join('');
+      }
+    } catch (e) {
+      resultDiv.innerHTML = \`<span class="text-red-400">\${e.message}</span>\`;
     }
-    
-    // Clear selection
-    function clearSelection() {
-      selectedModels.clear();
-      updateSelectedDisplay();
-      applyFilters();
-    }
-    
-    // Run single model test
-    async function runSingleTest() {
-      const apiKey = localStorage.getItem('openrouter_api_key');
-      const query = document.getElementById('testQuery').value.trim();
-      
-      if (!apiKey) {
-        alert(isRu ? 'Сначала настройте API ключ' : 'Configure API key first');
-        return;
-      }
-      
-      if (selectedModels.size === 0) {
-        alert(isRu ? 'Выберите хотя бы одну модель' : 'Select at least one model');
-        return;
-      }
-      
-      const model = Array.from(selectedModels)[0];
-      showTestResults('loading', isRu ? 'Выполнение запроса...' : 'Running query...');
-      
-      try {
-        const response = await fetch('/api/openrouter/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            apiKey,
-            model,
-            messages: [{ role: 'user', content: query }]
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.error) {
-          showTestResults('error', data.error);
-        } else {
-          const content = data.choices?.[0]?.message?.content || 'No response';
-          showTestResults('success', \`
-            <div class="mb-2"><strong>\${model}</strong></div>
-            <div class="bg-gray-900 rounded p-4 text-sm">\${content}</div>
-            <div class="text-xs text-gray-500 mt-2">
-              Tokens: \${data.usage?.total_tokens || 'N/A'}
-            </div>
-          \`);
-        }
-      } catch (error) {
-        showTestResults('error', error.message);
-      }
-    }
-    
-    // Run ensemble test
-    async function runEnsembleTest() {
-      const apiKey = localStorage.getItem('openrouter_api_key');
-      const query = document.getElementById('testQuery').value.trim();
-      
-      if (!apiKey) {
-        alert(isRu ? 'Сначала настройте API ключ' : 'Configure API key first');
-        return;
-      }
-      
-      if (selectedModels.size < 2) {
-        alert(isRu ? 'Выберите минимум 2 модели для ансамбля' : 'Select at least 2 models for ensemble');
-        return;
-      }
-      
-      showTestResults('loading', isRu ? 'Выполнение ансамблевого запроса...' : 'Running ensemble query...');
-      
-      try {
-        const response = await fetch('/api/openrouter/ensemble', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            apiKey,
-            models: Array.from(selectedModels),
-            query
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.error) {
-          showTestResults('error', data.error);
-        } else {
-          let html = \`
-            <div class="mb-4 flex items-center gap-4">
-              <span class="text-green-400"><i class="fas fa-check-circle mr-1"></i>\${data.successful} \${isRu ? 'успешно' : 'successful'}</span>
-              \${data.failed > 0 ? \`<span class="text-red-400"><i class="fas fa-times-circle mr-1"></i>\${data.failed} \${isRu ? 'ошибок' : 'failed'}</span>\` : ''}
-              <span class="text-gray-500">\${data.totalLatency}ms</span>
-            </div>
-          \`;
-          
-          data.results.forEach(result => {
-            html += \`
-              <div class="mb-4 bg-gray-900 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <strong>\${result.model}</strong>
-                  <span class="text-xs text-gray-500">\${result.latency}ms</span>
-                </div>
-                <div class="text-sm">\${result.response.substring(0, 500)}\${result.response.length > 500 ? '...' : ''}</div>
-              </div>
-            \`;
-          });
-          
-          if (data.errors?.length > 0) {
-            html += \`<div class="text-red-400 text-sm mt-4">\`;
-            data.errors.forEach(err => {
-              html += \`<div>\${err.model}: \${err.error}</div>\`;
-            });
-            html += \`</div>\`;
+  }
+
+  // ─── Stats ──────────────────────────────────────────────────────────────
+  function updateStats() {
+    const configured = PROVIDERS.filter(p => getSavedKey(p.id)).length;
+    const totalModels = PROVIDERS.filter(p => getSavedKey(p.id)).reduce((s, p) => s + p.models.length, 0);
+    document.getElementById('stat-configured').textContent = configured;
+    document.getElementById('stat-models').textContent = totalModels;
+    document.getElementById('stat-custom').textContent = customModels.length;
+  }
+
+  // ─── Save all / Clear all ───────────────────────────────────────────────
+  function saveAllToStorage() {
+    PROVIDERS.forEach(p => {
+      const input = document.getElementById('key-' + p.id);
+      if (input) {
+        const val = input.dataset.realValue || '';
+        if (val && !val.startsWith('••')) {
+          localStorage.setItem('era_key_' + p.id, val);
+          if (p.id === 'openrouter') {
+            localStorage.setItem('openrouter_api_key', val);
+            localStorage.setItem('ora_api_key', val);
           }
-          
-          showTestResults('success', html);
         }
-      } catch (error) {
-        showTestResults('error', error.message);
       }
-    }
-    
-    // Show test results
-    function showTestResults(type, content) {
-      const resultsDiv = document.getElementById('testResults');
-      resultsDiv.classList.remove('hidden');
-      
-      if (type === 'loading') {
-        resultsDiv.innerHTML = \`
-          <div class="bg-gray-800 rounded-lg p-4 flex items-center gap-3">
-            <i class="fas fa-spinner fa-spin text-blue-400"></i>
-            <span>\${content}</span>
-          </div>
-        \`;
-      } else if (type === 'error') {
-        resultsDiv.innerHTML = \`
-          <div class="bg-red-900/30 border border-red-500/30 rounded-lg p-4">
-            <i class="fas fa-times-circle text-red-400 mr-2"></i>
-            \${content}
-          </div>
-        \`;
-      } else {
-        resultsDiv.innerHTML = \`
-          <div class="bg-gray-800 rounded-lg p-4">
-            \${content}
-          </div>
-        \`;
-      }
-    }
-    
-    // Save configuration
-    function saveConfig() {
-      const apiKey = document.getElementById('apiKey').value.trim();
-      
-      if (apiKey) {
-        localStorage.setItem('openrouter_api_key', apiKey);
-      }
-      
-      localStorage.setItem('era_selected_models', JSON.stringify(Array.from(selectedModels)));
-      
-      // Show success toast
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50';
-      toast.innerHTML = \`<i class="fas fa-check-circle"></i> \${isRu ? 'Конфигурация сохранена!' : 'Configuration saved!'}\`;
-      document.body.appendChild(toast);
-      
-      setTimeout(() => toast.remove(), 3000);
-    }
-    
-    // Reset configuration
-    function resetConfig() {
-      if (confirm(isRu ? 'Сбросить все настройки?' : 'Reset all settings?')) {
-        localStorage.removeItem('openrouter_api_key');
-        localStorage.removeItem('era_selected_models');
-        document.getElementById('apiKey').value = '';
-        selectedModels.clear();
-        updateSelectedDisplay();
-        applyFilters();
-        
-        document.getElementById('connectionStatus').classList.add('hidden');
-        document.getElementById('creditsInfo').classList.add('hidden');
-      }
-    }
+    });
+    localStorage.setItem('era_custom_models', JSON.stringify(customModels));
+    updateStats();
+    renderAllModels();
+    populateTestSelect();
+    showToast(isRu ? 'Всё сохранено!' : 'All saved!', 'success');
+  }
+
+  function clearAllKeys() {
+    if (!confirm(isRu ? 'Очистить все API ключи? Это действие нельзя отменить.' : 'Clear all API keys? This cannot be undone.')) return;
+    PROVIDERS.forEach(p => {
+      localStorage.removeItem('era_key_' + p.id);
+    });
+    localStorage.removeItem('openrouter_api_key');
+    localStorage.removeItem('ora_api_key');
+    customModels = [];
+    localStorage.removeItem('era_custom_models');
+    renderProviders();
+    renderCustomModels();
+    renderAllModels();
+    updateStats();
+    populateTestSelect();
+    showToast(isRu ? 'Все ключи удалены' : 'All keys cleared', 'info');
+  }
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showToast(msg, type = 'info') {
+    const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-blue-600' };
+    const toast = document.createElement('div');
+    toast.className = \`fixed bottom-4 right-4 \${colors[type]} text-white px-5 py-3 rounded-lg shadow-lg z-50 text-sm flex items-center gap-2\`;
+    toast.innerHTML = \`<i class="fas \${type==='success'?'fa-check-circle':type==='error'?'fa-times-circle':'fa-info-circle'}"></i> \${msg}\`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
   </script>
 </body>
 </html>

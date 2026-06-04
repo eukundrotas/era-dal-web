@@ -63,7 +63,7 @@ export const docsPage = (lang: Language = 'en') => `
       </aside>
 
       <!-- Main Content -->
-      <div class="lg:ml-64 flex-1 p-8 max-w-4xl">
+      <div class="lg:ml-56 flex-1 p-8 max-w-4xl">
         <!-- Introduction -->
         <section id="introduction" class="mb-16">
           <h1 class="text-4xl font-bold mb-4">ERA DAL Documentation</h1>

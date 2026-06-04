@@ -14,7 +14,7 @@ export const dashboardPage = (lang: Language = 'en') => {
 <body class="bg-gray-950 text-white">
   ${sidebar('dashboard', lang)}
   
-  <main class="ml-64 pt-4 min-h-screen">
+  <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6">
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
@@ -158,9 +158,13 @@ export const dashboardPage = (lang: Language = 'en') => {
                 <span class="text-gray-400">${t.topDomain}</span>
                 <span class="text-blue-400 font-medium" id="stat-top-domain">--</span>
               </div>
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between mb-2">
                 <span class="text-gray-400">${t.topModel}</span>
                 <span class="text-purple-400 font-medium" id="stat-top-model">--</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">${isRu ? 'Расход сегодня' : 'Cost today'}</span>
+                <span class="text-green-400 font-medium" id="stat-cost-today">--</span>
               </div>
             </div>
           </div>
@@ -297,8 +301,11 @@ export const dashboardPage = (lang: Language = 'en') => {
       document.getElementById('stat-success-rate').textContent = dashboardData.successRate + '%';
       document.getElementById('success-bar').style.width = dashboardData.successRate + '%';
       
-      document.getElementById('stat-top-domain').textContent = dashboardData.topDomain;
-      document.getElementById('stat-top-model').textContent = dashboardData.topModel;
+      document.getElementById('stat-top-domain').textContent = dashboardData.topDomain || '—';
+      document.getElementById('stat-top-model').textContent = dashboardData.topModel || '—';
+      const cost = dashboardData.costToday;
+      document.getElementById('stat-cost-today').textContent =
+        cost != null ? (cost < 0.001 ? '<$0.001' : '$' + cost.toFixed(4)) : '—';
     }
 
     function updateActivity() {

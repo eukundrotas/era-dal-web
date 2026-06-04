@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { type ThinkingMode, applyThinkingMode } from '../types/thinking-modes'
 
 export const openRouterApi = new Hono()
 
@@ -152,13 +153,14 @@ openRouterApi.post('/test-connection', async (c) => {
 openRouterApi.post('/chat', async (c) => {
   try {
     const body = await c.req.json()
-    const { 
-      apiKey, 
-      model, 
-      messages, 
-      temperature = 0.7, 
+    const {
+      apiKey,
+      model,
+      messages,
+      temperature = 0.7,
       max_tokens = 2048,
-      stream = false 
+      stream = false,
+      thinking_mode = 'standard' as ThinkingMode
     } = body
 
     if (!apiKey) {
@@ -173,6 +175,8 @@ openRouterApi.post('/chat', async (c) => {
       return c.json({ error: 'Messages array is required' }, 400)
     }
 
+    const finalMessages = applyThinkingMode(messages, thinking_mode)
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -183,7 +187,7 @@ openRouterApi.post('/chat', async (c) => {
       },
       body: JSON.stringify({
         model,
-        messages,
+        messages: finalMessages,
         temperature,
         max_tokens,
         stream
@@ -208,13 +212,14 @@ openRouterApi.post('/chat', async (c) => {
 openRouterApi.post('/ensemble', async (c) => {
   try {
     const body = await c.req.json()
-    const { 
-      apiKey, 
-      models, 
-      query, 
+    const {
+      apiKey,
+      models,
+      query,
       systemPrompt,
       temperature = 0.7,
-      max_tokens = 2048
+      max_tokens = 2048,
+      thinking_mode = 'standard' as ThinkingMode
     } = body
 
     if (!apiKey) {
@@ -229,10 +234,11 @@ openRouterApi.post('/ensemble', async (c) => {
       return c.json({ error: 'Query is required' }, 400)
     }
 
-    const messages = [
+    const baseMessages = [
       ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
       { role: 'user', content: query }
     ]
+    const messages = applyThinkingMode(baseMessages, thinking_mode)
 
     // Execute queries in parallel
     const startTime = Date.now()

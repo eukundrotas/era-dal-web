@@ -5,7 +5,11 @@ export const head = (title: string, description: string = '', lang: Language = '
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="${description}">
+  <meta name="theme-color" content="#4f46e5">
   <title>${title} | ERA DAL</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.svg">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -52,6 +56,24 @@ export const head = (title: string, description: string = '', lang: Language = '
       background: rgba(59, 130, 246, 0.2);
       border-left: 3px solid #3b82f6;
     }
+    /* Thin custom scrollbar for the sidebar nav */
+    .sidebar-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.12) transparent;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+    }
+    .sidebar-scroll:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+    /* Smooth height-collapse for category sections */
+    .sb-sec-body { overflow: hidden; transition: max-height 0.22s ease, opacity 0.18s ease; }
+    .sb-sec-header { transition: background 0.15s; border-radius: 6px; }
+    .sb-sec-header:hover { background: rgba(255,255,255,0.03); }
     .lang-dropdown {
       position: relative;
       display: inline-block;
@@ -175,88 +197,393 @@ export const navbar = (lang: Language = 'en') => {
 
 export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en') => {
   const sb = getSection('sidebar', lang)
-  
+  const isRu = lang === 'ru'
+
+  const link = (page: string, href: string, icon: string, iconColor: string, label: string) =>
+    `<a href="${href}?lang=${lang}" data-sb-link
+        class="sidebar-link ${activePage === page ? 'active' : ''} flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-gray-300 hover:text-white text-sm"
+        title="${label}">
+       <i class="${icon} w-4 text-center flex-shrink-0 ${iconColor}" style="font-size:13px"></i>
+       <span class="sb-label truncate">${label}</span>
+     </a>`
+
+  const sectionHeader = (id: string, label: string, colorClass: string, topBorder = false, count = 0) =>
+    `<button onclick="sbSection('${id}')" data-sec-header="${id}"
+        class="sb-sec-header w-full flex items-center justify-between px-3 ${topBorder ? 'mt-1.5 pt-2.5' : 'pt-2'} pb-1 group${topBorder ? ' border-t border-gray-800/70' : ''}">
+       <span class="sb-label text-xs ${colorClass} uppercase tracking-wider font-semibold flex items-center gap-1.5">
+         ${label}
+         <span class="sb-sec-count text-[9px] text-gray-600 normal-case font-normal tracking-normal">${count}</span>
+       </span>
+       <i id="sbch-${id}" class="fas fa-chevron-down text-xs text-gray-600 group-hover:text-gray-400 transition-transform duration-200"></i>
+     </button>`
+
   return `
-  <aside class="fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-800 pt-16 z-40">
-    <div class="p-4">
-      <div class="flex items-center justify-between mb-4">
-        <!-- Language Switcher in Sidebar -->
-        <div class="lang-dropdown w-full">
-          <button class="flex items-center justify-between w-full glass rounded-lg px-3 py-2 text-gray-300 hover:text-white text-sm">
-            <span><i class="fas fa-globe mr-2"></i>${lang === 'ru' ? 'Русский' : 'English'}</span>
-            <i class="fas fa-chevron-down text-xs"></i>
+  <!-- ── Sidebar ── -->
+  <aside id="app-sidebar" class="fixed left-0 top-0 h-screen w-56 bg-gray-900 border-r border-gray-800 z-40 flex flex-col select-none transition-all duration-200">
+
+    <!-- Top: brand + collapse toggle -->
+    <div class="flex-shrink-0 px-3 pt-3 pb-2 border-b border-gray-800">
+      <div class="flex items-center justify-between mb-3">
+        <a href="/dashboard?lang=${lang}" class="flex items-center gap-2 group min-w-0">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-sitemap text-white" style="font-size:11px"></i>
+          </div>
+          <span class="sb-label font-bold text-white text-sm tracking-wide whitespace-nowrap">ERA <span class="text-violet-400">DAL</span></span>
+        </a>
+        <div class="flex items-center gap-1">
+          <!-- Notification bell -->
+          <button id="notif-btn" onclick="toggleNotifs()" title="${isRu ? 'Уведомления' : 'Notifications'}"
+              class="relative flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
+            <i class="fas fa-bell" style="font-size:11px"></i>
+            <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-red-500 rounded-full text-white px-0.5 flex items-center justify-center leading-none" style="font-size:8px">0</span>
           </button>
-          <div class="lang-dropdown-content w-full" style="position: relative; margin-top: 4px;">
-            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">
-              <span class="mr-2">🇬🇧</span> English
-            </div>
-            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">
-              <span class="mr-2">🇷🇺</span> Русский
-            </div>
-          </div>
+          <!-- Collapse sidebar button -->
+          <button onclick="sbCollapse()" title="${isRu ? 'Свернуть/развернуть' : 'Collapse/expand'}"
+              class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
+            <i id="sb-collapse-icon" class="fas fa-angles-left" style="font-size:11px"></i>
+          </button>
         </div>
       </div>
-      
-      <div class="flex items-center space-x-3 mb-8 p-3 glass rounded-lg">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-user text-white"></i>
+
+      <!-- User row -->
+      <div class="flex items-center gap-2 px-1">
+        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-user text-white" style="font-size:9px"></i>
         </div>
-        <div>
-          <p class="text-white font-medium">Eugene</p>
-          <p class="text-gray-400 text-xs">${sb.proPlan}</p>
+        <div class="sb-label min-w-0">
+          <p class="text-white text-xs font-medium leading-tight truncate">Eugene</p>
+          <p class="text-gray-500 text-xs leading-tight">${sb.proPlan}</p>
         </div>
-      </div>
-      
-      <nav class="space-y-1">
-        <a href="/dashboard?lang=${lang}" class="sidebar-link ${activePage === 'dashboard' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-chart-pie w-5"></i>
-          <span>${sb.dashboard}</span>
-        </a>
-        <a href="/playground?lang=${lang}" class="sidebar-link ${activePage === 'playground' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-flask w-5"></i>
-          <span>${sb.playground}</span>
-        </a>
-        <a href="/history?lang=${lang}" class="sidebar-link ${activePage === 'history' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-history w-5"></i>
-          <span>${sb.history}</span>
-        </a>
-        
-        <div class="pt-4 mt-4 border-t border-gray-800">
-          <p class="px-3 text-xs text-gray-500 uppercase tracking-wider mb-2">${sb.settings}</p>
-        </div>
-        
-        <a href="/ai-config?lang=${lang}" class="sidebar-link ${activePage === 'ai-config' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-robot w-5 text-purple-400"></i>
-          <span>${lang === 'ru' ? 'AI Провайдеры' : 'AI Providers'}</span>
-        </a>
-        <a href="/integrations?lang=${lang}" class="sidebar-link ${activePage === 'integrations' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-plug w-5 text-blue-400"></i>
-          <span>${lang === 'ru' ? 'Интеграции' : 'Integrations'}</span>
-        </a>
-        <a href="/settings?lang=${lang}" class="sidebar-link ${activePage === 'settings' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-cog w-5"></i>
-          <span>${sb.settings}</span>
-        </a>
-        <a href="/profile?lang=${lang}" class="sidebar-link ${activePage === 'profile' ? 'active' : ''} flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:text-white">
-          <i class="fas fa-user-circle w-5"></i>
-          <span>${sb.profile}</span>
-        </a>
-      </nav>
-      
-      <div class="absolute bottom-4 left-4 right-4">
-        <div class="glass rounded-lg p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-400 text-sm">${sb.apiCalls}</span>
-            <span class="text-white text-sm font-medium">847 / 1000</span>
+        <div class="sb-label lang-dropdown ml-auto">
+          <button class="text-gray-500 hover:text-gray-300 transition" title="${isRu ? 'Язык' : 'Language'}">
+            <span style="font-size:14px">${lang === 'ru' ? '🇷🇺' : '🇬🇧'}</span>
+          </button>
+          <div class="lang-dropdown-content" style="right:0;top:100%;min-width:110px">
+            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">🇬🇧 English</div>
+            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">🇷🇺 Русский</div>
           </div>
-          <div class="w-full bg-gray-700 rounded-full h-2">
-            <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: 84.7%"></div>
-          </div>
-          <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-2 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
         </div>
       </div>
     </div>
+
+    <!-- Middle: scrollable nav -->
+    <nav class="flex-1 overflow-y-auto px-2 py-2 sidebar-scroll">
+
+      <!-- Nav toolbar: collapse / expand all categories -->
+      <div id="sb-nav-toolbar" class="sb-label flex items-center justify-between px-2 pb-1.5 mb-0.5">
+        <span class="text-[10px] text-gray-600 uppercase tracking-wider font-semibold">${isRu ? 'Категории' : 'Categories'}</span>
+        <button onclick="sbToggleAll()" id="sb-toggle-all" title="${isRu ? 'Свернуть / развернуть все' : 'Collapse / expand all'}"
+            class="flex items-center gap-1 text-[10px] text-gray-600 hover:text-gray-300 transition px-1.5 py-0.5 rounded hover:bg-gray-800">
+          <i id="sb-toggle-all-icon" class="fas fa-angles-up" style="font-size:10px"></i>
+        </button>
+      </div>
+
+      <!-- Meta-Orchestrator -->
+      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70', false, 6)}
+      <div id="sbsec-meta" class="sb-sec-body space-y-0.5">
+        ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор'      : 'Orchestrator')}
+        ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
+        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400',isRu ? 'Метаагенты'       : 'Meta-Agents')}
+        ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'         : 'Scenarios')}
+        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',   isRu ? 'Базы знаний'      : 'Knowledge Bases')}
+        ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'           : 'Journal')}
+      </div>
+
+      <!-- ERA DAL -->
+      ${sectionHeader('dal', 'ERA DAL', 'text-gray-500', true, 3)}
+      <div id="sbsec-dal" class="sb-sec-body space-y-0.5">
+        ${link('dashboard',  '/dashboard',  'fas fa-chart-pie', 'text-cyan-400',   sb.dashboard)}
+        ${link('playground', '/playground', 'fas fa-flask',     'text-yellow-400', sb.playground)}
+        ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
+      </div>
+
+      <!-- Tasks & Projects -->
+      ${sectionHeader('tasks', isRu ? 'Задачи и проекты' : 'Tasks & Projects', 'text-gray-500', true, 3)}
+      <div id="sbsec-tasks" class="sb-sec-body space-y-0.5">
+        ${link('tasks',    '/tasks',    'fas fa-list-check',  'text-blue-400',   isRu ? 'Задачи'   : 'Tasks')}
+        ${link('projects', '/projects', 'fas fa-folder-open', 'text-green-400',  isRu ? 'Проекты'  : 'Projects')}
+        ${link('goals',    '/goals',    'fas fa-bullseye',    'text-yellow-400', isRu ? 'Цели OKR' : 'Goals OKR')}
+      </div>
+
+      <!-- Company -->
+      ${sectionHeader('company', isRu ? 'Компания' : 'Company', 'text-gray-500', true, 3)}
+      <div id="sbsec-company" class="sb-sec-body space-y-0.5">
+        ${link('company',     '/company',     'fas fa-building',      'text-cyan-400',    isRu ? 'Оргструктура'   : 'Company')}
+        ${link('regulations', '/regulations', 'fas fa-book-open',     'text-orange-400',  isRu ? 'Регламенты'     : 'Regulations')}
+        ${link('expenses',    '/expenses',    'fas fa-receipt',       'text-red-400',     isRu ? 'Расходы'        : 'Expenses')}
+      </div>
+
+      <!-- Settings -->
+      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 4)}
+      <div id="sbsec-cfg" class="sb-sec-body space-y-0.5">
+        ${link('ai-config',    '/ai-config',    'fas fa-robot',       'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
+        ${link('integrations', '/integrations', 'fas fa-plug',        'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
+        ${link('settings',     '/settings',     'fas fa-cog',         'text-gray-400',   sb.settings)}
+        ${link('profile',      '/profile',      'fas fa-user-circle', 'text-gray-400',   sb.profile)}
+      </div>
+    </nav>
+
+    <!-- Bottom: API usage (never overlaps nav) -->
+    <div class="flex-shrink-0 px-3 py-2 border-t border-gray-800">
+      <div id="sb-usage" class="sb-label glass rounded-lg px-3 py-2">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-gray-400 text-xs">${sb.apiCalls}</span>
+          <span class="text-white text-xs font-medium">847/1k</span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-1.5">
+          <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full" style="width:84.7%"></div>
+        </div>
+        <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-1 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
+      </div>
+      <!-- Collapsed: show tiny dot indicator -->
+      <div id="sb-usage-mini" class="hidden justify-center py-1">
+        <div class="w-2 h-2 rounded-full bg-blue-500" title="847/1000 API calls"></div>
+      </div>
+    </div>
   </aside>
+
+  <!-- ── Notifications Panel ── -->
+  <div id="notif-panel" class="hidden fixed left-56 top-0 bottom-0 w-72 bg-gray-900 border-r border-gray-700 z-30 flex flex-col shadow-2xl transition-all" style="transition:left 0.2s">
+    <div class="flex-shrink-0 px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+      <span class="text-sm font-semibold text-white">${isRu ? 'Уведомления' : 'Notifications'}</span>
+      <div class="flex items-center gap-3">
+        <button onclick="clearAllNotifs()" class="text-xs text-gray-500 hover:text-gray-300">${isRu ? 'Прочитать всё' : 'Mark all read'}</button>
+        <button onclick="toggleNotifs()" class="text-gray-400 hover:text-white w-5 h-5 flex items-center justify-center">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+    </div>
+    <div id="notif-list" class="flex-1 overflow-y-auto divide-y divide-gray-800/60">
+      <div class="py-8 text-center text-gray-500 text-sm" id="notif-empty">
+        <i class="fas fa-bell-slash text-2xl mb-2 block text-gray-700"></i>
+        ${isRu ? 'Нет уведомлений' : 'No notifications'}
+      </div>
+    </div>
+  </div>
+  <!-- Click outside to close notif panel -->
+  <div id="notif-overlay" class="hidden fixed inset-0 z-20" onclick="toggleNotifs()"></div>
+
+  <script>
+  (function() {
+    var SB_W  = '14rem';   // expanded  (w-56)
+    var SB_WC = '3rem';    // collapsed (w-12)
+
+    var SB_SECTIONS = ['meta', 'dal', 'tasks', 'company', 'cfg'];
+
+    /* ── Section accordion ─────────────────────────────── */
+    function sbSetSection(id, expanded) {
+      var sec = document.getElementById('sbsec-' + id);
+      var ch  = document.getElementById('sbch-'  + id);
+      if (!sec) return;
+      sec.style.display = expanded ? '' : 'none';
+      if (ch) ch.style.transform = expanded ? '' : 'rotate(-90deg)';
+      localStorage.setItem('era-sb-sec-' + id, expanded ? '0' : '1');
+    }
+
+    function sbSection(id) {
+      var sec = document.getElementById('sbsec-' + id);
+      if (!sec) return;
+      sbSetSection(id, sec.style.display === 'none');
+      sbSyncToggleAll();
+    }
+    window.sbSection = sbSection;
+
+    /* ── Collapse / expand ALL categories ──────────────── */
+    function sbToggleAll() {
+      var anyExpanded = SB_SECTIONS.some(function(id) {
+        var sec = document.getElementById('sbsec-' + id);
+        return sec && sec.style.display !== 'none';
+      });
+      SB_SECTIONS.forEach(function(id) { sbSetSection(id, !anyExpanded); });
+      localStorage.setItem('era-sb-allcollapsed', anyExpanded ? '1' : '0');
+      sbSyncToggleAll();
+    }
+    window.sbToggleAll = sbToggleAll;
+
+    function sbSyncToggleAll() {
+      var anyExpanded = SB_SECTIONS.some(function(id) {
+        var sec = document.getElementById('sbsec-' + id);
+        return sec && sec.style.display !== 'none';
+      });
+      var icon = document.getElementById('sb-toggle-all-icon');
+      if (icon) icon.className = 'fas ' + (anyExpanded ? 'fa-angles-up' : 'fa-angles-down');
+      var btn = document.getElementById('sb-toggle-all');
+      if (btn) btn.title = anyExpanded
+        ? '${isRu ? 'Свернуть все категории' : 'Collapse all categories'}'
+        : '${isRu ? 'Развернуть все категории' : 'Expand all categories'}';
+    }
+
+    /* ── Full sidebar collapse ──────────────────────────── */
+    function sbCollapse() {
+      var sb   = document.getElementById('app-sidebar');
+      var icon = document.getElementById('sb-collapse-icon');
+      var main = document.querySelector('main') || document.querySelector('[data-main]');
+      var collapsed = sb.dataset.sbCollapsed === '1';
+
+      if (collapsed) {
+        // expand
+        sb.style.width = SB_W;
+        sb.dataset.sbCollapsed = '0';
+        if (main) main.style.marginLeft = SB_W;
+        if (icon) { icon.classList.remove('fa-angles-right'); icon.classList.add('fa-angles-left'); }
+        sb.querySelectorAll('.sb-label').forEach(function(el) { el.style.display = ''; });
+        sb.querySelectorAll('[data-sb-link]').forEach(function(el) { el.style.justifyContent = ''; el.style.padding = ''; });
+        // restore category headers + toolbar, and re-apply each section's saved state
+        sb.querySelectorAll('.sb-sec-header').forEach(function(el) { el.style.display = ''; });
+        var tb = document.getElementById('sb-nav-toolbar'); if (tb) tb.style.display = '';
+        SB_SECTIONS.forEach(function(id) {
+          sbSetSection(id, localStorage.getItem('era-sb-sec-' + id) !== '1');
+        });
+        sbSyncToggleAll();
+        var usageFull = document.getElementById('sb-usage');
+        var usageMini = document.getElementById('sb-usage-mini');
+        if (usageFull) usageFull.style.display = '';
+        if (usageMini) usageMini.style.display = 'none';
+        localStorage.setItem('era-sb-collapsed', '0');
+      } else {
+        // collapse to icons only
+        sb.style.width = SB_WC;
+        sb.dataset.sbCollapsed = '1';
+        if (main) main.style.marginLeft = SB_WC;
+        if (icon) { icon.classList.remove('fa-angles-left'); icon.classList.add('fa-angles-right'); }
+        sb.querySelectorAll('.sb-label').forEach(function(el) { el.style.display = 'none'; });
+        sb.querySelectorAll('[data-sb-link]').forEach(function(el) { el.style.justifyContent = 'center'; el.style.padding = '0.375rem 0'; });
+        // hide category headers + toolbar, and force every section's links visible as icons
+        sb.querySelectorAll('.sb-sec-header').forEach(function(el) { el.style.display = 'none'; });
+        var tb2 = document.getElementById('sb-nav-toolbar'); if (tb2) tb2.style.display = 'none';
+        SB_SECTIONS.forEach(function(id) {
+          var sec = document.getElementById('sbsec-' + id);
+          if (sec) sec.style.display = '';
+        });
+        var usageFull = document.getElementById('sb-usage');
+        var usageMini = document.getElementById('sb-usage-mini');
+        if (usageFull) usageFull.style.display = 'none';
+        if (usageMini) usageMini.style.display = 'flex';
+        localStorage.setItem('era-sb-collapsed', '1');
+      }
+    }
+    window.sbCollapse = sbCollapse;
+
+    /* ── Restore state on load ──────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function() {
+      // Restore each category's collapsed/expanded state (all 5 sections)
+      SB_SECTIONS.forEach(function(id) {
+        if (localStorage.getItem('era-sb-sec-' + id) === '1') {
+          var sec = document.getElementById('sbsec-' + id);
+          var ch  = document.getElementById('sbch-'  + id);
+          if (sec) sec.style.display = 'none';
+          if (ch)  ch.style.transform = 'rotate(-90deg)';
+        }
+      });
+      sbSyncToggleAll();
+      // Restore full icon-collapse state
+      if (localStorage.getItem('era-sb-collapsed') === '1') {
+        sbCollapse();
+      }
+    });
+
+    /* ── Notifications ──────────────────────────────────────────────── */
+    var notifUnread = 0;
+    var notifData   = [];
+
+    var NOTIF_ICONS = {
+      success: { icon:'fa-check-circle', color:'text-green-400', bg:'bg-green-900/20' },
+      error:   { icon:'fa-times-circle', color:'text-red-400',   bg:'bg-red-900/20'   },
+      pending: { icon:'fa-clock',        color:'text-yellow-400',bg:'bg-yellow-900/20'},
+      info:    { icon:'fa-info-circle',  color:'text-blue-400',  bg:'bg-blue-900/20'  },
+    };
+
+    function toggleNotifs() {
+      var panel   = document.getElementById('notif-panel');
+      var overlay = document.getElementById('notif-overlay');
+      var isOpen  = !panel.classList.contains('hidden');
+      if (isOpen) {
+        panel.classList.add('hidden');
+        overlay.classList.add('hidden');
+      } else {
+        // Adjust panel position for collapsed sidebar
+        var sb = document.getElementById('app-sidebar');
+        panel.style.left = sb && sb.dataset.sbCollapsed === '1' ? '3rem' : '14rem';
+        panel.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        notifUnread = 0;
+        var badge = document.getElementById('notif-badge');
+        if (badge) badge.classList.add('hidden');
+        localStorage.setItem('era-notif-read', Date.now().toString());
+      }
+    }
+    window.toggleNotifs = toggleNotifs;
+
+    function renderNotifs() {
+      var list  = document.getElementById('notif-list');
+      var empty = document.getElementById('notif-empty');
+      if (!list) return;
+      if (!notifData.length) {
+        if (empty) empty.style.display = '';
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+      list.innerHTML = notifData.map(function(ev) {
+        var s = NOTIF_ICONS[ev.type] || NOTIF_ICONS.info;
+        return '<div class="flex items-start gap-3 px-4 py-3 hover:bg-gray-800/40 transition '+s.bg+'">'
+          + '<i class="fas '+s.icon+' '+s.color+' mt-0.5 flex-shrink-0" style="font-size:13px"></i>'
+          + '<div class="flex-1 min-w-0">'
+          + '<p class="text-xs font-medium text-white leading-tight">'+(ev.title||ev.type)+'</p>'
+          + '<p class="text-xs text-gray-400 mt-0.5 line-clamp-2">'+(ev.description||'')+'</p>'
+          + '<p class="text-xs text-gray-600 mt-1">'+(ev.time||'')+'</p>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    function clearAllNotifs() {
+      notifUnread = 0;
+      var badge = document.getElementById('notif-badge');
+      if (badge) badge.classList.add('hidden');
+      localStorage.setItem('era-notif-read', Date.now().toString());
+    }
+    window.clearAllNotifs = clearAllNotifs;
+
+    function loadNotifs() {
+      fetch('/api/events?limit=15')
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          notifData = data.events || [];
+          var lastRead = parseInt(localStorage.getItem('era-notif-read') || '0');
+          var newCount = notifData.filter(function(ev) {
+            var t = ev.timestamp ? new Date(ev.timestamp).getTime() : 0;
+            return t > lastRead;
+          }).length;
+          notifUnread = newCount || (notifData.length > 0 ? 0 : 0);
+          var badge = document.getElementById('notif-badge');
+          if (badge) {
+            if (notifUnread > 0) {
+              badge.textContent = notifUnread > 9 ? '9+' : notifUnread;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+          renderNotifs();
+        })
+        .catch(function() {
+          // Show mock events when no DB
+          notifData = [
+            { type:'success', title:'${isRu ? 'Задача завершена' : 'Task completed'}',    description:'${isRu ? 'Анализ конкурентов выполнен' : 'Competitor analysis done'}', time:'2m ago' },
+            { type:'success', title:'${isRu ? 'Консенсус достигнут' : 'Consensus reached'}', description:'5/7 ${isRu ? 'моделей согласны' : 'models agreed'}', time:'5m ago' },
+            { type:'pending', title:'${isRu ? 'Обработка' : 'Processing'}',              description:'${isRu ? 'Прогноз продаж...' : 'Sales forecast running...'}', time:'8m ago' },
+            { type:'error',   title:'${isRu ? 'Ошибка агента' : 'Agent timeout'}',        description:'Llama-3.1 ${isRu ? 'превысил лимит' : 'exceeded timeout'}', time:'22m ago' },
+          ];
+          renderNotifs();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadNotifs();
+      setInterval(loadNotifs, 60000); // refresh every 60s
+    });
+
+  })();
+  </script>
 `
 }
 
