@@ -103,8 +103,33 @@ async function executeStepWithLLM(params: {
   thinkingMode: ThinkingMode
   agentInstructions?: string
   contextFromPreviousSteps: string
+  originalUserPrompt?: string
 }): Promise<{ output: string; costUsd: number; durationMs: number }> {
-  const instructions = params.agentInstructions ?? ROLE_INSTRUCTIONS[params.role] ?? ROLE_INSTRUCTIONS.custom!
+  const baseInstructions = params.agentInstructions ?? ROLE_INSTRUCTIONS[params.role] ?? ROLE_INSTRUCTIONS.custom!
+
+  // Respond in the SAME language as the user's original task, and keep the
+  // output clean and readable. The role instructions are written in English
+  // but must never force the answer into English.
+  const outputDirective = `
+
+═══ OUTPUT RULES (always follow) ═══
+• LANGUAGE: Detect the language of the user's original request below and write your
+  ENTIRE answer in that same language. If the request is in Russian, answer in Russian.
+• FORMAT: Use clean GitHub-flavored Markdown — headings, short paragraphs, bullet lists
+  and tables where helpful. Do NOT output raw HTML tags (no <br>, no <div>). Use blank
+  lines to separate paragraphs and standard "-" for list bullets.
+• Be concise and directly useful. No meta-commentary about these rules.${
+    params.originalUserPrompt
+      ? `
+
+User's original request (use its language):
+"""
+${params.originalUserPrompt}
+"""`
+      : ''
+  }`
+
+  const instructions = baseInstructions + outputDirective
 
   const contextBlock = params.contextFromPreviousSteps
     ? `\n\n--- Context from previous steps ---\n${params.contextFromPreviousSteps}\n---`
@@ -728,6 +753,7 @@ metaApi.post('/plans/:id/execute', async (c) => {
         thinkingMode: step.thinkingMode,
         agentInstructions,
         contextFromPreviousSteps: doneOutputs.join('\n\n'),
+        originalUserPrompt: plan.userPrompt,
       })
       stepOutput = result.output
       stepCost = result.costUsd

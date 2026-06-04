@@ -14,7 +14,27 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
 <html lang="${lang}">
 <head>
   ${head(title, subtitle, lang)}
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
   <style>
+    .result-md { font-size: 13px; line-height: 1.65; color: #d1d5db; word-break: break-word; }
+    .result-md > *:first-child { margin-top: 0; }
+    .result-md h1,.result-md h2,.result-md h3,.result-md h4 { color:#fff; font-weight:600; margin:.9em 0 .45em; line-height:1.3; }
+    .result-md h1{font-size:1.3em} .result-md h2{font-size:1.16em} .result-md h3{font-size:1.05em} .result-md h4{font-size:1em}
+    .result-md p{margin:.5em 0}
+    .result-md ul,.result-md ol{margin:.5em 0; padding-left:1.4em}
+    .result-md li{margin:.22em 0}
+    .result-md strong{color:#fff}
+    .result-md em{color:#e5e7eb}
+    .result-md a{color:#818cf8; text-decoration:underline}
+    .result-md code{background:rgba(255,255,255,.08); padding:1px 5px; border-radius:4px; font-size:.9em}
+    .result-md pre{background:rgba(0,0,0,.4); padding:10px 12px; border-radius:8px; overflow-x:auto; margin:.6em 0}
+    .result-md pre code{background:none; padding:0}
+    .result-md table{border-collapse:collapse; width:100%; margin:.7em 0; font-size:12px; display:block; overflow-x:auto}
+    .result-md th,.result-md td{border:1px solid rgba(255,255,255,.12); padding:6px 9px; text-align:left; vertical-align:top}
+    .result-md th{background:rgba(255,255,255,.06); color:#e5e7eb; font-weight:600}
+    .result-md blockquote{border-left:3px solid rgba(139,92,246,.5); padding-left:10px; color:#9ca3af; margin:.6em 0}
+    .result-md hr{border:none; border-top:1px solid rgba(255,255,255,.1); margin:1em 0}
     .agent-chip {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 4px 10px; border-radius: 20px; font-size: 12px;
@@ -854,7 +874,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
         ? doneSteps.map(s => \`
             <div class="bg-gray-800/40 rounded-lg p-3">
               <p class="text-xs text-gray-500 mb-1">\${s.agentRole.replace(/_/g,' ')} · ${isRu?'шаг':'step'} \${s.orderIndex}</p>
-              <p class="text-sm text-gray-300 whitespace-pre-wrap">\${escHtml(s.outputData)}</p>
+              <div class="result-md">\${renderMd(s.outputData)}</div>
             </div>
           \`).join('')
         : '<p class="text-gray-400 text-sm">' + (isRu?'Все шаги выполнены успешно.':'All steps completed successfully.') + '</p>';
@@ -912,6 +932,19 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
 
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // Render Markdown (tables, headings, lists, bold) into safe HTML.
+    // Falls back to plain escaped text if the libraries failed to load.
+    function renderMd(s) {
+      const text = String(s == null ? '' : s);
+      try {
+        if (window.marked) {
+          const html = window.marked.parse(text, { breaks: true, gfm: true });
+          return window.DOMPurify ? window.DOMPurify.sanitize(html) : html;
+        }
+      } catch (e) { /* fall through to plain text */ }
+      return '<p style="white-space:pre-wrap">' + escHtml(text) + '</p>';
     }
 
     // ─── Init ───────────────────────────────────────────────────────────────
