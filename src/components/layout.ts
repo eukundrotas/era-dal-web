@@ -243,10 +243,11 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       <!-- Meta-Orchestrator -->
       ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70')}
       <div id="sbsec-meta" class="space-y-0.5">
-        ${link('meta',      '/meta',      'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор' : 'Orchestrator')}
-        ${link('agents',    '/agents',    'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
-        ${link('scenarios', '/scenarios', 'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'    : 'Scenarios')}
-        ${link('journal',   '/journal',   'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'      : 'Journal')}
+        ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор'      : 'Orchestrator')}
+        ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
+        ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'         : 'Scenarios')}
+        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',   isRu ? 'Базы знаний'      : 'Knowledge Bases')}
+        ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'           : 'Journal')}
       </div>
 
       <!-- ERA DAL -->

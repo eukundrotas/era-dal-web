@@ -26,12 +26,14 @@ import { goalsPage } from './pages/goals'
 import { regulationsPage } from './pages/regulations'
 import { expensesPage } from './pages/expenses'
 import { companyPage } from './pages/company'
+import { knowledgeBasePage } from './pages/knowledge-base'
 
 // API Routes
 import { apiRoutes } from './api/routes'
 import { openRouterApi } from './api/openrouter'
 import { integrationsApi } from './api/integrations'
 import { metaApi } from './api/meta'
+import { businessApi } from './api/business'
 
 type Bindings = {
   DB: D1Database    // Cloudflare D1 — run: wrangler d1 create era-dal
@@ -79,8 +81,9 @@ app.get('/tasks',       (c) => c.html(tasksPage(getLang(c))))
 app.get('/projects',    (c) => c.html(projectsPage(getLang(c))))
 app.get('/goals',       (c) => c.html(goalsPage(getLang(c))))
 app.get('/regulations', (c) => c.html(regulationsPage(getLang(c))))
-app.get('/expenses',    (c) => c.html(expensesPage(getLang(c))))
-app.get('/company',     (c) => c.html(companyPage(getLang(c))))
+app.get('/expenses',        (c) => c.html(expensesPage(getLang(c))))
+app.get('/company',         (c) => c.html(companyPage(getLang(c))))
+app.get('/knowledge-base',  (c) => c.html(knowledgeBasePage(getLang(c))))
 
 // ============================================
 // API Routes
@@ -89,6 +92,7 @@ app.route('/api', apiRoutes)
 app.route('/api/openrouter', openRouterApi)
 app.route('/api/integrations', integrationsApi)
 app.route('/api/meta', metaApi)
+app.route('/api/business', businessApi)
 
 // ============================================
 // 404 Handler

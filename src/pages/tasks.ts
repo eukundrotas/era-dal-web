@@ -179,7 +179,7 @@ export const tasksPage = (lang: Language = 'en') => {
   </div>
 
   <script>
-  var TASKS = [
+  var SEED_TASKS = [
     { id:'t1', title:${isRu ? "'Анализ конкурентов Q2'" : "'Competitor analysis Q2'"}, desc:${isRu ? "'Исследовать топ-10 конкурентов'" : "'Research top-10 competitors'"}, status:'in_progress', priority:'high', agent:'lead_researcher', project:'research', due:'2025-06-15', planId:null },
     { id:'t2', title:${isRu ? "'Написать email-кампанию'" : "'Write email campaign'"}, desc:${isRu ? "'Серия из 5 писем для онбординга'" : "'5-email onboarding series'"}, status:'todo', priority:'medium', agent:'copywriter', project:'marketing', due:'2025-06-20', planId:null },
     { id:'t3', title:${isRu ? "'Прогноз продаж на июль'" : "'July sales forecast'"}, desc:${isRu ? "'Модель прогнозирования на основе данных'" : "'Data-driven forecast model'"}, status:'todo', priority:'critical', agent:'market_analyst', project:'sales', due:'2025-06-10', planId:null },
@@ -188,8 +188,20 @@ export const tasksPage = (lang: Language = 'en') => {
     { id:'t6', title:${isRu ? "'Отчёт по рынку SaaS'" : "'SaaS market report'"}, desc:'', status:'in_progress', priority:'medium', agent:'market_analyst', project:'research', due:'2025-06-25', planId:null },
     { id:'t7', title:${isRu ? "'Контент-план на квартал'" : "'Quarterly content plan'"}, desc:'', status:'todo', priority:'medium', agent:'copywriter', project:'marketing', due:'2025-07-01', planId:null },
   ];
+  var TASKS = [];
 
   var currentStatus = 'all';
+
+  // Load from API (fall back to seed data if no DB)
+  fetch('/api/business/tasks')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      TASKS = data.tasks && data.tasks.length
+        ? data.tasks.map(function(t){ return { id:t.id, title:t.title, desc:t.description||'', status:t.status, priority:t.priority, agent:t.assigned_agent_role, project:t.project_id, due:t.due_date, planId:t.plan_id }; })
+        : SEED_TASKS;
+      renderTasks();
+    })
+    .catch(function() { TASKS = SEED_TASKS; renderTasks(); });
 
   var PRIORITY_COLOR = { critical:'text-red-400', high:'text-orange-400', medium:'text-yellow-400', low:'text-green-400' };
   var PRIORITY_LABEL = { critical:'${t.critical}', high:'${t.high}', medium:'${t.medium}', low:'${t.low}' };
