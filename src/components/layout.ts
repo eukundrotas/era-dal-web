@@ -56,6 +56,24 @@ export const head = (title: string, description: string = '', lang: Language = '
       background: rgba(59, 130, 246, 0.2);
       border-left: 3px solid #3b82f6;
     }
+    /* Thin custom scrollbar for the sidebar nav */
+    .sidebar-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.12) transparent;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+    }
+    .sidebar-scroll:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+    /* Smooth height-collapse for category sections */
+    .sb-sec-body { overflow: hidden; transition: max-height 0.22s ease, opacity 0.18s ease; }
+    .sb-sec-header { transition: background 0.15s; border-radius: 6px; }
+    .sb-sec-header:hover { background: rgba(255,255,255,0.03); }
     .lang-dropdown {
       position: relative;
       display: inline-block;
@@ -189,10 +207,13 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
        <span class="sb-label truncate">${label}</span>
      </a>`
 
-  const sectionHeader = (id: string, label: string, colorClass: string, topBorder = false) =>
-    `<button onclick="sbSection('${id}')"
-        class="w-full flex items-center justify-between px-3 ${topBorder ? 'mt-2 pt-3' : 'pt-2'} pb-1 group${topBorder ? ' border-t border-gray-800' : ''}">
-       <span class="sb-label text-xs ${colorClass} uppercase tracking-wider font-semibold">${label}</span>
+  const sectionHeader = (id: string, label: string, colorClass: string, topBorder = false, count = 0) =>
+    `<button onclick="sbSection('${id}')" data-sec-header="${id}"
+        class="sb-sec-header w-full flex items-center justify-between px-3 ${topBorder ? 'mt-1.5 pt-2.5' : 'pt-2'} pb-1 group${topBorder ? ' border-t border-gray-800/70' : ''}">
+       <span class="sb-label text-xs ${colorClass} uppercase tracking-wider font-semibold flex items-center gap-1.5">
+         ${label}
+         <span class="sb-sec-count text-[9px] text-gray-600 normal-case font-normal tracking-normal">${count}</span>
+       </span>
        <i id="sbch-${id}" class="fas fa-chevron-down text-xs text-gray-600 group-hover:text-gray-400 transition-transform duration-200"></i>
      </button>`
 
@@ -248,9 +269,18 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     <!-- Middle: scrollable nav -->
     <nav class="flex-1 overflow-y-auto px-2 py-2 sidebar-scroll">
 
+      <!-- Nav toolbar: collapse / expand all categories -->
+      <div id="sb-nav-toolbar" class="sb-label flex items-center justify-between px-2 pb-1.5 mb-0.5">
+        <span class="text-[10px] text-gray-600 uppercase tracking-wider font-semibold">${isRu ? 'Категории' : 'Categories'}</span>
+        <button onclick="sbToggleAll()" id="sb-toggle-all" title="${isRu ? 'Свернуть / развернуть все' : 'Collapse / expand all'}"
+            class="flex items-center gap-1 text-[10px] text-gray-600 hover:text-gray-300 transition px-1.5 py-0.5 rounded hover:bg-gray-800">
+          <i id="sb-toggle-all-icon" class="fas fa-angles-up" style="font-size:10px"></i>
+        </button>
+      </div>
+
       <!-- Meta-Orchestrator -->
-      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70')}
-      <div id="sbsec-meta" class="space-y-0.5">
+      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70', false, 6)}
+      <div id="sbsec-meta" class="sb-sec-body space-y-0.5">
         ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор'      : 'Orchestrator')}
         ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
         ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400',isRu ? 'Метаагенты'       : 'Meta-Agents')}
@@ -260,32 +290,32 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
 
       <!-- ERA DAL -->
-      ${sectionHeader('dal', 'ERA DAL', 'text-gray-500', true)}
-      <div id="sbsec-dal" class="space-y-0.5">
+      ${sectionHeader('dal', 'ERA DAL', 'text-gray-500', true, 3)}
+      <div id="sbsec-dal" class="sb-sec-body space-y-0.5">
         ${link('dashboard',  '/dashboard',  'fas fa-chart-pie', 'text-cyan-400',   sb.dashboard)}
         ${link('playground', '/playground', 'fas fa-flask',     'text-yellow-400', sb.playground)}
         ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
       </div>
 
       <!-- Tasks & Projects -->
-      ${sectionHeader('tasks', isRu ? 'Задачи и проекты' : 'Tasks & Projects', 'text-gray-500', true)}
-      <div id="sbsec-tasks" class="space-y-0.5">
+      ${sectionHeader('tasks', isRu ? 'Задачи и проекты' : 'Tasks & Projects', 'text-gray-500', true, 3)}
+      <div id="sbsec-tasks" class="sb-sec-body space-y-0.5">
         ${link('tasks',    '/tasks',    'fas fa-list-check',  'text-blue-400',   isRu ? 'Задачи'   : 'Tasks')}
         ${link('projects', '/projects', 'fas fa-folder-open', 'text-green-400',  isRu ? 'Проекты'  : 'Projects')}
         ${link('goals',    '/goals',    'fas fa-bullseye',    'text-yellow-400', isRu ? 'Цели OKR' : 'Goals OKR')}
       </div>
 
       <!-- Company -->
-      ${sectionHeader('company', isRu ? 'Компания' : 'Company', 'text-gray-500', true)}
-      <div id="sbsec-company" class="space-y-0.5">
+      ${sectionHeader('company', isRu ? 'Компания' : 'Company', 'text-gray-500', true, 3)}
+      <div id="sbsec-company" class="sb-sec-body space-y-0.5">
         ${link('company',     '/company',     'fas fa-building',      'text-cyan-400',    isRu ? 'Оргструктура'   : 'Company')}
         ${link('regulations', '/regulations', 'fas fa-book-open',     'text-orange-400',  isRu ? 'Регламенты'     : 'Regulations')}
         ${link('expenses',    '/expenses',    'fas fa-receipt',       'text-red-400',     isRu ? 'Расходы'        : 'Expenses')}
       </div>
 
       <!-- Settings -->
-      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true)}
-      <div id="sbsec-cfg" class="space-y-0.5">
+      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 4)}
+      <div id="sbsec-cfg" class="sb-sec-body space-y-0.5">
         ${link('ai-config',    '/ai-config',    'fas fa-robot',       'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
         ${link('integrations', '/integrations', 'fas fa-plug',        'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
         ${link('settings',     '/settings',     'fas fa-cog',         'text-gray-400',   sb.settings)}
@@ -338,17 +368,50 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     var SB_W  = '14rem';   // expanded  (w-56)
     var SB_WC = '3rem';    // collapsed (w-12)
 
+    var SB_SECTIONS = ['meta', 'dal', 'tasks', 'company', 'cfg'];
+
     /* ── Section accordion ─────────────────────────────── */
-    function sbSection(id) {
+    function sbSetSection(id, expanded) {
       var sec = document.getElementById('sbsec-' + id);
       var ch  = document.getElementById('sbch-'  + id);
       if (!sec) return;
-      var isHidden = sec.style.display === 'none';
-      sec.style.display = isHidden ? '' : 'none';
-      if (ch) ch.style.transform = isHidden ? '' : 'rotate(-90deg)';
-      localStorage.setItem('era-sb-sec-' + id, isHidden ? '0' : '1');
+      sec.style.display = expanded ? '' : 'none';
+      if (ch) ch.style.transform = expanded ? '' : 'rotate(-90deg)';
+      localStorage.setItem('era-sb-sec-' + id, expanded ? '0' : '1');
+    }
+
+    function sbSection(id) {
+      var sec = document.getElementById('sbsec-' + id);
+      if (!sec) return;
+      sbSetSection(id, sec.style.display === 'none');
+      sbSyncToggleAll();
     }
     window.sbSection = sbSection;
+
+    /* ── Collapse / expand ALL categories ──────────────── */
+    function sbToggleAll() {
+      var anyExpanded = SB_SECTIONS.some(function(id) {
+        var sec = document.getElementById('sbsec-' + id);
+        return sec && sec.style.display !== 'none';
+      });
+      SB_SECTIONS.forEach(function(id) { sbSetSection(id, !anyExpanded); });
+      localStorage.setItem('era-sb-allcollapsed', anyExpanded ? '1' : '0');
+      sbSyncToggleAll();
+    }
+    window.sbToggleAll = sbToggleAll;
+
+    function sbSyncToggleAll() {
+      var anyExpanded = SB_SECTIONS.some(function(id) {
+        var sec = document.getElementById('sbsec-' + id);
+        return sec && sec.style.display !== 'none';
+      });
+      var icon = document.getElementById('sb-toggle-all-icon');
+      if (icon) icon.className = 'fas ' + (anyExpanded ? 'fa-angles-up' : 'fa-angles-down');
+      var btn = document.getElementById('sb-toggle-all');
+      if (btn) btn.title = anyExpanded
+        ? '${isRu ? 'Свернуть все категории' : 'Collapse all categories'}'
+        : '${isRu ? 'Развернуть все категории' : 'Expand all categories'}';
+    }
 
     /* ── Full sidebar collapse ──────────────────────────── */
     function sbCollapse() {
@@ -365,19 +428,33 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         if (icon) { icon.classList.remove('fa-angles-right'); icon.classList.add('fa-angles-left'); }
         sb.querySelectorAll('.sb-label').forEach(function(el) { el.style.display = ''; });
         sb.querySelectorAll('[data-sb-link]').forEach(function(el) { el.style.justifyContent = ''; el.style.padding = ''; });
+        // restore category headers + toolbar, and re-apply each section's saved state
+        sb.querySelectorAll('.sb-sec-header').forEach(function(el) { el.style.display = ''; });
+        var tb = document.getElementById('sb-nav-toolbar'); if (tb) tb.style.display = '';
+        SB_SECTIONS.forEach(function(id) {
+          sbSetSection(id, localStorage.getItem('era-sb-sec-' + id) !== '1');
+        });
+        sbSyncToggleAll();
         var usageFull = document.getElementById('sb-usage');
         var usageMini = document.getElementById('sb-usage-mini');
         if (usageFull) usageFull.style.display = '';
         if (usageMini) usageMini.style.display = 'none';
         localStorage.setItem('era-sb-collapsed', '0');
       } else {
-        // collapse
+        // collapse to icons only
         sb.style.width = SB_WC;
         sb.dataset.sbCollapsed = '1';
         if (main) main.style.marginLeft = SB_WC;
         if (icon) { icon.classList.remove('fa-angles-left'); icon.classList.add('fa-angles-right'); }
         sb.querySelectorAll('.sb-label').forEach(function(el) { el.style.display = 'none'; });
         sb.querySelectorAll('[data-sb-link]').forEach(function(el) { el.style.justifyContent = 'center'; el.style.padding = '0.375rem 0'; });
+        // hide category headers + toolbar, and force every section's links visible as icons
+        sb.querySelectorAll('.sb-sec-header').forEach(function(el) { el.style.display = 'none'; });
+        var tb2 = document.getElementById('sb-nav-toolbar'); if (tb2) tb2.style.display = 'none';
+        SB_SECTIONS.forEach(function(id) {
+          var sec = document.getElementById('sbsec-' + id);
+          if (sec) sec.style.display = '';
+        });
         var usageFull = document.getElementById('sb-usage');
         var usageMini = document.getElementById('sb-usage-mini');
         if (usageFull) usageFull.style.display = 'none';
@@ -389,8 +466,8 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
 
     /* ── Restore state on load ──────────────────────────── */
     document.addEventListener('DOMContentLoaded', function() {
-      // Restore section states
-      ['meta', 'dal', 'cfg'].forEach(function(id) {
+      // Restore each category's collapsed/expanded state (all 5 sections)
+      SB_SECTIONS.forEach(function(id) {
         if (localStorage.getItem('era-sb-sec-' + id) === '1') {
           var sec = document.getElementById('sbsec-' + id);
           var ch  = document.getElementById('sbch-'  + id);
@@ -398,7 +475,8 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           if (ch)  ch.style.transform = 'rotate(-90deg)';
         }
       });
-      // Restore collapsed state
+      sbSyncToggleAll();
+      // Restore full icon-collapse state
       if (localStorage.getItem('era-sb-collapsed') === '1') {
         sbCollapse();
       }
