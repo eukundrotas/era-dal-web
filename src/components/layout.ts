@@ -71,7 +71,16 @@ export const head = (title: string, description: string = '', lang: Language = '
     }
     .sidebar-scroll:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
     /* Smooth height-collapse for category sections */
-    .sb-sec-body { overflow: hidden; transition: max-height 0.22s ease, opacity 0.18s ease; }
+    .sb-sec-body {
+      overflow: hidden;
+      transition: max-height 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+      max-height: 500px; /* expanded default — large enough for any section */
+      opacity: 1;
+    }
+    .sb-sec-body.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+    }
     .sb-sec-header { transition: background 0.15s; border-radius: 6px; }
     .sb-sec-header:hover { background: rgba(255,255,255,0.03); }
     .lang-dropdown {
@@ -266,8 +275,15 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
     </div>
 
+    <!-- Scroll up indicator -->
+    <div id="sb-scroll-up" onclick="sbNavScroll(-120)"
+      class="hidden sb-label absolute left-0 right-0 z-10 flex justify-center py-1 cursor-pointer bg-gradient-to-b from-gray-900 to-transparent pointer-events-auto"
+      style="top:72px">
+      <i class="fas fa-chevron-up text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+    </div>
+
     <!-- Middle: scrollable nav -->
-    <nav class="flex-1 overflow-y-auto px-2 py-2 sidebar-scroll">
+    <nav id="sb-nav" class="flex-1 overflow-y-auto px-2 py-2 sidebar-scroll" onscroll="sbUpdateScrollHints()">
 
       <!-- Nav toolbar: collapse / expand all categories -->
       <div id="sb-nav-toolbar" class="sb-label flex items-center justify-between px-2 pb-1.5 mb-0.5">
@@ -323,6 +339,13 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
     </nav>
 
+    <!-- Scroll down indicator -->
+    <div id="sb-scroll-dn" onclick="sbNavScroll(120)"
+      class="sb-label flex justify-center py-1 cursor-pointer bg-gradient-to-t from-gray-900 to-transparent pointer-events-auto"
+      style="margin-top:-20px; position:relative; z-index:10">
+      <i class="fas fa-chevron-down text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+    </div>
+
     <!-- Bottom: API usage (never overlaps nav) -->
     <div class="flex-shrink-0 px-3 py-2 border-t border-gray-800">
       <div id="sb-usage" class="sb-label glass rounded-lg px-3 py-2">
@@ -370,20 +393,45 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
 
     var SB_SECTIONS = ['meta', 'dal', 'tasks', 'company', 'cfg'];
 
+    /* ── Scroll hint helpers ────────────────────────────── */
+    function sbNavScroll(delta) {
+      var nav = document.getElementById('sb-nav');
+      if (nav) nav.scrollBy({ top: delta, behavior: 'smooth' });
+    }
+    window.sbNavScroll = sbNavScroll;
+
+    function sbUpdateScrollHints() {
+      var nav = document.getElementById('sb-nav');
+      var up  = document.getElementById('sb-scroll-up');
+      var dn  = document.getElementById('sb-scroll-dn');
+      if (!nav) return;
+      var atTop    = nav.scrollTop <= 4;
+      var atBottom = nav.scrollTop + nav.clientHeight >= nav.scrollHeight - 4;
+      if (up) up.style.display = atTop ? 'none' : 'flex';
+      if (dn) dn.style.display = atBottom ? 'none' : 'flex';
+    }
+    window.sbUpdateScrollHints = sbUpdateScrollHints;
+
     /* ── Section accordion ─────────────────────────────── */
     function sbSetSection(id, expanded) {
       var sec = document.getElementById('sbsec-' + id);
       var ch  = document.getElementById('sbch-'  + id);
       if (!sec) return;
-      sec.style.display = expanded ? '' : 'none';
+      // Use CSS class animation instead of display:none for smooth transitions
+      if (expanded) {
+        sec.classList.remove('collapsed');
+      } else {
+        sec.classList.add('collapsed');
+      }
       if (ch) ch.style.transform = expanded ? '' : 'rotate(-90deg)';
+      setTimeout(sbUpdateScrollHints, 280); // after animation
       localStorage.setItem('era-sb-sec-' + id, expanded ? '0' : '1');
     }
 
     function sbSection(id) {
       var sec = document.getElementById('sbsec-' + id);
       if (!sec) return;
-      sbSetSection(id, sec.style.display === 'none');
+      sbSetSection(id, sec.classList.contains('collapsed'));
       sbSyncToggleAll();
     }
     window.sbSection = sbSection;
@@ -392,7 +440,7 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     function sbToggleAll() {
       var anyExpanded = SB_SECTIONS.some(function(id) {
         var sec = document.getElementById('sbsec-' + id);
-        return sec && sec.style.display !== 'none';
+        return sec && !sec.classList.contains('collapsed');
       });
       SB_SECTIONS.forEach(function(id) { sbSetSection(id, !anyExpanded); });
       localStorage.setItem('era-sb-allcollapsed', anyExpanded ? '1' : '0');
@@ -403,7 +451,7 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     function sbSyncToggleAll() {
       var anyExpanded = SB_SECTIONS.some(function(id) {
         var sec = document.getElementById('sbsec-' + id);
-        return sec && sec.style.display !== 'none';
+        return sec && !sec.classList.contains('collapsed');
       });
       var icon = document.getElementById('sb-toggle-all-icon');
       if (icon) icon.className = 'fas ' + (anyExpanded ? 'fa-angles-up' : 'fa-angles-down');
@@ -453,7 +501,8 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         var tb2 = document.getElementById('sb-nav-toolbar'); if (tb2) tb2.style.display = 'none';
         SB_SECTIONS.forEach(function(id) {
           var sec = document.getElementById('sbsec-' + id);
-          if (sec) sec.style.display = '';
+          // In icon-only mode show all sections regardless of collapse state
+          if (sec) { sec.classList.remove('collapsed'); sec.style.maxHeight = ''; }
         });
         var usageFull = document.getElementById('sb-usage');
         var usageMini = document.getElementById('sb-usage-mini');
@@ -471,11 +520,12 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         if (localStorage.getItem('era-sb-sec-' + id) === '1') {
           var sec = document.getElementById('sbsec-' + id);
           var ch  = document.getElementById('sbch-'  + id);
-          if (sec) sec.style.display = 'none';
+          if (sec) sec.classList.add('collapsed');
           if (ch)  ch.style.transform = 'rotate(-90deg)';
         }
       });
       sbSyncToggleAll();
+      sbUpdateScrollHints();
       // Restore full icon-collapse state
       if (localStorage.getItem('era-sb-collapsed') === '1') {
         sbCollapse();
