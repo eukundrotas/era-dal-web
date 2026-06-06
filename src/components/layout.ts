@@ -346,20 +346,41 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       <i class="fas fa-chevron-down text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
     </div>
 
-    <!-- Bottom: API usage (never overlaps nav) -->
-    <div class="flex-shrink-0 px-3 py-2 border-t border-gray-800">
-      <div id="sb-usage" class="sb-label glass rounded-lg px-3 py-2">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-gray-400 text-xs">${sb.apiCalls}</span>
-          <span class="text-white text-xs font-medium">847/1k</span>
+    <!-- Bottom: API usage widget (dismissible) -->
+    <div id="sb-usage-wrap" class="flex-shrink-0 border-t border-gray-800">
+
+      <!-- Full widget -->
+      <div id="sb-usage" class="sb-label px-3 pt-2 pb-2">
+        <div class="glass rounded-lg px-3 py-2" style="position:relative">
+          <!-- Dismiss button -->
+          <button onclick="sbUsageDismiss()" title="${isRu ? 'Скрыть' : 'Hide'}"
+            class="absolute top-1.5 right-1.5 w-4 h-4 flex items-center justify-center rounded text-gray-600 hover:text-gray-300 hover:bg-gray-700 transition">
+            <i class="fas fa-times" style="font-size:8px"></i>
+          </button>
+          <div class="flex items-center justify-between mb-1.5 pr-4">
+            <span class="text-gray-400 text-xs">${sb.apiCalls}</span>
+            <span class="text-white text-xs font-medium" id="sb-api-count">847/1k</span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-1.5">
+            <div id="sb-api-bar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full" style="width:84.7%"></div>
+          </div>
+          <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-1 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
         </div>
-        <div class="w-full bg-gray-700 rounded-full h-1.5">
-          <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full" style="width:84.7%"></div>
-        </div>
-        <a href="/pricing?lang=${lang}" class="text-blue-400 text-xs mt-1 inline-block hover:text-blue-300">${sb.upgradePlan} →</a>
       </div>
-      <!-- Collapsed: show tiny dot indicator -->
-      <div id="sb-usage-mini" class="hidden justify-center py-1">
+
+      <!-- Minimised bar — shown when dismissed -->
+      <div id="sb-usage-mini" class="hidden sb-label items-center justify-between px-3 py-1.5 gap-2">
+        <div class="flex-1 bg-gray-700 rounded-full h-1" style="overflow:hidden">
+          <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full" style="width:84.7%"></div>
+        </div>
+        <button onclick="sbUsageRestore()" title="${isRu ? 'Показать статистику' : 'Show API stats'}"
+          class="text-gray-600 hover:text-gray-300 transition flex-shrink-0" style="font-size:10px">
+          <i class="fas fa-chart-bar"></i>
+        </button>
+      </div>
+
+      <!-- Collapsed sidebar: dot only -->
+      <div id="sb-usage-dot" class="hidden justify-center py-1.5">
         <div class="w-2 h-2 rounded-full bg-blue-500" title="847/1000 API calls"></div>
       </div>
     </div>
@@ -461,6 +482,40 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         : '${isRu ? 'Развернуть все категории' : 'Expand all categories'}';
     }
 
+    /* ── API usage widget dismiss / restore ────────────── */
+    function sbUsageApply(dismissed) {
+      var sb   = document.getElementById('app-sidebar');
+      var iconOnly = sb && sb.dataset.sbCollapsed === '1';
+      var uFull = document.getElementById('sb-usage');
+      var uMini = document.getElementById('sb-usage-mini');
+      var uDot  = document.getElementById('sb-usage-dot');
+      if (iconOnly) {
+        if (uFull) uFull.style.display = 'none';
+        if (uMini) uMini.style.display = 'none';
+        if (uDot)  uDot.style.display  = 'flex';
+        return;
+      }
+      if (dismissed) {
+        if (uFull) uFull.style.display = 'none';
+        if (uMini) { uMini.style.display = 'flex'; }
+        if (uDot)  uDot.style.display   = 'none';
+      } else {
+        if (uFull) uFull.style.display = '';
+        if (uMini) uMini.style.display = 'none';
+        if (uDot)  uDot.style.display  = 'none';
+      }
+    }
+    function sbUsageDismiss() {
+      localStorage.setItem('era-sb-usage-dismissed', '1');
+      sbUsageApply(true);
+    }
+    function sbUsageRestore() {
+      localStorage.setItem('era-sb-usage-dismissed', '0');
+      sbUsageApply(false);
+    }
+    window.sbUsageDismiss = sbUsageDismiss;
+    window.sbUsageRestore = sbUsageRestore;
+
     /* ── Full sidebar collapse ──────────────────────────── */
     function sbCollapse() {
       var sb   = document.getElementById('app-sidebar');
@@ -483,10 +538,8 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           sbSetSection(id, localStorage.getItem('era-sb-sec-' + id) !== '1');
         });
         sbSyncToggleAll();
-        var usageFull = document.getElementById('sb-usage');
-        var usageMini = document.getElementById('sb-usage-mini');
-        if (usageFull) usageFull.style.display = '';
-        if (usageMini) usageMini.style.display = 'none';
+        // restore usage widget to its saved dismiss state
+        sbUsageApply(localStorage.getItem('era-sb-usage-dismissed') === '1');
         localStorage.setItem('era-sb-collapsed', '0');
       } else {
         // collapse to icons only
@@ -504,10 +557,13 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
           // In icon-only mode show all sections regardless of collapse state
           if (sec) { sec.classList.remove('collapsed'); sec.style.maxHeight = ''; }
         });
-        var usageFull = document.getElementById('sb-usage');
-        var usageMini = document.getElementById('sb-usage-mini');
-        if (usageFull) usageFull.style.display = 'none';
-        if (usageMini) usageMini.style.display = 'flex';
+        // icon-only: show dot, hide full widget and mini bar
+        var uFull = document.getElementById('sb-usage');
+        var uMini = document.getElementById('sb-usage-mini');
+        var uDot  = document.getElementById('sb-usage-dot');
+        if (uFull) uFull.style.display = 'none';
+        if (uMini) uMini.style.display = 'none';
+        if (uDot)  uDot.style.display  = 'flex';
         localStorage.setItem('era-sb-collapsed', '1');
       }
     }
@@ -526,6 +582,8 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       });
       sbSyncToggleAll();
       sbUpdateScrollHints();
+      // Restore usage widget dismiss state
+      sbUsageApply(localStorage.getItem('era-sb-usage-dismissed') === '1');
       // Restore full icon-collapse state
       if (localStorage.getItem('era-sb-collapsed') === '1') {
         sbCollapse();
