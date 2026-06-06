@@ -230,9 +230,9 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
   <!-- ── Sidebar ── -->
   <aside id="app-sidebar" class="fixed left-0 top-0 h-screen w-56 bg-gray-900 border-r border-gray-800 z-40 flex flex-col select-none transition-all duration-200">
 
-    <!-- Top: brand + collapse toggle -->
+    <!-- Top: brand + collapse toggle only -->
     <div class="flex-shrink-0 px-3 pt-3 pb-2 border-b border-gray-800">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between">
         <a href="/dashboard?lang=${lang}" class="flex items-center gap-2 group min-w-0">
           <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-sitemap text-white" style="font-size:11px"></i>
@@ -251,26 +251,6 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
               class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition">
             <i id="sb-collapse-icon" class="fas fa-angles-left" style="font-size:11px"></i>
           </button>
-        </div>
-      </div>
-
-      <!-- User row -->
-      <div class="flex items-center gap-2 px-1">
-        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-          <i class="fas fa-user text-white" style="font-size:9px"></i>
-        </div>
-        <div class="sb-label min-w-0">
-          <p class="text-white text-xs font-medium leading-tight truncate">Eugene</p>
-          <p class="text-gray-500 text-xs leading-tight">${sb.proPlan}</p>
-        </div>
-        <div class="sb-label lang-dropdown ml-auto">
-          <button class="text-gray-500 hover:text-gray-300 transition" title="${isRu ? 'Язык' : 'Language'}">
-            <span style="font-size:14px">${lang === 'ru' ? '🇷🇺' : '🇬🇧'}</span>
-          </button>
-          <div class="lang-dropdown-content" style="right:0;top:100%;min-width:110px">
-            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">🇬🇧 English</div>
-            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">🇷🇺 Русский</div>
-          </div>
         </div>
       </div>
     </div>
@@ -330,12 +310,22 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
 
       <!-- Settings -->
-      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 4)}
+      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 5)}
       <div id="sbsec-cfg" class="sb-sec-body space-y-0.5">
         ${link('ai-config',    '/ai-config',    'fas fa-robot',       'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
         ${link('integrations', '/integrations', 'fas fa-plug',        'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
         ${link('settings',     '/settings',     'fas fa-cog',         'text-gray-400',   sb.settings)}
         ${link('profile',      '/profile',      'fas fa-user-circle', 'text-gray-400',   sb.profile)}
+        <div class="lang-dropdown">
+          <button class="sidebar-link w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-gray-300 hover:text-white text-sm">
+            <i class="fas fa-globe w-4 text-center flex-shrink-0 text-blue-300" style="font-size:13px"></i>
+            <span class="sb-label truncate">${isRu ? 'Язык: 🇷🇺 RU' : 'Language: 🇬🇧 EN'}</span>
+          </button>
+          <div class="lang-dropdown-content" style="left:0;right:auto;top:auto;bottom:100%;min-width:130px;margin-bottom:2px">
+            <div class="lang-dropdown-item ${lang === 'en' ? 'active' : ''}" onclick="setLang('en')">🇬🇧 English</div>
+            <div class="lang-dropdown-item ${lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">🇷🇺 Русский</div>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -343,6 +333,22 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       <div id="sb-scroll-dn" onclick="sbNavScroll(120)"
         class="sb-label absolute left-0 right-0 bottom-0 z-10 flex justify-center py-1 cursor-pointer bg-gradient-to-t from-gray-900 to-transparent pointer-events-auto">
         <i class="fas fa-chevron-down text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+      </div>
+    </div>
+
+    <!-- Bottom: user profile row -->
+    <div class="flex-shrink-0 border-t border-gray-800 px-3 py-2">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-user text-white" style="font-size:9px"></i>
+        </div>
+        <div class="sb-label min-w-0 flex-1">
+          <p class="text-white text-xs font-medium leading-tight truncate">Eugene</p>
+          <p class="text-gray-500 text-xs leading-tight">${sb.proPlan}</p>
+        </div>
+        <a href="/profile?lang=${lang}" class="sb-label text-gray-600 hover:text-gray-300 transition flex-shrink-0" title="${isRu ? 'Профиль' : 'Profile'}">
+          <i class="fas fa-chevron-right" style="font-size:10px"></i>
+        </a>
       </div>
     </div>
 
