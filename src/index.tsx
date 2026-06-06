@@ -28,6 +28,7 @@ import { regulationsPage } from './pages/regulations'
 import { expensesPage } from './pages/expenses'
 import { companyPage } from './pages/company'
 import { knowledgeBasePage } from './pages/knowledge-base'
+import { researchPage } from './pages/research'
 
 // API Routes
 import { apiRoutes } from './api/routes'
@@ -86,6 +87,7 @@ app.get('/regulations', (c) => c.html(regulationsPage(getLang(c))))
 app.get('/expenses',        (c) => c.html(expensesPage(getLang(c))))
 app.get('/company',         (c) => c.html(companyPage(getLang(c))))
 app.get('/knowledge-base',  (c) => c.html(knowledgeBasePage(getLang(c))))
+app.get('/research',        (c) => c.html(researchPage(getLang(c))))
 
 // ============================================
 // API Routes

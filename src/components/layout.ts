@@ -275,14 +275,15 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
 
       <!-- Meta-Orchestrator -->
-      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70', false, 6)}
+      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70', false, 7)}
       <div id="sbsec-meta" class="sb-sec-body space-y-0.5">
-        ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400', isRu ? 'Оркестратор'      : 'Orchestrator')}
-        ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',   isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
-        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400',isRu ? 'Метаагенты'       : 'Meta-Agents')}
-        ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',  isRu ? 'Сценарии'         : 'Scenarios')}
-        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',   isRu ? 'Базы знаний'      : 'Knowledge Bases')}
-        ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',   isRu ? 'Журнал'           : 'Journal')}
+        ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400',  isRu ? 'Оркестратор'      : 'Orchestrator')}
+        ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',    isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
+        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400', isRu ? 'Метаагенты'       : 'Meta-Agents')}
+        ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',   isRu ? 'Сценарии'         : 'Scenarios')}
+        ${link('research',       '/research',       'fas fa-microscope', 'text-emerald-400', isRu ? 'AI Исследования'  : 'AI Research')}
+        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',    isRu ? 'Базы знаний'      : 'Knowledge Bases')}
+        ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',    isRu ? 'Журнал'           : 'Journal')}
       </div>
 
       <!-- ERA DAL -->
