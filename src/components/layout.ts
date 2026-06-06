@@ -275,15 +275,15 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
     </div>
 
-    <!-- Scroll up indicator -->
-    <div id="sb-scroll-up" onclick="sbNavScroll(-120)"
-      class="hidden sb-label absolute left-0 right-0 z-10 flex justify-center py-1 cursor-pointer bg-gradient-to-b from-gray-900 to-transparent pointer-events-auto"
-      style="top:72px">
-      <i class="fas fa-chevron-up text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
-    </div>
+    <!-- Middle: scrollable nav (wrapper for scroll hint overlays) -->
+    <div class="flex-1 relative overflow-hidden" id="sb-nav-wrap">
+      <!-- Scroll up hint (absolute overlay) -->
+      <div id="sb-scroll-up" onclick="sbNavScroll(-120)"
+        class="hidden sb-label absolute left-0 right-0 top-0 z-10 flex justify-center py-1 cursor-pointer bg-gradient-to-b from-gray-900 to-transparent pointer-events-auto">
+        <i class="fas fa-chevron-up text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+      </div>
 
-    <!-- Middle: scrollable nav -->
-    <nav id="sb-nav" class="flex-1 overflow-y-auto px-2 py-2 sidebar-scroll" onscroll="sbUpdateScrollHints()">
+    <nav id="sb-nav" class="h-full overflow-y-auto px-2 py-2 sidebar-scroll" onscroll="sbUpdateScrollHints()">
 
       <!-- Nav toolbar: collapse / expand all categories -->
       <div id="sb-nav-toolbar" class="sb-label flex items-center justify-between px-2 pb-1.5 mb-0.5">
@@ -339,11 +339,11 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
       </div>
     </nav>
 
-    <!-- Scroll down indicator -->
-    <div id="sb-scroll-dn" onclick="sbNavScroll(120)"
-      class="sb-label flex justify-center py-1 cursor-pointer bg-gradient-to-t from-gray-900 to-transparent pointer-events-auto"
-      style="margin-top:-20px; position:relative; z-index:10">
-      <i class="fas fa-chevron-down text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+      <!-- Scroll down hint (absolute overlay) -->
+      <div id="sb-scroll-dn" onclick="sbNavScroll(120)"
+        class="sb-label absolute left-0 right-0 bottom-0 z-10 flex justify-center py-1 cursor-pointer bg-gradient-to-t from-gray-900 to-transparent pointer-events-auto">
+        <i class="fas fa-chevron-down text-gray-500 hover:text-gray-300 transition" style="font-size:10px"></i>
+      </div>
     </div>
 
     <!-- Bottom: API usage widget (dismissible) -->
