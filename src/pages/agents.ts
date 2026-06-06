@@ -463,6 +463,17 @@ export const agentsPage = (lang: Language = 'en') => {
         <textarea id="test-prompt" rows="3"
             placeholder="${isRu ? 'Введите тестовый запрос для агента...' : 'Enter a test prompt for this agent...'}"
             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500 resize-none"></textarea>
+        <!-- Model selector row -->
+        <div class="flex items-center gap-2 mt-2">
+          <i class="fas fa-robot text-xs text-violet-400 flex-shrink-0"></i>
+          <select id="test-model-select"
+              class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-violet-500 min-w-0">
+            <option value="">${isRu ? '— выберите модель —' : '— select model —'}</option>
+          </select>
+          <a href="/ai-config?lang=${lang}" class="text-[10px] text-gray-600 hover:text-blue-400 flex-shrink-0 whitespace-nowrap">
+            <i class="fas fa-key mr-0.5"></i>${isRu ? 'Ключи' : 'Keys'}
+          </a>
+        </div>
         <div class="flex gap-2 mt-2">
           <button onclick="runTest()"
               class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
@@ -514,6 +525,67 @@ export const agentsPage = (lang: Language = 'en') => {
     const isRu = ${isRu};
     let currentAgentId = null;
     let customAgents = [];
+
+    // ─── Model selector for test modal ─────────────────────────────────────
+    const AGENT_PROVIDERS = [
+      { id:'openrouter', name:'OpenRouter', models:[
+        { id:'meta-llama/llama-3.3-70b-instruct:free', name:'Llama 3.3 70B (free)' },
+        { id:'google/gemini-2.0-flash-exp:free', name:'Gemini 2.0 Flash (free)' },
+        { id:'deepseek/deepseek-r1:free', name:'DeepSeek R1 (free)' },
+        { id:'mistralai/mistral-7b-instruct:free', name:'Mistral 7B (free)' },
+        { id:'anthropic/claude-3.5-sonnet', name:'Claude 3.5 Sonnet' },
+        { id:'openai/gpt-4o', name:'GPT-4o' },
+        { id:'openai/gpt-4o-mini', name:'GPT-4o mini' },
+      ]},
+      { id:'anthropic', name:'Anthropic', models:[
+        { id:'claude-opus-4-8', name:'Claude Opus 4.8' },
+        { id:'claude-sonnet-4-6', name:'Claude Sonnet 4.6' },
+        { id:'claude-haiku-4-5-20251001', name:'Claude Haiku 4.5' },
+      ]},
+      { id:'openai', name:'OpenAI', models:[
+        { id:'gpt-4o', name:'GPT-4o' },
+        { id:'gpt-4o-mini', name:'GPT-4o mini' },
+        { id:'o3-mini', name:'o3-mini' },
+      ]},
+      { id:'gemini', name:'Google Gemini', models:[
+        { id:'gemini-2.0-flash-exp', name:'Gemini 2.0 Flash (free)' },
+        { id:'gemini-1.5-pro-latest', name:'Gemini 1.5 Pro' },
+      ]},
+      { id:'groq', name:'Groq', models:[
+        { id:'llama-3.3-70b-versatile', name:'Llama 3.3 70B' },
+        { id:'llama-3.1-8b-instant', name:'Llama 3.1 8B' },
+      ]},
+    ];
+
+    function getAgentProviderKey(pid) {
+      if (pid === 'openrouter') {
+        return localStorage.getItem('era_key_openrouter')
+          || localStorage.getItem('openrouter_api_key')
+          || localStorage.getItem('ora_api_key') || '';
+      }
+      return localStorage.getItem('era_key_' + pid) || '';
+    }
+
+    function populateTestModelSelect() {
+      const sel = document.getElementById('test-model-select');
+      if (!sel) return;
+      const savedVal = localStorage.getItem('era_agent_test_model') || '';
+      // Build options: all providers, configured ones first
+      const configured = AGENT_PROVIDERS.filter(p => getAgentProviderKey(p.id));
+      const unconfigured = AGENT_PROVIDERS.filter(p => !getAgentProviderKey(p.id));
+      const ordered = [...configured, ...unconfigured];
+      let html = '<option value="">' + (isRu ? '— выберите модель —' : '— select model —') + '</option>';
+      ordered.forEach(p => {
+        const hasKey = !!getAgentProviderKey(p.id);
+        html += '<optgroup label="' + p.name + (hasKey ? '' : ' 🔒') + '">';
+        p.models.forEach(m => {
+          const selected = m.id === savedVal ? ' selected' : '';
+          html += '<option value="' + m.id + '"' + selected + (hasKey ? '' : ' disabled') + '>' + m.name + '</option>';
+        });
+        html += '</optgroup>';
+      });
+      sel.innerHTML = html;
+    }
 
     // ─── Custom agents from API ─────────────────────────────────────────────
 
@@ -728,6 +800,7 @@ export const agentsPage = (lang: Language = 'en') => {
       testAgentRole = role;
       testAgentInstructions = instructions;
       document.getElementById('test-agent-name').textContent = name + ' (' + role + ')';
+      populateTestModelSelect();
       document.getElementById('test-prompt').value = '';
       document.getElementById('test-result').classList.add('hidden');
       document.getElementById('test-meta').classList.add('hidden');
@@ -750,6 +823,28 @@ export const agentsPage = (lang: Language = 'en') => {
       const prompt = document.getElementById('test-prompt').value.trim();
       if (!prompt) return;
 
+      const modelSel = document.getElementById('test-model-select');
+      const chosenModel = modelSel ? modelSel.value : '';
+      if (chosenModel) localStorage.setItem('era_agent_test_model', chosenModel);
+
+      // Determine the provider and API key for the chosen model
+      let apiKey = '';
+      let provider = 'openrouter';
+      if (chosenModel) {
+        for (const p of AGENT_PROVIDERS) {
+          if (p.models.find(m => m.id === chosenModel)) {
+            provider = p.id;
+            apiKey = getAgentProviderKey(p.id);
+            break;
+          }
+        }
+      }
+      if (!apiKey) {
+        apiKey = localStorage.getItem('era_key_openrouter')
+          || localStorage.getItem('openrouter_api_key')
+          || localStorage.getItem('ora_api_key') || '';
+      }
+
       const icon  = document.getElementById('test-icon');
       const label = document.getElementById('test-btn-label');
       icon.className  = 'fas fa-spinner fa-spin';
@@ -761,10 +856,12 @@ export const agentsPage = (lang: Language = 'en') => {
 
       const t0 = Date.now();
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (apiKey) headers['X-API-Key'] = apiKey;
         const res  = await fetch('/api/query', {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ query: prompt, agentRole: testAgentRole, singleAgent: true }),
+          headers,
+          body: JSON.stringify({ query: prompt, agentRole: testAgentRole, singleAgent: true, model: chosenModel || undefined }),
         });
         const data = await res.json();
         const elapsed = ((Date.now() - t0) / 1000).toFixed(1);

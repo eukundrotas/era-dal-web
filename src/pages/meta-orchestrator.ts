@@ -467,56 +467,59 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
       const noProviders = document.getElementById('model-panel-no-providers');
       const providersDiv = document.getElementById('model-panel-providers');
 
-      // Build list of providers with configured keys
-      const configuredProviders = PROVIDERS_META.filter(p => getProviderKey(p.id));
+      // Always hide the "no providers" placeholder — we show all providers
+      noProviders.classList.add('hidden');
 
-      // Add custom models to their providers
+      // Build custom models by provider
       const customByProvider = {};
       customModels.forEach(m => {
         if (!customByProvider[m.provider]) customByProvider[m.provider] = [];
         customByProvider[m.provider].push(m);
       });
-      Object.keys(customByProvider).forEach(pid => {
-        if (!configuredProviders.find(p => p.id === pid)) {
-          const base = PROVIDERS_META.find(p => p.id === pid);
-          if (base && getProviderKey(pid)) configuredProviders.push(base);
-        }
-      });
 
-      if (!configuredProviders.length) {
-        noProviders.classList.remove('hidden');
-        providersDiv.innerHTML = '';
-        return;
-      }
-      noProviders.classList.add('hidden');
-
-      providersDiv.innerHTML = configuredProviders.map(p => {
+      // Show ALL providers; mark ones without keys as locked
+      providersDiv.innerHTML = PROVIDERS_META.map(p => {
+        const hasKey = !!getProviderKey(p.id);
         const allModels = [
           ...p.models,
           ...(customByProvider[p.id] || []).map(m => ({ ...m, custom: true }))
         ];
         const chips = allModels.map(m => {
           const sel = selectedModels.has(p.id + '|' + m.id);
-          return \`<span class="model-chip \${sel ? 'selected' : 'unselected'}"
-                        onclick="toggleOrcModel('\${p.id}', '\${m.id.replace(/'/g,"\\\\'")}', '\${(m.name||m.id).replace(/'/g,"\\\\'")}', '\${p.name}', '\${p.color}')"
-                        title="\${m.id}">
+          const clickHandler = hasKey
+            ? \`toggleOrcModel('\${p.id}', '\${m.id.replace(/'/g,"\\\\'")}', '\${(m.name||m.id).replace(/'/g,"\\\\'")}', '\${p.name}', '\${p.color}')\`
+            : \`goToAiConfig()\`;
+          return \`<span class="model-chip \${sel ? 'selected' : 'unselected'} \${!hasKey ? 'opacity-50' : ''}"
+                        onclick="\${clickHandler}"
+                        title="\${m.id}\${!hasKey ? ' (API key required)' : ''}">
             <span class="provider-dot" style="background:\${p.color}"></span>
             \${m.name || m.id}
             \${m.free ? '<span style="color:#4ade80;font-size:9px">free</span>' : ''}
-            \${m.custom ? '<span style="color:#c084fc;font-size:9px">custom</span>' : ''}
+            \${m.custom ? '<span style="color:#c084fc;font-size:9px">✦</span>' : ''}
           </span>\`;
         }).join('');
 
+        const lockBadge = !hasKey
+          ? \`<a href="/ai-config?lang=\${lang}" class="ml-auto text-[10px] text-gray-600 hover:text-orange-400 transition flex items-center gap-1" title="Add API key">
+               <i class="fas fa-lock"></i> key
+             </a>\`
+          : '';
+
         return \`
-          <div>
+          <div class="\${!hasKey ? 'opacity-70' : ''}">
             <div class="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style="color:\${p.color}">
               <span class="provider-dot" style="background:\${p.color}"></span>
               \${p.name}
+              \${lockBadge}
             </div>
             <div class="flex flex-wrap gap-1.5">\${chips}</div>
           </div>
         \`;
       }).join('');
+    }
+
+    function goToAiConfig() {
+      window.location.href = '/ai-config?lang=' + lang;
     }
 
     function toggleOrcModel(providerId, modelId, modelName, providerName, color) {
