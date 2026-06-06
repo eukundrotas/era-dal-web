@@ -312,7 +312,7 @@ export const historyPage = (lang: Language = 'en') => {
                   <span class="text-violet-400 font-mono text-xs mt-0.5">\${i+1}</span>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-1">
-                      <span class="text-xs text-gray-300 font-medium">\${s.agentRole}</span>
+                      <span class="text-xs text-gray-300 font-medium">\${roleName(s.agentRole)}</span>
                       <span class="text-xs px-1.5 py-0.5 rounded
                         \${s.status==='done'?'bg-green-500/20 text-green-400':s.status==='failed'?'bg-red-500/20 text-red-400':'bg-gray-700 text-gray-400'}">\${s.status}</span>
                     </div>
@@ -367,6 +367,37 @@ export const historyPage = (lang: Language = 'en') => {
     }
 
     // ─── Helpers ───────────────────────────────────────────────────────────────
+
+    var ROLE_NAMES = {
+      researcher:'${isRu?'Исследователь':'Researcher'}',analyst:'${isRu?'Аналитик':'Analyst'}',
+      writer:'${isRu?'Автор':'Writer'}',critic:'${isRu?'Критик':'Critic'}',
+      planner:'${isRu?'Планировщик':'Planner'}',executor:'${isRu?'Исполнитель':'Executor'}',
+      reviewer:'${isRu?'Ревьюер':'Reviewer'}',supervisor:'${isRu?'Супервизор':'Supervisor'}',
+      coordinator:'${isRu?'Координатор':'Coordinator'}',custom:'${isRu?'Свой агент':'Custom Agent'}',
+      sales_manager:'${isRu?'Менеджер продаж':'Sales Manager'}',
+      marketing_manager:'${isRu?'Маркетолог':'Marketing Manager'}',
+      financial_analyst:'${isRu?'Финансовый аналитик':'Financial Analyst'}',
+      legal_counsel:'${isRu?'Юрист':'Legal Counsel'}',
+      hr_specialist:'${isRu?'HR-специалист':'HR Specialist'}',
+      project_manager:'${isRu?'Менеджер проектов':'Project Manager'}',
+      software_engineer:'${isRu?'Разработчик':'Software Engineer'}',
+      data_engineer:'${isRu?'Data-инженер':'Data Engineer'}',
+      devops_engineer:'${isRu?'DevOps-инженер':'DevOps Engineer'}',
+      security_analyst:'${isRu?'Аналитик ИБ':'Security Analyst'}',
+      research_scientist:'${isRu?'Учёный-исследователь':'Research Scientist'}',
+      data_scientist:'${isRu?'Дата-сайентист':'Data Scientist'}',
+      experiment_designer:'${isRu?'Дизайнер экспериментов':'Experiment Designer'}',
+      peer_reviewer:'${isRu?'Рецензент':'Peer Reviewer'}',
+      literature_researcher:'${isRu?'Обзор литературы':'Literature Researcher'}',
+      ml_engineer:'${isRu?'ML-инженер':'ML Engineer'}',
+      prompt_engineer:'${isRu?'Prompt-инженер':'Prompt Engineer'}',
+      llm_engineer:'${isRu?'LLM-инженер':'LLM Engineer'}',
+      ai_architect:'${isRu?'AI-архитектор':'AI Architect'}',
+      mlops_engineer:'${isRu?'MLOps-инженер':'MLOps Engineer'}',
+    };
+    function roleName(r) {
+      return ROLE_NAMES[r] || r.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+    }
 
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

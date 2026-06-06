@@ -433,6 +433,45 @@ export const translations = {
     descSynectics: { en: 'Solve through analogy. Make the strange familiar.', ru: 'Решение через аналогию. Чужое сделать знакомым.' },
   },
 
+  // Agent role display names (used in result views, history, logs)
+  agentRoles: {
+    // Core
+    researcher:         { en: 'Researcher',          ru: 'Исследователь' },
+    analyst:            { en: 'Analyst',              ru: 'Аналитик' },
+    writer:             { en: 'Writer',               ru: 'Автор' },
+    critic:             { en: 'Critic',               ru: 'Критик' },
+    planner:            { en: 'Planner',              ru: 'Планировщик' },
+    executor:           { en: 'Executor',             ru: 'Исполнитель' },
+    reviewer:           { en: 'Reviewer',             ru: 'Ревьюер' },
+    supervisor:         { en: 'Supervisor',           ru: 'Супервизор' },
+    coordinator:        { en: 'Coordinator',          ru: 'Координатор' },
+    custom:             { en: 'Custom Agent',         ru: 'Свой агент' },
+    // Business
+    sales_manager:      { en: 'Sales Manager',        ru: 'Менеджер по продажам' },
+    marketing_manager:  { en: 'Marketing Manager',    ru: 'Маркетолог' },
+    financial_analyst:  { en: 'Financial Analyst',    ru: 'Финансовый аналитик' },
+    legal_counsel:      { en: 'Legal Counsel',        ru: 'Юрист' },
+    hr_specialist:      { en: 'HR Specialist',        ru: 'HR-специалист' },
+    project_manager:    { en: 'Project Manager',      ru: 'Менеджер проектов' },
+    // Tech
+    software_engineer:  { en: 'Software Engineer',    ru: 'Разработчик' },
+    data_engineer:      { en: 'Data Engineer',        ru: 'Data-инженер' },
+    devops_engineer:    { en: 'DevOps Engineer',      ru: 'DevOps-инженер' },
+    security_analyst:   { en: 'Security Analyst',     ru: 'Аналитик ИБ' },
+    // Science
+    research_scientist: { en: 'Research Scientist',   ru: 'Учёный-исследователь' },
+    data_scientist:     { en: 'Data Scientist',       ru: 'Дата-сайентист' },
+    experiment_designer:{ en: 'Experiment Designer',  ru: 'Дизайнер экспериментов' },
+    peer_reviewer:      { en: 'Peer Reviewer',        ru: 'Рецензент' },
+    literature_researcher:{ en: 'Literature Researcher',ru: 'Обзор литературы' },
+    // AI/LLM Engineering
+    ml_engineer:        { en: 'ML Engineer',          ru: 'ML-инженер' },
+    prompt_engineer:    { en: 'Prompt Engineer',      ru: 'Prompt-инженер' },
+    llm_engineer:       { en: 'LLM Engineer',         ru: 'LLM-инженер' },
+    ai_architect:       { en: 'AI Architect',         ru: 'AI-архитектор' },
+    mlops_engineer:     { en: 'MLOps Engineer',       ru: 'MLOps-инженер' },
+  },
+
   // Common
   common: {
     science: { en: 'Science', ru: 'Наука' },

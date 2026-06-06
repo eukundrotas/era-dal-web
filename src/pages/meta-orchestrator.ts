@@ -732,7 +732,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
               <div class="flex items-center gap-2 flex-wrap mb-0.5">
                 <span class="agent-chip">
                   <i class="fas \${iconName} \${iconColor} text-xs"></i>
-                  <span class="text-gray-300">\${s.agentRole.replace(/_/g,' ')}</span>
+                  <span class="text-gray-300">\${roleName(s.agentRole)}</span>
                 </span>
                 <span class="text-xs px-2 py-0.5 rounded
                   \${isBlocked?'bg-gray-500/10 text-gray-500':isConfirm?'bg-yellow-500/10 text-yellow-400':'bg-green-500/10 text-green-400'}">
@@ -760,7 +760,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
                 <i class="fas \${iconName} \${iconColor} text-sm"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium truncate">\${s.agentRole.replace(/_/g,' ')}</p>
+                <p class="text-sm font-medium truncate">\${roleName(s.agentRole)}</p>
                 <p class="text-xs text-gray-500">\${s.autonomyLevel}</p>
               </div>
               <div class="w-2 h-2 rounded-full \${s.autonomyLevel==='SAFE'?'bg-green-500':'bg-yellow-500'} flex-shrink-0"></div>
@@ -852,7 +852,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
             \${iconFor(s.status)}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-xs text-gray-500">\${s.agentRole.replace(/_/g,' ')}</p>
+            <p class="text-xs text-gray-500">\${roleName(s.agentRole)}</p>
             <p class="text-sm text-gray-300 truncate">\${s.action}</p>
             \${s.outputData ? '<p class="text-xs text-gray-500 mt-1 line-clamp-2">' + escHtml(s.outputData.slice(0,200)) + '</p>' : ''}
           </div>
@@ -873,7 +873,7 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
       document.getElementById('result-content').innerHTML = doneSteps.length
         ? doneSteps.map(s => \`
             <div class="bg-gray-800/40 rounded-lg p-3">
-              <p class="text-xs text-gray-500 mb-1">\${s.agentRole.replace(/_/g,' ')} · ${isRu?'шаг':'step'} \${s.orderIndex}</p>
+              <p class="text-xs text-gray-500 mb-1">\${roleName(s.agentRole)} · ${isRu?'шаг':'step'} \${s.orderIndex}</p>
               <div class="result-md">\${renderMd(s.outputData)}</div>
             </div>
           \`).join('')
@@ -932,6 +932,38 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
 
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // Localised agent role names
+    var ROLE_NAMES = {
+      researcher:'${isRu?'Исследователь':'Researcher'}',analyst:'${isRu?'Аналитик':'Analyst'}',
+      writer:'${isRu?'Автор':'Writer'}',critic:'${isRu?'Критик':'Critic'}',
+      planner:'${isRu?'Планировщик':'Planner'}',executor:'${isRu?'Исполнитель':'Executor'}',
+      reviewer:'${isRu?'Ревьюер':'Reviewer'}',supervisor:'${isRu?'Супервизор':'Supervisor'}',
+      coordinator:'${isRu?'Координатор':'Coordinator'}',custom:'${isRu?'Свой агент':'Custom Agent'}',
+      sales_manager:'${isRu?'Менеджер продаж':'Sales Manager'}',
+      marketing_manager:'${isRu?'Маркетолог':'Marketing Manager'}',
+      financial_analyst:'${isRu?'Финансовый аналитик':'Financial Analyst'}',
+      legal_counsel:'${isRu?'Юрист':'Legal Counsel'}',
+      hr_specialist:'${isRu?'HR-специалист':'HR Specialist'}',
+      project_manager:'${isRu?'Менеджер проектов':'Project Manager'}',
+      software_engineer:'${isRu?'Разработчик':'Software Engineer'}',
+      data_engineer:'${isRu?'Data-инженер':'Data Engineer'}',
+      devops_engineer:'${isRu?'DevOps-инженер':'DevOps Engineer'}',
+      security_analyst:'${isRu?'Аналитик ИБ':'Security Analyst'}',
+      research_scientist:'${isRu?'Учёный-исследователь':'Research Scientist'}',
+      data_scientist:'${isRu?'Дата-сайентист':'Data Scientist'}',
+      experiment_designer:'${isRu?'Дизайнер экспериментов':'Experiment Designer'}',
+      peer_reviewer:'${isRu?'Рецензент':'Peer Reviewer'}',
+      literature_researcher:'${isRu?'Обзор литературы':'Literature Researcher'}',
+      ml_engineer:'${isRu?'ML-инженер':'ML Engineer'}',
+      prompt_engineer:'${isRu?'Prompt-инженер':'Prompt Engineer'}',
+      llm_engineer:'${isRu?'LLM-инженер':'LLM Engineer'}',
+      ai_architect:'${isRu?'AI-архитектор':'AI Architect'}',
+      mlops_engineer:'${isRu?'MLOps-инженер':'MLOps Engineer'}',
+    };
+    function roleName(r) {
+      return ROLE_NAMES[r] || r.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
     }
 
     // Render Markdown (tables, headings, lists, bold) into safe HTML.
