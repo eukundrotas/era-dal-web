@@ -10,7 +10,26 @@ export const historyPage = (lang: Language = 'en') => {
 <html lang="${lang}">
 <head>
   ${head(title, isRu ? 'История выполнения задач мета-оркестратора' : 'Meta-orchestrator task execution history', lang)}
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
   <style>
+    .result-md { font-size:12px; line-height:1.65; color:#d1d5db; word-break:break-word; }
+    .result-md > *:first-child { margin-top:0; }
+    .result-md h1,.result-md h2,.result-md h3,.result-md h4 { color:#fff; font-weight:600; margin:.8em 0 .4em; line-height:1.3; }
+    .result-md h1{font-size:1.2em} .result-md h2{font-size:1.1em} .result-md h3{font-size:1em} .result-md h4{font-size:.95em}
+    .result-md p{margin:.4em 0}
+    .result-md ul,.result-md ol{margin:.4em 0; padding-left:1.3em}
+    .result-md li{margin:.18em 0}
+    .result-md strong{color:#fff}
+    .result-md a{color:#818cf8; text-decoration:underline}
+    .result-md code{background:rgba(255,255,255,.08); padding:1px 4px; border-radius:3px; font-size:.88em}
+    .result-md pre{background:rgba(0,0,0,.4); padding:8px 10px; border-radius:7px; overflow-x:auto; margin:.5em 0}
+    .result-md pre code{background:none; padding:0}
+    .result-md table{border-collapse:collapse; width:100%; margin:.6em 0; font-size:11px; display:block; overflow-x:auto}
+    .result-md th,.result-md td{border:1px solid rgba(255,255,255,.12); padding:5px 8px; text-align:left; vertical-align:top}
+    .result-md th{background:rgba(255,255,255,.06); color:#e5e7eb; font-weight:600}
+    .result-md blockquote{border-left:3px solid rgba(139,92,246,.5); padding-left:8px; color:#9ca3af; margin:.5em 0}
+    .result-md hr{border:none; border-top:1px solid rgba(255,255,255,.1); margin:.8em 0}
     .status-completed { background:rgba(16,185,129,.15); color:#34d399; border-color:rgba(16,185,129,.3); }
     .status-failed     { background:rgba(239,68,68,.15);   color:#f87171; border-color:rgba(239,68,68,.3); }
     .status-paused     { background:rgba(245,158,11,.15);  color:#fbbf24; border-color:rgba(245,158,11,.3); }
@@ -298,7 +317,12 @@ export const historyPage = (lang: Language = 'en') => {
                         \${s.status==='done'?'bg-green-500/20 text-green-400':s.status==='failed'?'bg-red-500/20 text-red-400':'bg-gray-700 text-gray-400'}">\${s.status}</span>
                     </div>
                     <p class="text-gray-300 text-xs leading-snug">\${escHtml(s.action)}</p>
-                    \${s.outputData ? \`<p class="text-gray-500 text-xs mt-1 line-clamp-2">\${escHtml(s.outputData)}</p>\` : ''}
+                    \${s.outputData ? \`
+                      <p class="text-gray-500 text-xs mt-1 line-clamp-2 step-output-preview">\${escHtml(s.outputData.slice(0,200))}\${s.outputData.length > 200 ? '…' : ''}</p>
+                      <div class="step-output-full" style="display:none"><div class="result-md mt-2 border-t border-gray-700/50 pt-2">\${renderMd(s.outputData)}</div></div>
+                      <button onclick="toggleStepOutput(this)"
+                        class="text-violet-400 hover:text-violet-300 text-xs mt-1 transition">${isRu ? 'Показать вывод ▸' : 'Show output ▸'}</button>
+                    \` : ''}
                   </div>
                 </div>
               \`).join('')}
@@ -346,6 +370,28 @@ export const historyPage = (lang: Language = 'en') => {
 
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderMd(s) {
+      const text = String(s == null ? '' : s);
+      try {
+        if (window.marked) {
+          const html = window.marked.parse(text, { breaks: true, gfm: true });
+          return window.DOMPurify ? window.DOMPurify.sanitize(html) : html;
+        }
+      } catch (e) { /* fall through */ }
+      return '<p style="white-space:pre-wrap">' + escHtml(text) + '</p>';
+    }
+
+    function toggleStepOutput(btn) {
+      const box = btn.parentElement.querySelector('.step-output-full');
+      const preview = btn.parentElement.querySelector('.step-output-preview');
+      const expanded = box.style.display !== 'none';
+      box.style.display = expanded ? 'none' : 'block';
+      if (preview) preview.style.display = expanded ? 'block' : 'none';
+      btn.textContent = expanded
+        ? (isRu ? 'Показать вывод ▸' : 'Show output ▸')
+        : (isRu ? 'Скрыть ▴' : 'Hide ▴');
     }
 
     function copyToClipboard(text) {
