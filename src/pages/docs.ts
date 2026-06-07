@@ -53,6 +53,14 @@ export const docsPage = (lang: Language = 'en') => `
           </div>
           
           <div>
+            <h4 class="text-xs text-gray-500 uppercase tracking-wider mb-2">Research Databases</h4>
+            <ul class="space-y-1">
+              <li><a href="#research-databases" class="block px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5">Overview</a></li>
+              <li><a href="#pubmed-arxiv" class="block px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5">PubMed & ArXiv</a></li>
+            </ul>
+          </div>
+
+          <div>
             <h4 class="text-xs text-gray-500 uppercase tracking-wider mb-2">Examples</h4>
             <ul class="space-y-1">
               <li><a href="#example-science" class="block px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5">Science Query</a></li>
@@ -68,7 +76,7 @@ export const docsPage = (lang: Language = 'en') => `
         <section id="introduction" class="mb-16">
           <h1 class="text-4xl font-bold mb-4">ERA DAL Documentation</h1>
           <p class="text-gray-400 text-lg mb-6">
-            ERA Decision & Arbitration Layer is a multi-model AI system that provides reliable, reproducible, and quantified answers through ensemble LLMs, arbitration, consensus synthesis, and self-critique.
+            ERA Decision & Arbitration Layer is a multi-agent AI research platform that delivers reliable, reproducible, and quantified answers through ensemble LLMs, arbitration, consensus synthesis, and self-critique. Built for scientific research, medicine, and engineering.
           </p>
           
           <div class="glass rounded-xl p-6">
@@ -288,6 +296,52 @@ python -m pytest tests/</code></pre>
 }</code></pre>
             </div>
           </div>
+        </section>
+
+        <!-- Research Databases -->
+        <section id="research-databases" class="mb-16">
+          <h2 class="text-2xl font-bold mb-4">Research Databases</h2>
+          <p class="text-gray-400 mb-6">
+            ERA DAL integrates with six major scientific databases. Configure each via the <a href="/integrations" class="text-blue-400 hover:underline">Integrations</a> page — your credentials stay in browser localStorage.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            ${[
+              { id: 'pubmed', icon: 'dna', color: 'blue', name: 'PubMed / NCBI', auth: 'Email + optional API key', note: 'Free; key raises limit to 10 req/s' },
+              { id: 'arxiv', icon: 'file-alt', color: 'cyan', name: 'ArXiv', auth: 'None required', note: 'Free, open-access preprints' },
+              { id: 'crossref', icon: 'link', color: 'purple', name: 'CrossRef', auth: 'Polite-pool email', note: 'DOI metadata, citation counts' },
+              { id: 'orcid', icon: 'id-badge', color: 'green', name: 'ORCID', auth: 'OAuth2 client credentials', note: 'Researcher profiles & publications' },
+              { id: 'zotero', icon: 'book', color: 'orange', name: 'Zotero', auth: 'API key + user/group ID', note: 'Personal & group reference libraries' },
+              { id: 'semantic_scholar', icon: 'graduation-cap', color: 'pink', name: 'Semantic Scholar', auth: 'Optional API key', note: 'AI-powered relevance ranking' },
+            ].map(db => `
+              <div class="glass rounded-xl p-4 flex items-start gap-3">
+                <i class="fas fa-${db.icon} text-${db.color}-400 text-xl mt-1 w-6 flex-shrink-0"></i>
+                <div>
+                  <div class="font-semibold">${db.name}</div>
+                  <div class="text-sm text-gray-400">Auth: ${db.auth}</div>
+                  <div class="text-xs text-gray-500 mt-1">${db.note}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <section id="pubmed-arxiv">
+            <h3 class="text-lg font-semibold mb-2">PubMed Search via Python</h3>
+            <pre class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-green-400">python app.py \\
+  --pool med \\
+  --problem "CRISPR off-target effects in gene therapy" \\
+  --db pubmed \\
+  --db-email researcher@uni.edu \\
+  --repeats 3</code></pre>
+
+            <h3 class="text-lg font-semibold mb-2">ArXiv Search via Python</h3>
+            <pre class="bg-gray-900 rounded-lg p-4 overflow-x-auto"><code class="text-green-400">python app.py \\
+  --pool science \\
+  --problem "Transformer attention mechanisms in protein folding" \\
+  --db arxiv \\
+  --db-category cs.LG \\
+  --repeats 3</code></pre>
+          </section>
         </section>
 
         <!-- Examples -->
