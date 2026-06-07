@@ -176,11 +176,24 @@ export const researchPage = (lang: Language = 'en') => {
                 <option value="economics">${isRu ? '📊 Экономика' : '📊 Economics'}</option>
                 <option value="math">${isRu ? '📐 Математика' : '📐 Mathematics'}</option>
               </select>
+              <select id="thinking-mode"
+                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-emerald-500"
+                onchange="updateThinkingDesc(this.value)" title="${isRu ? 'Режим мышления' : 'Thinking mode'}">
+                <option value="standard">🧠 ${isRu ? 'Стандарт' : 'Standard'}</option>
+                <option value="first_principles">🔬 ${isRu ? 'Первые принципы' : 'First Principles'}</option>
+                <option value="systems">🌐 ${isRu ? 'Системное' : 'Systems'}</option>
+                <option value="bayesian">📊 ${isRu ? 'Байесовское' : 'Bayesian'}</option>
+                <option value="critical">⚖️ ${isRu ? 'Критическое' : 'Critical'}</option>
+                <option value="lateral">🔀 ${isRu ? 'Латеральное' : 'Lateral'}</option>
+                <option value="abductive">🔍 ${isRu ? 'Абдуктивное' : 'Abductive'}</option>
+              </select>
               <label class="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer">
                 <input type="checkbox" id="peer-review-toggle" class="rounded border-gray-600 bg-gray-800 text-emerald-500">
                 ${isRu ? 'Авто-рецензирование' : 'Auto peer-review'}
               </label>
             </div>
+
+            <p id="thinking-mode-hint" class="text-xs text-gray-600 leading-relaxed mb-2">${isRu ? 'Обычное рассуждение без специального фреймворка.' : 'Default reasoning, no special framework.'}</p>
 
             <div class="flex gap-2">
               <button onclick="runResearch()" id="research-btn"
@@ -351,6 +364,20 @@ export const researchPage = (lang: Language = 'en') => {
     let activeAgentRole = '';
     let lastResult = '';
 
+    const THINKING_DESCS = {
+      standard:        isRu ? 'Обычное рассуждение без специального фреймворка.' : 'Default reasoning, no special framework.',
+      first_principles:isRu ? 'Убрать все допущения. Строить только на доказанных фактах.' : 'Strip assumptions. Rebuild from indisputable facts only.',
+      systems:         isRu ? 'Обратные связи, точки рычага, эмерджентность, первопричины.' : 'Feedback loops, leverage points, root causes.',
+      bayesian:        isRu ? 'Априорные убеждения + данные → обновлённая вероятность.' : 'Prior beliefs + evidence → updated probability.',
+      critical:        isRu ? 'Качество доказательств, логические ошибки, калибровка.' : 'Evidence quality, logical fallacies, calibrated confidence.',
+      lateral:         isRu ? 'Разрыв шаблонов, провокации, неожиданные связи.' : 'Break patterns, provocations, unexpected connections.',
+      abductive:       isRu ? 'Вывод к лучшему объяснению. Детективное мышление.' : 'Inference to the best explanation. Think like a detective.',
+    };
+    function updateThinkingDesc(mode) {
+      const el = document.getElementById('thinking-mode-hint');
+      if (el) el.textContent = THINKING_DESCS[mode] || THINKING_DESCS.standard;
+    }
+
     function renderMd(s) {
       if (!s) return '';
       try {
@@ -385,9 +412,10 @@ export const researchPage = (lang: Language = 'en') => {
       const prompt = document.getElementById('research-prompt').value.trim();
       if (!prompt) return;
 
-      const domain  = document.getElementById('research-domain').value;
-      const depth   = document.getElementById('research-depth').value;
-      const peerRev = document.getElementById('peer-review-toggle').checked;
+      const domain       = document.getElementById('research-domain').value;
+      const depth        = document.getElementById('research-depth').value;
+      const peerRev      = document.getElementById('peer-review-toggle').checked;
+      const thinkingMode = document.getElementById('thinking-mode').value;
 
       const agentMap = {
         quick:    'researcher',
@@ -419,6 +447,7 @@ export const researchPage = (lang: Language = 'en') => {
             query: (peerRev ? '[PEER_REVIEW] ' : '') + '[DOMAIN:' + domain + '] ' + prompt,
             agentRole: agentMap[depth] || 'research_scientist',
             singleAgent: depth === 'quick',
+            thinkingMode,
           }),
         });
         const data = await res.json();
@@ -473,7 +502,7 @@ export const researchPage = (lang: Language = 'en') => {
     window.copyResult = copyResult;
 
     function saveToJournal() {
-      window.location.href = '/journal?lang=' + lang;
+      window.location.href = '/history?tab=log&lang=' + lang;
     }
     window.saveToJournal = saveToJournal;
 

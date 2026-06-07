@@ -1,338 +1,320 @@
 import { head, sidebar } from '../components/layout'
-import { Language, translations } from '../i18n/translations'
+import { Language } from '../i18n/translations'
 
-function t(lang: Language, path: string): string {
-  const keys = path.split('.')
-  let result: any = translations[lang]
-  for (const key of keys) {
-    if (result && typeof result === 'object' && key in result) { result = result[key] } else { return path }
-  }
-  return typeof result === 'string' ? result : path
-}
+export const settingsPage = (lang: Language = 'en') => {
+  const isRu = lang === 'ru'
+  const title = isRu ? 'Профиль и настройки' : 'Profile & Settings'
 
-export const settingsPage = (lang: Language = 'en') => `
+  return `
 <!DOCTYPE html>
 <html lang="${lang}">
 <head>
-  ${head(t(lang, 'nav.settings'), lang === 'ru' ? 'Настройте параметры ERA DAL.' : 'Configure your ERA DAL preferences, API settings, and notifications.', lang)}
+  ${head(title, isRu ? 'Управление профилем и настройками ERA DAL' : 'Manage your ERA DAL profile and preferences', lang)}
+  <style>
+    .tab-btn{transition:all .15s;border-bottom:2px solid transparent;padding:.6rem 1.25rem;font-size:.875rem;font-weight:500;color:#9ca3af}
+    .tab-btn.active{border-bottom-color:#8b5cf6;color:#fff}
+    .toggle-track{width:2.75rem;height:1.5rem;background:#374151;border-radius:9999px;position:relative;cursor:pointer;transition:.2s}
+    .toggle-track.on{background:#2563eb}
+    .toggle-thumb{position:absolute;top:2px;left:2px;width:1.25rem;height:1.25rem;background:#fff;border-radius:50%;transition:.2s}
+    .toggle-track.on .toggle-thumb{transform:translateX(1.25rem)}
+  </style>
 </head>
 <body class="bg-gray-950 text-white">
-  ${sidebar(lang, 'settings')}
-  
+  ${sidebar('settings', lang)}
+
   <main class="ml-56 pt-4 min-h-screen">
     <div class="p-6 max-w-4xl">
+
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-2xl font-bold">Settings</h1>
-        <p class="text-gray-400">Configure your ERA DAL preferences</p>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
+          <i class="fas fa-user-cog text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">${title}</h1>
+          <p class="text-gray-400 text-sm">${isRu ? 'Аккаунт, подписка и настройки платформы' : 'Account, subscription and platform preferences'}</p>
+        </div>
       </div>
 
-      <!-- API Configuration -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-6">
-          <i class="fas fa-plug text-blue-500 mr-2"></i>
-          API Configuration
-        </h3>
-        
-        <div class="space-y-6">
-          <div>
-            <label class="block text-gray-400 text-sm mb-2">OpenRouter API Key</label>
-            <div class="flex items-center space-x-2">
-              <input type="password" id="api-key" value="sk-or-v1-****************************" 
-                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
-              <button onclick="toggleApiKey()" class="glass hover:bg-white/10 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-eye" id="eye-icon"></i>
-              </button>
-              <button onclick="testApiKey()" class="bg-green-600 hover:bg-green-700 px-4 py-3 rounded-lg transition">
-                <i class="fas fa-check mr-2"></i> Test
+      <!-- Tabs -->
+      <div class="flex items-center gap-1 mb-6 border-b border-gray-800">
+        <button id="tab-profile" onclick="switchTab('profile')" class="tab-btn active">
+          <i class="fas fa-user mr-2 text-blue-400"></i>${isRu ? 'Профиль' : 'Profile'}
+        </button>
+        <button id="tab-prefs" onclick="switchTab('prefs')" class="tab-btn">
+          <i class="fas fa-sliders-h mr-2 text-gray-500"></i>${isRu ? 'Настройки' : 'Preferences'}
+        </button>
+      </div>
+
+      <!-- ── TAB: Profile ── -->
+      <div id="panel-profile" class="space-y-6">
+
+        <!-- Profile card -->
+        <div class="glass rounded-xl p-6">
+          <div class="flex items-center gap-5 mb-6">
+            <div class="relative">
+              <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold">EK</div>
+              <button class="absolute bottom-0 right-0 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+                <i class="fas fa-camera text-xs"></i>
               </button>
             </div>
-            <p class="text-gray-500 text-xs mt-2">Get your API key from <a href="https://openrouter.ai" target="_blank" class="text-blue-400 hover:underline">openrouter.ai</a></p>
+            <div>
+              <h2 class="text-xl font-bold">Eugene Kundrotas</h2>
+              <p class="text-gray-400 text-sm">eu.kundrotas@gmail.com</p>
+              <span class="mt-1 inline-block bg-purple-500/20 text-purple-400 px-3 py-0.5 rounded-full text-xs">
+                <i class="fas fa-crown mr-1"></i>Pro Plan
+              </span>
+            </div>
           </div>
-
-          <div>
-            <label class="block text-gray-400 text-sm mb-2">API Base URL</label>
-            <input type="text" value="https://openrouter.ai/api/v1" 
-              class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
-          </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-gray-400 text-sm mb-2">Solver Timeout (seconds)</label>
-              <input type="number" value="30" min="5" max="120"
-                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Полное имя' : 'Full name'}</label>
+              <input type="text" value="Eugene Kundrotas"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition text-sm">
             </div>
             <div>
-              <label class="block text-gray-400 text-sm mb-2">Arbiter Timeout (seconds)</label>
-              <input type="number" value="60" min="10" max="180"
-                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
+              <label class="block text-gray-400 text-sm mb-1.5">Email</label>
+              <input type="email" value="eu.kundrotas@gmail.com"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition text-sm">
             </div>
+            <div>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Организация' : 'Organization'}</label>
+              <input type="text" value="UAB Propriezura"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition text-sm">
+            </div>
+            <div>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Должность / специальность' : 'Role / specialty'}</label>
+              <input type="text" placeholder="${isRu ? 'Исследователь, инженер, аналитик...' : 'Researcher, engineer, analyst...'}"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition text-sm">
+            </div>
+          </div>
+          <button class="mt-5 bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg text-sm transition">
+            <i class="fas fa-save mr-2"></i>${isRu ? 'Сохранить' : 'Save changes'}
+          </button>
+        </div>
+
+        <!-- Subscription -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-credit-card text-green-400"></i>
+            ${isRu ? 'Подписка' : 'Subscription'}
+          </h3>
+          <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-5 mb-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-purple-200 text-xs">${isRu ? 'Текущий план' : 'Current plan'}</p>
+                <p class="text-white text-xl font-bold">Pro Plan</p>
+                <p class="text-purple-200 text-xs mt-1">$49/${isRu ? 'месяц' : 'month'}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-purple-200 text-xs">API ${isRu ? 'Вызовы' : 'Calls'}</p>
+                <p class="text-white text-xl font-bold">847 / 10k</p>
+                <p class="text-purple-200 text-xs mt-1">8.47% ${isRu ? 'использовано' : 'used'}</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-gray-800 rounded-lg p-3 text-center">
+              <p class="text-gray-400 text-xs">${isRu ? 'Моделей' : 'Models'}</p>
+              <p class="text-white font-bold">12+</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-3 text-center">
+              <p class="text-gray-400 text-xs">${isRu ? 'Параллельно' : 'Parallel'}</p>
+              <p class="text-white font-bold">${isRu ? 'Без огр.' : 'Unlimited'}</p>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-3 text-center">
+              <p class="text-gray-400 text-xs">Support</p>
+              <p class="text-green-400 font-bold"><i class="fas fa-check"></i></p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <a href="/pricing?lang=${lang}" class="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg text-sm transition">
+              <i class="fas fa-arrow-up mr-2"></i>${isRu ? 'Улучшить план' : 'Upgrade plan'}
+            </a>
+            <button class="glass hover:bg-white/10 px-5 py-2 rounded-lg text-sm text-gray-300 transition">
+              <i class="fas fa-file-invoice mr-2"></i>${isRu ? 'История платежей' : 'Billing history'}
+            </button>
+          </div>
+        </div>
+
+        <!-- Usage stats -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-bar text-cyan-400"></i>
+            ${isRu ? 'Использование' : 'Usage statistics'}
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            ${[
+              [isRu ? 'Этот месяц' : 'This month', '847', isRu ? '+12%' : '+12%', 'text-green-400'],
+              [isRu ? 'Всего' : 'All time', '3,421', isRu ? 'с Dec 2024' : 'since Dec 2024', 'text-gray-500'],
+              [isRu ? 'Ср. время' : 'Avg latency', '1.85s', isRu ? '−0.3s улучшение' : '−0.3s improved', 'text-blue-400'],
+              [isRu ? 'Успешность' : 'Success rate', '94.2%', isRu ? 'Отлично' : 'Excellent', 'text-green-400'],
+            ].map(([lbl, val, sub, subColor]) => `
+            <div class="bg-gray-800 rounded-lg p-3">
+              <p class="text-gray-400 text-xs">${lbl}</p>
+              <p class="text-white text-xl font-bold">${val}</p>
+              <p class="${subColor} text-xs">${sub}</p>
+            </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="glass rounded-xl p-5 border border-red-500/30">
+          <h3 class="text-base font-semibold mb-3 text-red-400 flex items-center gap-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            ${isRu ? 'Опасная зона' : 'Danger zone'}
+          </h3>
+          <div class="flex gap-3">
+            <button class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-4 py-2 rounded-lg text-sm transition border border-red-500/30">
+              <i class="fas fa-download mr-2"></i>${isRu ? 'Экспорт данных' : 'Export data'}
+            </button>
+            <button class="bg-red-600/20 hover:bg-red-600/40 text-red-400 px-4 py-2 rounded-lg text-sm transition border border-red-500/30">
+              <i class="fas fa-trash mr-2"></i>${isRu ? 'Удалить аккаунт' : 'Delete account'}
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Default Query Settings -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-6">
-          <i class="fas fa-sliders-h text-purple-500 mr-2"></i>
-          Default Query Settings
-        </h3>
-        
-        <div class="space-y-6">
+      <!-- ── TAB: Preferences ── -->
+      <div id="panel-prefs" class="hidden space-y-6">
+
+        <!-- Research defaults -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-flask text-emerald-400"></i>
+            ${isRu ? 'Параметры исследований по умолчанию' : 'Default research settings'}
+          </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-gray-400 text-sm mb-2">Default Domain</label>
-              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                <option value="science" selected>Science</option>
-                <option value="math">Mathematics</option>
-                <option value="med">Medical</option>
-                <option value="econ">Economics</option>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Домен по умолчанию' : 'Default domain'}</label>
+              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm">
+                <option value="general">${isRu ? 'Общий' : 'General'}</option>
+                <option value="ai_ml">AI / ML</option>
+                <option value="medicine">${isRu ? 'Медицина' : 'Medicine'}</option>
+                <option value="biology">${isRu ? 'Биология' : 'Biology'}</option>
+                <option value="physics">${isRu ? 'Физика' : 'Physics'}</option>
+                <option value="economics">${isRu ? 'Экономика' : 'Economics'}</option>
+                <option value="math">${isRu ? 'Математика' : 'Mathematics'}</option>
+                <option value="engineering">${isRu ? 'Инженерия' : 'Engineering'}</option>
+                <option value="psychology">${isRu ? 'Психология' : 'Psychology'}</option>
               </select>
             </div>
             <div>
-              <label class="block text-gray-400 text-sm mb-2">Default Mode</label>
-              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                <option value="consensus_top2" selected>Consensus Top-2</option>
-                <option value="consensus_top3">Consensus Top-3</option>
-                <option value="hard_select">Hard Select</option>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Глубина по умолчанию' : 'Default depth'}</label>
+              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm">
+                <option value="quick">${isRu ? 'Быстрый (1 агент)' : 'Quick (1 agent)'}</option>
+                <option value="standard" selected>${isRu ? 'Стандартный (3 агента)' : 'Standard (3 agents)'}</option>
+                <option value="deep">${isRu ? 'Глубокий (5+ агентов)' : 'Deep (5+ agents)'}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Режим мышления' : 'Default thinking mode'}</label>
+              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm">
+                <option value="standard">${isRu ? 'Стандартное' : 'Standard'}</option>
+                <option value="first_principles">${isRu ? 'Первые принципы' : 'First Principles'}</option>
+                <option value="systems">${isRu ? 'Системное' : 'Systems Thinking'}</option>
+                <option value="bayesian">${isRu ? 'Байесовское' : 'Bayesian'}</option>
+                <option value="critical">${isRu ? 'Критическое' : 'Critical'}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-400 text-sm mb-1.5">${isRu ? 'Стратегия оркестратора' : 'Orchestrator strategy'}</label>
+              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm">
+                <option value="SINGLE">SINGLE</option>
+                <option value="PARALLEL" selected>PARALLEL</option>
+                <option value="RELAY">RELAY</option>
+                <option value="VERIFIED">VERIFIED</option>
+                <option value="EXPERT_PANEL">EXPERT PANEL</option>
               </select>
             </div>
           </div>
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Default Repeats</label>
-              <input type="number" value="3" min="1" max="10"
-                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
-            </div>
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Consensus Top-K</label>
-              <input type="number" value="2" min="1" max="5"
-                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
-            </div>
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Epsilon</label>
-              <input type="number" value="0.05" min="0" max="0.2" step="0.01"
-                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition">
-            </div>
-          </div>
-
+        <!-- Notifications -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-bell text-yellow-400"></i>
+            ${isRu ? 'Уведомления' : 'Notifications'}
+          </h3>
           <div class="space-y-4">
+            ${[
+              [isRu ? 'Email-уведомления' : 'Email notifications', isRu ? 'Получать обновления о задачах' : 'Receive task updates by email', true],
+              [isRu ? 'Предупреждения об использовании' : 'Usage alerts', isRu ? 'Уведомлять при достижении лимитов' : 'Notify when approaching limits', true],
+              [isRu ? 'Еженедельный отчёт' : 'Weekly report', isRu ? 'Сводка использования платформы' : 'Platform usage summary', false],
+              [isRu ? 'Новости платформы' : 'Platform updates', isRu ? 'Новые функции и улучшения' : 'New features and improvements', false],
+            ].map(([title, desc, checked]) => `
             <div class="flex items-center justify-between">
               <div>
-                <span class="text-white">Enable Rebuttal by Default</span>
-                <p class="text-gray-500 text-sm">Models will critique each other's answers</p>
+                <p class="text-white text-sm">${title}</p>
+                <p class="text-gray-500 text-xs">${desc}</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
+              <div class="toggle-track ${checked ? 'on' : ''}" onclick="this.classList.toggle('on')">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>`).join('')}
+          </div>
+        </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-white">Hard Only Selection</span>
-                <p class="text-gray-500 text-sm">Only use hard-select mode for answers</p>
+        <!-- Appearance -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="text-base font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-palette text-pink-400"></i>
+            ${isRu ? 'Оформление' : 'Appearance'}
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-gray-400 text-sm mb-2">${isRu ? 'Тема' : 'Theme'}</label>
+              <div class="flex gap-3">
+                <button class="flex-1 bg-gray-800 border-2 border-blue-500 rounded-lg p-3 text-center">
+                  <i class="fas fa-moon text-blue-400 text-lg mb-1 block"></i>
+                  <p class="text-white text-sm">Dark</p>
+                </button>
+                <button class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-lg p-3 text-center opacity-50 cursor-not-allowed">
+                  <i class="fas fa-sun text-yellow-400 text-lg mb-1 block"></i>
+                  <p class="text-white text-sm">Light</p>
+                  <p class="text-gray-500 text-xs">${isRu ? 'Скоро' : 'Coming soon'}</p>
+                </button>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
+            </div>
+            <div>
+              <label class="block text-gray-400 text-sm mb-2">${isRu ? 'Язык / Language' : 'Language'}</label>
+              <div class="flex gap-2">
+                <button onclick="setLang('en')" class="flex-1 px-4 py-2.5 rounded-lg text-sm border-2 transition ${lang === 'en' ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}">
+                  🇬🇧 English
+                </button>
+                <button onclick="setLang('ru')" class="flex-1 px-4 py-2.5 rounded-lg text-sm border-2 transition ${lang === 'ru' ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}">
+                  🇷🇺 Русский
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Model Preferences -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-6">
-          <i class="fas fa-robot text-cyan-500 mr-2"></i>
-          Model Preferences
-        </h3>
-        
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" checked class="w-5 h-5 accent-blue-500">
-              <div>
-                <span class="text-white">GPT-4o</span>
-                <p class="text-gray-500 text-xs">OpenAI's latest model</p>
-              </div>
-            </div>
-            <span class="text-gray-400 text-sm">$0.01/1K tokens</span>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" checked class="w-5 h-5 accent-blue-500">
-              <div>
-                <span class="text-white">Claude 3.5 Sonnet</span>
-                <p class="text-gray-500 text-xs">Anthropic's flagship model</p>
-              </div>
-            </div>
-            <span class="text-gray-400 text-sm">$0.003/1K tokens</span>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" checked class="w-5 h-5 accent-blue-500">
-              <div>
-                <span class="text-white">Llama 3.1 70B</span>
-                <p class="text-gray-500 text-xs">Meta's open-source model</p>
-              </div>
-            </div>
-            <span class="text-gray-400 text-sm">$0.0009/1K tokens</span>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" checked class="w-5 h-5 accent-blue-500">
-              <div>
-                <span class="text-white">Mistral Large</span>
-                <p class="text-gray-500 text-xs">Mistral AI's largest model</p>
-              </div>
-            </div>
-            <span class="text-gray-400 text-sm">$0.008/1K tokens</span>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-            <div class="flex items-center space-x-3">
-              <input type="checkbox" checked class="w-5 h-5 accent-blue-500">
-              <div>
-                <span class="text-white">Gemini 1.5 Pro</span>
-                <p class="text-gray-500 text-xs">Google's multimodal model</p>
-              </div>
-            </div>
-            <span class="text-gray-400 text-sm">$0.0035/1K tokens</span>
-          </div>
+        <!-- Save -->
+        <div class="flex items-center justify-end gap-3">
+          <button class="glass hover:bg-white/10 px-5 py-2.5 rounded-lg text-sm text-gray-300 transition">
+            ${isRu ? 'Сбросить' : 'Reset defaults'}
+          </button>
+          <button onclick="alert('${isRu ? 'Настройки сохранены' : 'Settings saved'}')" class="bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-lg text-sm transition">
+            <i class="fas fa-save mr-2"></i>${isRu ? 'Сохранить' : 'Save settings'}
+          </button>
         </div>
       </div>
 
-      <!-- Notifications -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-6">
-          <i class="fas fa-bell text-yellow-500 mr-2"></i>
-          Notifications
-        </h3>
-        
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-white">Email Notifications</span>
-              <p class="text-gray-500 text-sm">Receive updates about your queries</p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-white">Usage Alerts</span>
-              <p class="text-gray-500 text-sm">Get notified when approaching limits</p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-white">Weekly Reports</span>
-              <p class="text-gray-500 text-sm">Receive weekly usage summaries</p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="text-white">Marketing Emails</span>
-              <p class="text-gray-500 text-sm">News about features and updates</p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only peer">
-              <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Appearance -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-6">
-          <i class="fas fa-palette text-pink-500 mr-2"></i>
-          Appearance
-        </h3>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-gray-400 text-sm mb-2">Theme</label>
-            <div class="flex items-center space-x-4">
-              <button class="flex-1 bg-gray-800 border-2 border-blue-500 rounded-lg p-4 text-center">
-                <i class="fas fa-moon text-blue-400 text-xl mb-2"></i>
-                <p class="text-white">Dark</p>
-              </button>
-              <button class="flex-1 bg-gray-800 border-2 border-gray-700 rounded-lg p-4 text-center opacity-50 cursor-not-allowed">
-                <i class="fas fa-sun text-yellow-400 text-xl mb-2"></i>
-                <p class="text-white">Light</p>
-                <p class="text-gray-500 text-xs">Coming soon</p>
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-gray-400 text-sm mb-2">Language</label>
-            <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-              <option value="en" selected>English</option>
-              <option value="ru">Russian</option>
-              <option value="lt">Lithuanian</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Save Button -->
-      <div class="flex items-center justify-end space-x-4">
-        <button class="glass hover:bg-white/10 px-6 py-3 rounded-lg transition">
-          Reset to Defaults
-        </button>
-        <button onclick="saveSettings()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition">
-          <i class="fas fa-save mr-2"></i> Save Settings
-        </button>
-      </div>
     </div>
   </main>
 
   <script>
-    let apiKeyVisible = false;
-
-    function toggleApiKey() {
-      apiKeyVisible = !apiKeyVisible;
-      const input = document.getElementById('api-key');
-      const icon = document.getElementById('eye-icon');
-      
-      if (apiKeyVisible) {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-      } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-      }
-    }
-
-    function testApiKey() {
-      alert('API key test will be implemented with backend integration.');
-    }
-
-    function saveSettings() {
-      alert('Settings saved successfully!');
-    }
+  function switchTab(tab) {
+    ['profile','prefs'].forEach(t => {
+      document.getElementById('panel-'+t).classList.toggle('hidden', t !== tab);
+      document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+    });
+    localStorage.setItem('era-settings-tab', tab);
+  }
+  const initTab = new URLSearchParams(location.search).get('tab') || localStorage.getItem('era-settings-tab') || 'profile';
+  if (initTab !== 'profile') switchTab(initTab);
   </script>
 </body>
-</html>
-`
+</html>`
+}

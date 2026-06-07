@@ -6,8 +6,6 @@ import { Language } from './i18n/translations'
 // Pages
 import { landingPage } from './pages/landing'
 import { dashboardPage } from './pages/dashboard'
-import { profilePage } from './pages/profile'
-import { playgroundPage } from './pages/playground'
 import { historyPage } from './pages/history'
 import { settingsPage } from './pages/settings'
 import { pricingPage } from './pages/pricing'
@@ -19,7 +17,6 @@ import { metaOrchestratorPage } from './pages/meta-orchestrator'
 import { agentsPage } from './pages/agents'
 import { metaAgentsPage } from './pages/meta-agents'
 import { scenariosPage } from './pages/scenarios'
-import { journalPage } from './pages/journal'
 import { knowledgeBasePage } from './pages/knowledge-base'
 import { researchPage } from './pages/research'
 
@@ -58,19 +55,17 @@ app.get('/docs', (c) => c.html(docsPage(getLang(c))))
 // ============================================
 // Dashboard & App Pages
 // ============================================
-app.get('/dashboard', (c) => c.html(dashboardPage(getLang(c))))
-app.get('/playground', (c) => c.html(playgroundPage(getLang(c))))
-app.get('/history', (c) => c.html(historyPage(getLang(c))))
-app.get('/settings', (c) => c.html(settingsPage(getLang(c))))
-app.get('/profile', (c) => c.html(profilePage(getLang(c))))
-app.get('/ai-config', (c) => c.html(aiConfigPage(getLang(c))))
-app.get('/integrations', (c) => c.html(integrationsPage(getLang(c))))
+app.get('/dashboard',      (c) => c.html(dashboardPage(getLang(c))))
+app.get('/history',        (c) => c.html(historyPage(getLang(c))))
+app.get('/settings',       (c) => c.html(settingsPage(getLang(c))))
+app.get('/profile',        (c) => c.html(settingsPage(getLang(c))))  // redirect legacy
+app.get('/ai-config',      (c) => c.html(aiConfigPage(getLang(c))))
+app.get('/integrations',   (c) => c.html(integrationsPage(getLang(c))))
 // Meta-Orchestrator Layer
-app.get('/meta', (c) => c.html(metaOrchestratorPage(getLang(c))))
-app.get('/agents', (c) => c.html(agentsPage(getLang(c))))
-app.get('/meta-agents', (c) => c.html(metaAgentsPage(getLang(c))))
-app.get('/scenarios', (c) => c.html(scenariosPage(getLang(c))))
-app.get('/journal',        (c) => c.html(journalPage(getLang(c))))
+app.get('/meta',           (c) => c.html(metaOrchestratorPage(getLang(c))))
+app.get('/agents',         (c) => c.html(agentsPage(getLang(c))))
+app.get('/meta-agents',    (c) => c.html(metaAgentsPage(getLang(c))))
+app.get('/scenarios',      (c) => c.html(scenariosPage(getLang(c))))
 app.get('/knowledge-base', (c) => c.html(knowledgeBasePage(getLang(c))))
 app.get('/research',       (c) => c.html(researchPage(getLang(c))))
 

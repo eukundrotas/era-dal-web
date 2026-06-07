@@ -274,33 +274,30 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         </button>
       </div>
 
-      <!-- Meta-Orchestrator -->
-      ${sectionHeader('meta', 'Meta-Orchestrator', 'text-violet-400/70', false, 7)}
+      <!-- Research -->
+      ${sectionHeader('meta', isRu ? 'Исследования' : 'Research', 'text-violet-400/70', false, 6)}
       <div id="sbsec-meta" class="sb-sec-body space-y-0.5">
-        ${link('meta',           '/meta',           'fas fa-sitemap',    'text-violet-400',  isRu ? 'Оркестратор'      : 'Orchestrator')}
-        ${link('agents',         '/agents',         'fas fa-users',      'text-blue-400',    isRu ? 'Цифр. сотрудники' : 'Digital Staff')}
-        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400', isRu ? 'Метаагенты'       : 'Meta-Agents')}
-        ${link('scenarios',      '/scenarios',      'fas fa-layer-group','text-green-400',   isRu ? 'Сценарии'         : 'Scenarios')}
-        ${link('research',       '/research',       'fas fa-microscope', 'text-emerald-400', isRu ? 'AI Исследования'  : 'AI Research')}
-        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',   'text-cyan-400',    isRu ? 'Базы знаний'      : 'Knowledge Bases')}
-        ${link('journal',        '/journal',        'fas fa-scroll',     'text-gray-400',    isRu ? 'Журнал'           : 'Journal')}
+        ${link('meta',           '/meta',           'fas fa-sitemap',     'text-violet-400',  isRu ? 'Оркестратор'      : 'Orchestrator')}
+        ${link('research',       '/research',       'fas fa-microscope',  'text-emerald-400', isRu ? 'AI Исследования'  : 'AI Research')}
+        ${link('agents',         '/agents',         'fas fa-users',       'text-blue-400',    isRu ? 'Агенты'           : 'Agents')}
+        ${link('meta-agents',    '/meta-agents',    'fas fa-people-group','text-fuchsia-400', isRu ? 'Команды агентов'  : 'Agent Teams')}
+        ${link('scenarios',      '/scenarios',      'fas fa-layer-group', 'text-green-400',   isRu ? 'Сценарии'         : 'Scenarios')}
+        ${link('knowledge-base', '/knowledge-base', 'fas fa-database',    'text-cyan-400',    isRu ? 'Библиотека'       : 'Research Library')}
       </div>
 
-      <!-- ERA DAL -->
-      ${sectionHeader('dal', 'ERA DAL', 'text-gray-500', true, 3)}
+      <!-- Explore -->
+      ${sectionHeader('dal', isRu ? 'Обзор' : 'Explore', 'text-gray-500', true, 2)}
       <div id="sbsec-dal" class="sb-sec-body space-y-0.5">
-        ${link('dashboard',  '/dashboard',  'fas fa-chart-pie', 'text-cyan-400',   sb.dashboard)}
-        ${link('playground', '/playground', 'fas fa-flask',     'text-yellow-400', sb.playground)}
-        ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
+        ${link('dashboard', '/dashboard', 'fas fa-chart-pie', 'text-cyan-400',  sb.dashboard)}
+        ${link('history',   '/history',   'fas fa-history',   'text-gray-400',  isRu ? 'История и журнал' : 'History & Journal')}
       </div>
 
       <!-- Settings -->
-      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 5)}
+      ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 4)}
       <div id="sbsec-cfg" class="sb-sec-body space-y-0.5">
-        ${link('ai-config',    '/ai-config',    'fas fa-robot',       'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
-        ${link('integrations', '/integrations', 'fas fa-plug',        'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
-        ${link('settings',     '/settings',     'fas fa-cog',         'text-gray-400',   sb.settings)}
-        ${link('profile',      '/profile',      'fas fa-user-circle', 'text-gray-400',   sb.profile)}
+        ${link('ai-config',    '/ai-config',    'fas fa-robot',  'text-purple-400', isRu ? 'AI Провайдеры' : 'AI Providers')}
+        ${link('integrations', '/integrations', 'fas fa-plug',   'text-blue-400',   isRu ? 'Интеграции'   : 'Integrations')}
+        ${link('settings',     '/settings',     'fas fa-cog',    'text-gray-400',   isRu ? 'Профиль и настройки' : 'Profile & Settings')}
         <div class="lang-dropdown">
           <button class="sidebar-link w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-gray-300 hover:text-white text-sm">
             <i class="fas fa-globe w-4 text-center flex-shrink-0 text-blue-300" style="font-size:13px"></i>
@@ -667,10 +664,10 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         .catch(function() {
           // Show mock events when no DB
           notifData = [
-            { type:'success', title:'${isRu ? 'Задача завершена' : 'Task completed'}',    description:'${isRu ? 'Анализ конкурентов выполнен' : 'Competitor analysis done'}', time:'2m ago' },
-            { type:'success', title:'${isRu ? 'Консенсус достигнут' : 'Consensus reached'}', description:'5/7 ${isRu ? 'моделей согласны' : 'models agreed'}', time:'5m ago' },
-            { type:'pending', title:'${isRu ? 'Обработка' : 'Processing'}',              description:'${isRu ? 'Прогноз продаж...' : 'Sales forecast running...'}', time:'8m ago' },
-            { type:'error',   title:'${isRu ? 'Ошибка агента' : 'Agent timeout'}',        description:'Llama-3.1 ${isRu ? 'превысил лимит' : 'exceeded timeout'}', time:'22m ago' },
+            { type:'success', title:'${isRu ? 'Исследование завершено' : 'Research complete'}',  description:'${isRu ? 'Обзор литературы выполнен' : 'Literature review finished'}', time:'2m ago' },
+            { type:'success', title:'${isRu ? 'Консенсус достигнут' : 'Consensus reached'}',   description:'5/7 ${isRu ? 'моделей согласны' : 'models agreed'}', time:'5m ago' },
+            { type:'pending', title:'${isRu ? 'Ожидает проверки' : 'Pending review'}',          description:'${isRu ? 'Анализ гипотез...' : 'Hypothesis analysis running...'}', time:'8m ago' },
+            { type:'error',   title:'${isRu ? 'Ошибка агента' : 'Agent timeout'}',              description:'Llama-3.1 ${isRu ? 'превысил лимит' : 'exceeded timeout'}', time:'22m ago' },
           ];
           renderNotifs();
         });
