@@ -294,22 +294,6 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
         ${link('history',    '/history',    'fas fa-history',   'text-gray-400',   sb.history)}
       </div>
 
-      <!-- Tasks & Projects -->
-      ${sectionHeader('tasks', isRu ? 'Задачи и проекты' : 'Tasks & Projects', 'text-gray-500', true, 3)}
-      <div id="sbsec-tasks" class="sb-sec-body space-y-0.5">
-        ${link('tasks',    '/tasks',    'fas fa-list-check',  'text-blue-400',   isRu ? 'Задачи'   : 'Tasks')}
-        ${link('projects', '/projects', 'fas fa-folder-open', 'text-green-400',  isRu ? 'Проекты'  : 'Projects')}
-        ${link('goals',    '/goals',    'fas fa-bullseye',    'text-yellow-400', isRu ? 'Цели OKR' : 'Goals OKR')}
-      </div>
-
-      <!-- Company -->
-      ${sectionHeader('company', isRu ? 'Компания' : 'Company', 'text-gray-500', true, 3)}
-      <div id="sbsec-company" class="sb-sec-body space-y-0.5">
-        ${link('company',     '/company',     'fas fa-building',      'text-cyan-400',    isRu ? 'Оргструктура'   : 'Company')}
-        ${link('regulations', '/regulations', 'fas fa-book-open',     'text-orange-400',  isRu ? 'Регламенты'     : 'Regulations')}
-        ${link('expenses',    '/expenses',    'fas fa-receipt',       'text-red-400',     isRu ? 'Расходы'        : 'Expenses')}
-      </div>
-
       <!-- Settings -->
       ${sectionHeader('cfg', isRu ? 'Настройки' : 'Settings', 'text-gray-500', true, 5)}
       <div id="sbsec-cfg" class="sb-sec-body space-y-0.5">
@@ -419,7 +403,7 @@ export const sidebar = (activePage: string = 'dashboard', lang: Language = 'en')
     var SB_W  = '14rem';   // expanded  (w-56)
     var SB_WC = '3rem';    // collapsed (w-12)
 
-    var SB_SECTIONS = ['meta', 'dal', 'tasks', 'company', 'cfg'];
+    var SB_SECTIONS = ['meta', 'dal', 'cfg'];
 
     /* ── Scroll hint helpers ────────────────────────────── */
     function sbNavScroll(delta) {
