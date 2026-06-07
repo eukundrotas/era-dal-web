@@ -198,22 +198,6 @@ export const metaAgentsPage = (lang: Language = 'en') => {
 
     // ─── Role catalog (built-in) ──────────────────────────────────────────
     const CATALOG = [
-      // Business
-      { role:'lead_researcher',      nameEn:'Lead Researcher',      nameRu:'Лид-исследователь',     icon:'fa-search',        group:'business' },
-      { role:'market_analyst',       nameEn:'Market Analyst',       nameRu:'Аналитик рынка',        icon:'fa-chart-bar',     group:'business' },
-      { role:'copywriter',           nameEn:'Copywriter',           nameRu:'Копирайтер',            icon:'fa-pen-nib',       group:'business' },
-      { role:'sales_director',       nameEn:'Sales Director',       nameRu:'Коммерч. директор',     icon:'fa-briefcase',     group:'business' },
-      { role:'marketing_strategist', nameEn:'Marketing Strategist', nameRu:'Маркетолог',            icon:'fa-bullhorn',      group:'business' },
-      { role:'quality_controller',   nameEn:'Quality Controller',   nameRu:'Контролёр качества',    icon:'fa-check-double',  group:'business' },
-      { role:'crm_agent',            nameEn:'CRM Agent',            nameRu:'CRM-агент',             icon:'fa-database',      group:'business' },
-      { role:'business_radar',       nameEn:'Business Radar',       nameRu:'Бизнес-радар',          icon:'fa-newspaper',     group:'business' },
-      { role:'support_agent',        nameEn:'Support Agent',        nameRu:'Поддержка',             icon:'fa-headset',       group:'business' },
-      { role:'project_manager',      nameEn:'Project Manager',      nameRu:'Менеджер проектов',     icon:'fa-tasks',         group:'business' },
-      { role:'legal_assistant',      nameEn:'Legal Assistant',      nameRu:'Юрист-ассистент',       icon:'fa-balance-scale', group:'business' },
-      { role:'technical_agent',      nameEn:'Technical Agent',      nameRu:'Технический агент',      icon:'fa-code',          group:'business' },
-      { role:'hr_assistant',         nameEn:'HR Assistant',         nameRu:'HR-ассистент',          icon:'fa-users',         group:'business' },
-      { role:'financial_analyst',    nameEn:'Financial Analyst',    nameRu:'Финансовый аналитик',   icon:'fa-chart-line',    group:'business' },
-      { role:'innovation_strategist',nameEn:'Innovation Strategist',nameRu:'Стратег',               icon:'fa-lightbulb',     group:'business' },
       // Science
       { role:'research_scientist',   nameEn:'Research Scientist',   nameRu:'Учёный-исследователь',  icon:'fa-flask',         group:'science' },
       { role:'data_scientist',       nameEn:'Data Scientist',       nameRu:'Дата-сайентист',        icon:'fa-chart-area',    group:'science' },
@@ -229,7 +213,6 @@ export const metaAgentsPage = (lang: Language = 'en') => {
     ];
 
     const GROUP_LABELS = {
-      business: isRu ? 'Бизнес' : 'Business',
       science:  isRu ? 'Наука' : 'Science',
       ai_eng:   isRu ? 'AI-инженерия' : 'AI engineering',
       custom:   isRu ? 'Кастомные' : 'Custom',
@@ -344,7 +327,7 @@ export const metaAgentsPage = (lang: Language = 'en') => {
     // ─── Builder ──────────────────────────────────────────────────────────
     function populateSupervisor() {
       const sel = document.getElementById('b-supervisor');
-      const groups = ['business','science','ai_eng','custom'];
+      const groups = ['science','ai_eng','custom'];
       sel.innerHTML = groups.map(g => {
         const items = catalogAll().filter(c => c.group === g);
         if (!items.length) return '';
@@ -352,7 +335,7 @@ export const metaAgentsPage = (lang: Language = 'en') => {
           items.map(c => \`<option value="\${c.role}">\${nameOf(c)}</option>\`).join('') +
           '</optgroup>';
       }).join('');
-      sel.value = 'project_manager';
+      sel.value = 'research_scientist';
     }
 
     function openBuilder() {

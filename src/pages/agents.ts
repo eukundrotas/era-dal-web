@@ -3,104 +3,13 @@ import { Language } from '../i18n/translations'
 
 export const agentsPage = (lang: Language = 'en') => {
   const isRu = lang === 'ru'
-  const title = isRu ? 'Цифровой штат' : 'Digital Staff'
+  const title = isRu ? 'Исследовательские агенты' : 'Research Agents'
   const subtitle = isRu
-    ? 'Управление ИИ-сотрудниками: роли, инструменты, инструкции, доступы'
-    : 'Manage AI employees: roles, tools, instructions, and permissions'
+    ? 'Управление AI-агентами для научных исследований: роли, инструменты, инструкции'
+    : 'Manage AI agents for scientific research: roles, tools, and instructions'
 
   // Built-in role catalog — always shown as reference
   const SHOWCASE = [
-    { icon: 'fa-search',        gradFrom: 'from-blue-600',    gradTo: 'to-blue-800',    role: 'lead_researcher',
-      nameEn: 'Lead Researcher',        nameRu: 'Лид-исследователь',
-      roleEn: 'Sales Intelligence',     roleRu: 'Поиск клиентов',
-      descEn: 'Searches companies, collects contacts, identifies decision-makers.',
-      descRu: 'Ищет компании, собирает контакты, определяет ЛПР.',
-      tools: ['Web Search', 'LinkedIn', 'CRM Read'] },
-    { icon: 'fa-chart-bar',     gradFrom: 'from-cyan-600',    gradTo: 'to-cyan-800',    role: 'market_analyst',
-      nameEn: 'Market Analyst',         nameRu: 'Аналитик рынка',
-      roleEn: 'Research & Analytics',   roleRu: 'Аналитика',
-      descEn: 'Collects market data, compares competitors, prepares analysis.',
-      descRu: 'Собирает данные рынка, сравнивает конкурентов, готовит обзор.',
-      tools: ['Web Search', 'Sheets', 'Critic'] },
-    { icon: 'fa-pen-nib',       gradFrom: 'from-purple-600',  gradTo: 'to-purple-800',  role: 'copywriter',
-      nameEn: 'Copywriter',             nameRu: 'Копирайтер',
-      roleEn: 'Content & Texts',        roleRu: 'Тексты и контент',
-      descEn: 'Writes posts, emails, proposals, scripts, and landing copy.',
-      descRu: 'Пишет посты, письма, КП, скрипты и тексты для лендингов.',
-      tools: ['Text Gen', 'RAG Docs', 'Editor'] },
-    { icon: 'fa-briefcase',     gradFrom: 'from-indigo-600',  gradTo: 'to-indigo-800',  role: 'sales_director',
-      nameEn: 'Sales Director',         nameRu: 'Коммерческий директор',
-      roleEn: 'Sales & Proposals',      roleRu: 'Продажи и оферты',
-      descEn: 'Builds offers, prepares proposals, evaluates deal probability.',
-      descRu: 'Собирает оффер, готовит КП, оценивает сделку.',
-      tools: ['RAG Docs', 'CRM Read', 'Calc'] },
-    { icon: 'fa-bullhorn',      gradFrom: 'from-pink-600',    gradTo: 'to-pink-800',    role: 'marketing_strategist',
-      nameEn: 'Marketing Strategist',   nameRu: 'Маркетолог',
-      roleEn: 'Marketing & Positioning',roleRu: 'Маркетинг и позиционирование',
-      descEn: 'Builds content plans, creates offers, analyzes audience.',
-      descRu: 'Строит контент-план, создаёт офферы, анализирует аудиторию.',
-      tools: ['Web Search', 'Sheets', 'Text Gen'] },
-    { icon: 'fa-check-double',  gradFrom: 'from-yellow-600',  gradTo: 'to-yellow-800',  role: 'quality_controller',
-      nameEn: 'Quality Controller',     nameRu: 'Контролёр качества',
-      roleEn: 'Validation & Critic',    roleRu: 'Валидация и критика',
-      descEn: 'Checks facts, logic, sources, and format of all outputs.',
-      descRu: 'Проверяет факты, логику, источники и формат результатов.',
-      tools: ['Critic LLM', 'Web Check', 'RAG'] },
-    { icon: 'fa-database',      gradFrom: 'from-green-600',   gradTo: 'to-green-800',   role: 'crm_agent',
-      nameEn: 'CRM Agent',              nameRu: 'CRM-агент',
-      roleEn: 'Data Management',        roleRu: 'Управление данными',
-      descEn: 'Writes leads, tasks, and results to CRM and spreadsheets.',
-      descRu: 'Заносит лиды, задачи и результаты в CRM и таблицы.',
-      tools: ['Google Sheets', 'CRM Write', 'Telegram'] },
-    { icon: 'fa-newspaper',     gradFrom: 'from-orange-600',  gradTo: 'to-orange-800',  role: 'business_radar',
-      nameEn: 'Business Radar',         nameRu: 'Бизнес-радар',
-      roleEn: 'Market Intelligence',    roleRu: 'Разведка рынка',
-      descEn: 'Monitors news, competitor activity, price changes.',
-      descRu: 'Мониторит новости, активность конкурентов, изменения цен.',
-      tools: ['Web Search', 'RSS', 'Summarizer'] },
-    { icon: 'fa-headset',       gradFrom: 'from-teal-600',    gradTo: 'to-teal-800',    role: 'support_agent',
-      nameEn: 'Support Agent',          nameRu: 'Поддержка',
-      roleEn: 'Customer Service',       roleRu: 'Клиентская поддержка',
-      descEn: 'Answers questions, classifies requests, escalates complex cases.',
-      descRu: 'Отвечает на вопросы, классифицирует обращения, эскалирует сложные.',
-      tools: ['RAG Docs', 'Telegram', 'CRM Read'] },
-    { icon: 'fa-tasks',         gradFrom: 'from-violet-600',  gradTo: 'to-violet-800',  role: 'project_manager',
-      nameEn: 'Project Manager',        nameRu: 'Менеджер проектов',
-      roleEn: 'Planning & Coordination',roleRu: 'Планирование и координация',
-      descEn: 'Breaks down projects, assigns agents, tracks statuses.',
-      descRu: 'Разбивает проекты на задачи, назначает агентов, отслеживает статусы.',
-      tools: ['Planner', 'Sheets', 'Notifier'] },
-    { icon: 'fa-balance-scale', gradFrom: 'from-red-600',     gradTo: 'to-red-800',     role: 'legal_assistant',
-      nameEn: 'Legal Assistant',        nameRu: 'Юрист-ассистент',
-      roleEn: 'Legal & Compliance',     roleRu: 'Юридическая поддержка',
-      descEn: 'Checks contracts, identifies risks, validates clauses.',
-      descRu: 'Проверяет договоры, выявляет риски, валидирует пункты.',
-      tools: ['RAG Docs', 'Critic LLM', 'Search'] },
-    { icon: 'fa-code',          gradFrom: 'from-lime-600',    gradTo: 'to-lime-800',    role: 'technical_agent',
-      nameEn: 'Technical Agent',        nameRu: 'Технический агент',
-      roleEn: 'Automation & Code',      roleRu: 'Автоматизация и код',
-      descEn: 'Writes code, configures automations, builds integrations.',
-      descRu: 'Пишет код, настраивает автоматизации, строит интеграции.',
-      tools: ['Code Gen', 'MCP Tools', 'API'] },
-    { icon: 'fa-users',         gradFrom: 'from-sky-600',     gradTo: 'to-sky-800',     role: 'hr_assistant',
-      nameEn: 'HR Assistant',           nameRu: 'HR-ассистент',
-      roleEn: 'Recruitment & Onboarding',roleRu: 'Подбор и онбординг',
-      descEn: 'Screens resumes, writes job descriptions, prepares onboarding.',
-      descRu: 'Скринирует резюме, пишет вакансии, готовит онбординг.',
-      tools: ['LinkedIn', 'RAG Docs', 'Sheets'] },
-    { icon: 'fa-chart-line',    gradFrom: 'from-emerald-600', gradTo: 'to-emerald-800', role: 'financial_analyst',
-      nameEn: 'Financial Analyst',      nameRu: 'Финансовый аналитик',
-      roleEn: 'Finance & Forecasting',  roleRu: 'Финансы и прогнозы',
-      descEn: 'Analyzes financial data, builds forecasts, prepares reports.',
-      descRu: 'Анализирует финансовые данные, строит прогнозы, готовит отчёты.',
-      tools: ['Sheets', 'Calc', 'RAG Docs'] },
-    { icon: 'fa-lightbulb',     gradFrom: 'from-amber-600',   gradTo: 'to-amber-800',   role: 'innovation_strategist',
-      nameEn: 'Innovation Strategist',  nameRu: 'Стратег',
-      roleEn: 'Strategy & Innovation',  roleRu: 'Стратегия и инновации',
-      descEn: 'Identifies growth opportunities, applies TRIZ and systems thinking.',
-      descRu: 'Находит точки роста, применяет ТРИЗ и системное мышление.',
-      tools: ['Web Search', 'Thinking Modes', 'Sheets'] },
-
     // ─── Scientific & experimental ───
     { icon: 'fa-flask',         gradFrom: 'from-rose-600',    gradTo: 'to-rose-800',    role: 'research_scientist', group: 'science',
       nameEn: 'Research Scientist',     nameRu: 'Учёный-исследователь',
@@ -263,9 +172,6 @@ export const agentsPage = (lang: Language = 'en') => {
             </div>`
 
         const categories = [
-          { key: 'business', icon: 'fa-layer-group', color: 'text-blue-400',
-            label: isRu ? 'Бизнес-роли' : 'Business roles',
-            items: SHOWCASE.filter(a => !(a as any).group) },
           { key: 'science', icon: 'fa-flask', color: 'text-rose-400',
             label: isRu ? 'Наука и эксперименты' : 'Science & experiments',
             items: SHOWCASE.filter(a => (a as any).group === 'science') },
@@ -319,21 +225,6 @@ export const agentsPage = (lang: Language = 'en') => {
           <label class="block text-xs text-gray-400 mb-1">${isRu ? 'Роль' : 'Role'} *</label>
           <select id="m-role"
             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-violet-500">
-            <option value="lead_researcher">lead_researcher</option>
-            <option value="market_analyst">market_analyst</option>
-            <option value="copywriter">copywriter</option>
-            <option value="sales_director">sales_director</option>
-            <option value="marketing_strategist">marketing_strategist</option>
-            <option value="quality_controller">quality_controller</option>
-            <option value="crm_agent">crm_agent</option>
-            <option value="business_radar">business_radar</option>
-            <option value="support_agent">support_agent</option>
-            <option value="project_manager">project_manager</option>
-            <option value="legal_assistant">legal_assistant</option>
-            <option value="technical_agent">technical_agent</option>
-            <option value="hr_assistant">hr_assistant</option>
-            <option value="financial_analyst">financial_analyst</option>
-            <option value="innovation_strategist">innovation_strategist</option>
             <optgroup label="${isRu ? 'Наука и эксперименты' : 'Science & experiments'}">
               <option value="research_scientist">research_scientist</option>
               <option value="data_scientist">data_scientist</option>
@@ -771,7 +662,7 @@ export const agentsPage = (lang: Language = 'en') => {
       const el = document.getElementById('kb-checkboxes');
       if (!el) return;
       try {
-        const res  = await fetch('/api/business/knowledge-bases');
+        const res  = await fetch('/api/meta/knowledge-bases');
         const data = await res.json();
         const kbs  = data.knowledge_bases || [];
         if (!kbs.length) {

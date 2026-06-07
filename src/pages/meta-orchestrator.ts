@@ -134,12 +134,6 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
                   ? ['💡 Гипотезы', 'Сформулируй научные гипотезы для исследования влияния prompt-инжиниринга на качество LLM-агентов']
                   : ['💡 Hypotheses', 'Formulate scientific hypotheses on how prompt engineering affects LLM agent quality'],
                 isRu
-                  ? ['📊 Анализ рынка', 'Сделай конкурентный анализ рынка AI-автоматизации: игроки, цены, позиционирование, тренды']
-                  : ['📊 Market Analysis', 'Competitive analysis of AI automation market: players, pricing, positioning, trends'],
-                isRu
-                  ? ['🚀 Запуск продукта', 'Помоги запустить AI-услугу: описание, оффер, КП, база клиентов, рассылка']
-                  : ['🚀 Product Launch', 'Help launch an AI service: description, offer, proposal, client base, outreach'],
-                isRu
                   ? ['🧬 Эксперимент', 'Спроектируй A/B-эксперимент для проверки гипотезы о влиянии температуры модели на точность ответов']
                   : ['🧬 Experiment Design', 'Design an A/B experiment to test the hypothesis that model temperature affects answer accuracy'],
                 isRu
@@ -338,9 +332,9 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
               <span id="result-cost" class="ml-auto text-sm text-gray-400"></span>
             </div>
             <div id="result-content" class="space-y-3"></div>
-            <a href="/journal?lang=${lang}" class="mt-4 inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300">
+            <a href="/history?tab=log&lang=${lang}" class="mt-4 inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300">
               <i class="fas fa-scroll"></i>
-              ${isRu ? 'Просмотреть полный журнал' : 'View full journal'}
+              ${isRu ? 'Просмотреть журнал' : 'View log'}
             </a>
           </div>
         </div>
@@ -392,8 +386,8 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
             <div id="recent-runs" class="space-y-1.5">
               <p class="text-xs text-gray-600">${isRu ? 'Загрузка...' : 'Loading...'}</p>
             </div>
-            <a href="/journal?lang=${lang}" class="mt-2 text-xs text-blue-400 hover:text-blue-300 block">
-              ${isRu ? 'Журнал →' : 'Journal →'}
+            <a href="/history?tab=log&lang=${lang}" class="mt-2 text-xs text-blue-400 hover:text-blue-300 block">
+              ${isRu ? 'История →' : 'History →'}
             </a>
           </div>
         </div>
@@ -535,7 +529,6 @@ export const metaOrchestratorPage = (lang: Language = 'en') => {
         { id:'mistral-large-latest', name:'Mistral Large', free:false },
         { id:'mistral-small-latest', name:'Mistral Small', free:false },
       ]},
-      { id:'groq', name:'Groq (free)', color:'#f59e0b', models:[] }, // kept for key lookup
     ];
 
     let selectedModels = new Set(JSON.parse(localStorage.getItem('era_orchestrator_models') || '[]'));

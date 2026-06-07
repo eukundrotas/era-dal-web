@@ -5,121 +5,124 @@ export const scenariosPage = (lang: Language = 'en') => {
   const isRu = lang === 'ru'
   const title = isRu ? 'Сценарии' : 'Scenarios'
   const subtitle = isRu
-    ? 'Готовые цепочки агентов для типовых бизнес-задач'
-    : 'Ready-made agent chains for common business tasks'
+    ? 'Готовые цепочки агентов для научно-исследовательских задач'
+    : 'Ready-made agent chains for scientific research workflows'
 
   // Built-in showcase scenarios — rendered server-side as templates
   const SHOWCASE = [
     {
-      id: 'tpl_leads',
-      icon: 'fa-crosshairs', gradFrom: 'from-blue-600', gradTo: 'to-blue-800',
-      tag: isRu ? 'Продажи' : 'Sales', tagColor: 'bg-blue-500/20 text-blue-300',
-      nameEn: 'Lead Generation', nameRu: 'Поиск клиентов',
-      descEn: 'Find companies in a niche, gather contacts, score leads, personalize messages, push to CRM.',
-      descRu: 'Найти компании в нише, собрать контакты, оценить лиды, персонализировать сообщения, занести в CRM.',
+      id: 'tpl_lit_review',
+      icon: 'fa-book-open', gradFrom: 'from-blue-600', gradTo: 'to-blue-800',
+      tag: isRu ? 'Обзор' : 'Review', tagColor: 'bg-blue-500/20 text-blue-300',
+      nameEn: 'Systematic Literature Review', nameRu: 'Систематический обзор литературы',
+      descEn: 'Search databases, screen abstracts, assess full texts, extract data, synthesise findings following PRISMA guidelines.',
+      descRu: 'Поиск по базам данных, скрининг аннотаций, оценка полных текстов, извлечение данных, синтез результатов по PRISMA.',
       prompt: isRu
-        ? 'Найди 30 потенциальных клиентов в нише B2B SaaS, собери контакты и ЛПР, оцени релевантность, подготовь персональные сообщения и занеси в таблицу'
-        : 'Find 30 potential B2B SaaS clients, collect contacts and decision-makers, score relevance, prepare personalized messages and add to spreadsheet',
+        ? 'Проведи систематический обзор литературы по теме LLM-агентов: найди ключевые работы, отбери релевантные, извлеки данные, синтезируй результаты и выдели пробелы в исследованиях'
+        : 'Conduct a systematic literature review on LLM agents: find key papers, screen for relevance, extract data, synthesise results and identify research gaps',
       steps: [
-        { icon: 'fa-search',      agent: isRu?'Лид-исследователь':'Lead Researcher', action: isRu?'Поиск компаний':'Company search' },
-        { icon: 'fa-address-book',agent: isRu?'Лид-исследователь':'Lead Researcher', action: isRu?'Сбор контактов':'Contact collection' },
-        { icon: 'fa-star',        agent: isRu?'Аналитик':'Analyst',                  action: isRu?'Оценка лидов':'Lead scoring' },
-        { icon: 'fa-pen',         agent: isRu?'Копирайтер':'Copywriter',             action: isRu?'Персональные сообщения':'Personalized messages' },
-        { icon: 'fa-database',    agent: isRu?'CRM-агент':'CRM Agent',               action: isRu?'Запись в CRM':'Write to CRM', confirm: true },
+        { icon: 'fa-search',    agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Поиск по базам':'Database search' },
+        { icon: 'fa-filter',    agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Скрининг аннотаций':'Abstract screening' },
+        { icon: 'fa-microscope',agent: isRu?'Рецензент':'Peer Reviewer',    action: isRu?'Оценка полных текстов':'Full-text assessment' },
+        { icon: 'fa-table',     agent: isRu?'Учёный':'Researcher',          action: isRu?'Извлечение данных':'Data extraction' },
+        { icon: 'fa-file-alt',  agent: isRu?'Учёный':'Researcher',          action: isRu?'Синтез и отчёт':'Synthesis & report' },
       ],
-      time: isRu?'~4 мин':'~4 min', cost: '~$0.18', runs: 127,
+      time: isRu?'~5 мин':'~5 min', cost: '~$0.22', runs: 84,
     },
     {
-      id: 'tpl_proposal',
-      icon: 'fa-file-contract', gradFrom: 'from-violet-600', gradTo: 'to-violet-800',
-      tag: isRu ? 'Продажи' : 'Sales', tagColor: 'bg-violet-500/20 text-violet-300',
-      nameEn: 'Proposal Preparation', nameRu: 'Подготовка КП',
-      descEn: 'Analyze client needs, find matching cases, build proposal structure, write copy, quality-check.',
-      descRu: 'Анализ потребностей клиента, подбор кейсов, структура КП, написание текста, контроль качества.',
+      id: 'tpl_clinical',
+      icon: 'fa-stethoscope', gradFrom: 'from-rose-600', gradTo: 'to-rose-800',
+      tag: isRu ? 'Медицина' : 'Medicine', tagColor: 'bg-rose-500/20 text-rose-300',
+      nameEn: 'Clinical Study Design', nameRu: 'Дизайн клинического исследования',
+      descEn: 'Define PICO, review prior evidence, design protocol, run power analysis, check ethics requirements.',
+      descRu: 'Определить PICO, обзор доказательств, протокол исследования, анализ мощности, этическая проверка.',
       prompt: isRu
-        ? 'Подготовь персональное коммерческое предложение для клиента: проанализируй потребности, найди релевантные кейсы, составь структуру и напиши текст КП'
-        : 'Prepare a personalized commercial proposal for a client: analyze needs, find relevant cases, build structure and write the proposal copy',
+        ? 'Разработай дизайн клинического исследования: сформулируй PICO-вопрос, сделай обзор доказательств, опиши протокол, рассчитай объём выборки и проверь этические требования'
+        : 'Design a clinical study: formulate the PICO question, review prior evidence, describe the protocol, calculate sample size and check ethics requirements',
       steps: [
-        { icon: 'fa-user-circle', agent: isRu?'Аналитик':'Analyst',    action: isRu?'Анализ клиента':'Client analysis' },
-        { icon: 'fa-book',        agent: isRu?'Аналитик':'Analyst',    action: isRu?'Поиск кейсов':'Find cases' },
-        { icon: 'fa-pen-nib',     agent: isRu?'Копирайтер':'Copywriter',action: isRu?'Текст КП':'Proposal copy' },
-        { icon: 'fa-check-double',agent: isRu?'Контролёр':'QC',        action: isRu?'Проверка полноты':'Completeness check' },
-        { icon: 'fa-envelope',    agent: isRu?'CRM-агент':'CRM Agent', action: isRu?'Отправка клиенту':'Send to client', confirm: true },
+        { icon: 'fa-question-circle', agent: isRu?'Учёный':'Researcher',        action: isRu?'Формулировка PICO':'PICO formulation' },
+        { icon: 'fa-book-open',       agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Обзор доказательств':'Evidence review' },
+        { icon: 'fa-vials',           agent: isRu?'Методолог':'Exp. Designer',  action: isRu?'Протокол исследования':'Study protocol' },
+        { icon: 'fa-calculator',      agent: isRu?'Аналитик':'Data Scientist',  action: isRu?'Анализ мощности':'Power analysis' },
+        { icon: 'fa-shield-alt',      agent: isRu?'Рецензент':'Peer Reviewer',  action: isRu?'Этическая проверка':'Ethics checklist', confirm: true },
       ],
-      time: isRu?'~5 мин':'~5 min', cost: '~$0.20', runs: 89,
+      time: isRu?'~6 мин':'~6 min', cost: '~$0.25', runs: 51,
     },
     {
-      id: 'tpl_market',
-      icon: 'fa-chart-pie', gradFrom: 'from-cyan-600', gradTo: 'to-cyan-800',
-      tag: isRu ? 'Аналитика' : 'Analytics', tagColor: 'bg-cyan-500/20 text-cyan-300',
-      nameEn: 'Market Analysis', nameRu: 'Анализ рынка',
-      descEn: 'Gather sources, extract key figures, check facts, prepare analytical overview with structure.',
-      descRu: 'Сбор источников, извлечение ключевых цифр, проверка фактов, аналитический обзор со структурой.',
+      id: 'tpl_data_pipeline',
+      icon: 'fa-chart-area', gradFrom: 'from-cyan-600', gradTo: 'to-cyan-800',
+      tag: isRu ? 'Данные' : 'Data Science', tagColor: 'bg-cyan-500/20 text-cyan-300',
+      nameEn: 'Data Analysis Pipeline', nameRu: 'Пайплайн анализа данных',
+      descEn: 'Load and validate data, run exploratory analysis, engineer features, train a model, interpret and report results.',
+      descRu: 'Загрузка и валидация данных, разведочный анализ, инжиниринг признаков, обучение модели, интерпретация.',
       prompt: isRu
-        ? 'Сделай конкурентный анализ рынка: собери источники, извлеки ключевые цифры и тренды, проверь факты, подготовь структурированный аналитический обзор'
-        : 'Do a competitive market analysis: gather sources, extract key figures and trends, verify facts, prepare a structured analytical overview',
+        ? 'Построй пайплайн анализа данных: загрузи и провалидируй датасет, проведи EDA, подготовь признаки, обучи модель и интерпретируй результаты'
+        : 'Build a data analysis pipeline: load and validate the dataset, run EDA, engineer features, train a model and interpret results',
       steps: [
-        { icon: 'fa-globe',    agent: isRu?'Аналитик':'Analyst', action: isRu?'Сбор источников':'Source collection' },
-        { icon: 'fa-table',    agent: isRu?'Аналитик':'Analyst', action: isRu?'Извлечение данных':'Data extraction' },
-        { icon: 'fa-check',    agent: isRu?'Контролёр':'QC',     action: isRu?'Проверка фактов':'Fact check' },
-        { icon: 'fa-file-alt', agent: isRu?'Копирайтер':'Copywriter', action: isRu?'Подготовка обзора':'Prepare overview' },
+        { icon: 'fa-database', agent: isRu?'Аналитик':'Data Scientist', action: isRu?'Загрузка и валидация':'Load & validate' },
+        { icon: 'fa-eye',      agent: isRu?'Аналитик':'Data Scientist', action: isRu?'Разведочный анализ':'Exploratory analysis' },
+        { icon: 'fa-wrench',   agent: isRu?'ML-инженер':'ML Engineer',  action: isRu?'Инжиниринг признаков':'Feature engineering' },
+        { icon: 'fa-brain',    agent: isRu?'ML-инженер':'ML Engineer',  action: isRu?'Обучение модели':'Model training' },
+        { icon: 'fa-file-alt', agent: isRu?'Учёный':'Researcher',       action: isRu?'Интерпретация':'Interpretation' },
       ],
-      time: isRu?'~3 мин':'~3 min', cost: '~$0.12', runs: 203,
+      time: isRu?'~4 мин':'~4 min', cost: '~$0.18', runs: 137,
     },
     {
-      id: 'tpl_content',
-      icon: 'fa-calendar-alt', gradFrom: 'from-pink-600', gradTo: 'to-pink-800',
-      tag: isRu ? 'Маркетинг' : 'Marketing', tagColor: 'bg-pink-500/20 text-pink-300',
-      nameEn: 'Content Machine', nameRu: 'Контент-машина',
-      descEn: 'Select topics, validate with facts, write posts in brand style, edit, schedule for publishing.',
-      descRu: 'Подбор тем, проверка фактуры, написание постов в стиле бренда, редактура, расписание публикаций.',
+      id: 'tpl_hypothesis',
+      icon: 'fa-lightbulb', gradFrom: 'from-violet-600', gradTo: 'to-violet-800',
+      tag: isRu ? 'Методология' : 'Methodology', tagColor: 'bg-violet-500/20 text-violet-300',
+      nameEn: 'Hypothesis Validation Chain', nameRu: 'Цепочка валидации гипотез',
+      descEn: 'Formalise hypotheses, scan prior literature, design test, run analysis, collect peer critique.',
+      descRu: 'Формализация гипотез, поиск литературы, дизайн теста, запуск анализа, рецензирование.',
       prompt: isRu
-        ? 'Составь контент-план на месяц для Telegram-канала про ИИ в бизнесе: подбери актуальные темы, напиши посты в стиле канала, проверь качество и подготовь расписание'
-        : 'Create a month-long content plan for a Telegram channel about AI in business: select relevant topics, write posts in channel style, check quality and prepare the schedule',
+        ? 'Проведи цепочку валидации гипотезы: формализуй гипотезу, проверь литературу, спроектируй тест, проведи анализ и получи критику рецензента'
+        : 'Run a hypothesis validation chain: formalise the hypothesis, scan literature, design the test, run analysis and get peer critique',
       steps: [
-        { icon: 'fa-hashtag', agent: isRu?'Маркетолог':'Marketer',   action: isRu?'Подбор тем':'Topic selection' },
-        { icon: 'fa-pen-nib', agent: isRu?'Копирайтер':'Copywriter', action: isRu?'Написание постов':'Write posts' },
-        { icon: 'fa-edit',    agent: isRu?'Контролёр':'QC',          action: isRu?'Редактура стиля':'Style editing' },
-        { icon: 'fa-calendar',agent: isRu?'CRM-агент':'CRM Agent',   action: isRu?'Публикация по расписанию':'Schedule publishing', confirm: true },
+        { icon: 'fa-flask',      agent: isRu?'Учёный':'Researcher',          action: isRu?'Формализация гипотез':'Formalise hypotheses' },
+        { icon: 'fa-book-open',  agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Поиск литературы':'Literature scan' },
+        { icon: 'fa-vials',      agent: isRu?'Методолог':'Exp. Designer',    action: isRu?'Дизайн теста':'Test design' },
+        { icon: 'fa-chart-bar',  agent: isRu?'Аналитик':'Data Scientist',    action: isRu?'Анализ результатов':'Run analysis' },
+        { icon: 'fa-microscope', agent: isRu?'Рецензент':'Peer Reviewer',    action: isRu?'Рецензия':'Peer critique' },
       ],
-      time: isRu?'~4 мин':'~4 min', cost: '~$0.14', runs: 156,
+      time: isRu?'~5 мин':'~5 min', cost: '~$0.20', runs: 98,
     },
     {
-      id: 'tpl_radar',
-      icon: 'fa-satellite-dish', gradFrom: 'from-orange-600', gradTo: 'to-orange-800',
-      tag: isRu ? 'Разведка' : 'Intelligence', tagColor: 'bg-orange-500/20 text-orange-300',
-      nameEn: 'Business Radar', nameRu: 'Бизнес-радар',
-      descEn: 'Monitor news, competitors, price changes, new products, and regulatory updates. Deliver digest.',
-      descRu: 'Мониторинг новостей, конкурентов, изменений цен, новых продуктов и регуляторики. Дайджест.',
+      id: 'tpl_patent',
+      icon: 'fa-certificate', gradFrom: 'from-amber-600', gradTo: 'to-amber-800',
+      tag: isRu ? 'Инженерия' : 'Engineering', tagColor: 'bg-amber-500/20 text-amber-300',
+      nameEn: 'Patent & Prior Art Search', nameRu: 'Патентный поиск и анализ новизны',
+      descEn: 'Identify key concepts, search patent databases and academic literature, assess novelty, draft a prior-art summary.',
+      descRu: 'Ключевые концепции, поиск по базам патентов и литературе, оценка новизны, патентный реферат.',
       prompt: isRu
-        ? 'Мониторинг рынка: собери последние новости о конкурентах и трендах в нашей нише, отфильтруй самые важные, оцени приоритет и подготовь дайджест'
-        : 'Market monitoring: gather latest news about competitors and trends in our niche, filter the most important ones, score priority and prepare a digest',
+        ? 'Проведи патентный поиск и анализ новизны: определи ключевые концепции, поищи по базам патентов и научным статьям, оцени новизну и подготовь реферат'
+        : 'Conduct a patent and prior art search: identify key concepts, search patent databases and academic literature, assess novelty and draft a prior-art summary',
       steps: [
-        { icon: 'fa-rss',         agent: isRu?'Бизнес-радар':'Biz Radar', action: isRu?'Сбор сигналов':'Signal collection' },
-        { icon: 'fa-filter',      agent: isRu?'Аналитик':'Analyst',       action: isRu?'Фильтрация и группировка':'Filter & group' },
-        { icon: 'fa-comment',     agent: isRu?'Аналитик':'Analyst',       action: isRu?'Оценка важности':'Importance scoring' },
-        { icon: 'fa-paper-plane', agent: isRu?'CRM-агент':'CRM Agent',    action: isRu?'Отправка дайджеста':'Send digest', confirm: true },
+        { icon: 'fa-tags',        agent: isRu?'Учёный':'Researcher',          action: isRu?'Ключевые концепции':'Key concepts' },
+        { icon: 'fa-search',      agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Поиск патентов':'Patent search' },
+        { icon: 'fa-book',        agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Поиск литературы':'Academic search' },
+        { icon: 'fa-check-circle',agent: isRu?'Рецензент':'Peer Reviewer',    action: isRu?'Оценка новизны':'Novelty assessment' },
+        { icon: 'fa-file-alt',    agent: isRu?'Учёный':'Researcher',          action: isRu?'Патентный реферат':'Prior-art summary' },
       ],
-      time: isRu?'~2 мин':'~2 min', cost: '~$0.06', runs: 312,
+      time: isRu?'~4 мин':'~4 min', cost: '~$0.15', runs: 62,
     },
     {
-      id: 'tpl_launch',
-      icon: 'fa-rocket', gradFrom: 'from-green-600', gradTo: 'to-green-800',
-      tag: isRu ? 'Операции' : 'Operations', tagColor: 'bg-green-500/20 text-green-300',
-      nameEn: 'Service Launch', nameRu: 'Запуск услуги',
-      descEn: 'Full cycle: market analysis, offer creation, lead generation, proposals, outreach, CRM setup.',
-      descRu: 'Полный цикл: анализ рынка, создание оффера, лидогенерация, КП, рассылка, настройка CRM.',
+      id: 'tpl_replication',
+      icon: 'fa-clone', gradFrom: 'from-emerald-600', gradTo: 'to-emerald-800',
+      tag: isRu ? 'Воспроизводимость' : 'Reproducibility', tagColor: 'bg-emerald-500/20 text-emerald-300',
+      nameEn: 'Experimental Replication Check', nameRu: 'Проверка воспроизводимости',
+      descEn: 'Locate original study, replicate methodology, compare results, evaluate reproducibility, document deviations.',
+      descRu: 'Найти оригинальное исследование, воспроизвести методологию, сравнить результаты, задокументировать отклонения.',
       prompt: isRu
-        ? 'Помоги запустить новую услугу: проанализируй рынок и ЦА, создай оффер и описание, найди первых потенциальных клиентов, подготовь персональные КП и занеси всё в CRM'
-        : 'Help launch a new service: analyze market and audience, create the offer and description, find first potential clients, prepare personalized proposals and add everything to CRM',
+        ? 'Проверь воспроизводимость исследования: найди оригинальную статью, воспроизведи методологию, сравни результаты и задокументируй отклонения'
+        : 'Check experimental reproducibility: locate the original study, replicate the methodology, compare results and document any deviations',
       steps: [
-        { icon: 'fa-search',   agent: isRu?'Аналитик':'Analyst',              action: isRu?'Анализ рынка и ЦА':'Market & audience analysis' },
-        { icon: 'fa-star',     agent: isRu?'Маркетолог':'Marketer',           action: isRu?'Оффер и описание':'Offer & description' },
-        { icon: 'fa-users',    agent: isRu?'Лид-исследователь':'Lead Researcher', action: isRu?'База первых клиентов':'First client base' },
-        { icon: 'fa-file-alt', agent: isRu?'Копирайтер':'Copywriter',         action: isRu?'Персональные КП':'Personal proposals' },
-        { icon: 'fa-database', agent: isRu?'CRM-агент':'CRM Agent',           action: isRu?'Настройка CRM':'CRM setup', confirm: true },
+        { icon: 'fa-search',      agent: isRu?'Лит. обзор':'Lit. Researcher', action: isRu?'Оригинальная статья':'Original study' },
+        { icon: 'fa-copy',        agent: isRu?'Методолог':'Exp. Designer',    action: isRu?'Репликация методологии':'Replicate method' },
+        { icon: 'fa-chart-bar',   agent: isRu?'Аналитик':'Data Scientist',    action: isRu?'Сравнение результатов':'Compare results' },
+        { icon: 'fa-check-double',agent: isRu?'Рецензент':'Peer Reviewer',    action: isRu?'Оценка воспроизводимости':'Reproducibility' },
+        { icon: 'fa-file-alt',    agent: isRu?'Учёный':'Researcher',          action: isRu?'Документирование':'Document deviations' },
       ],
-      time: isRu?'~6 мин':'~6 min', cost: '~$0.28', runs: 44,
+      time: isRu?'~5 мин':'~5 min', cost: '~$0.20', runs: 39,
     },
   ]
 
@@ -160,11 +163,11 @@ export const scenariosPage = (lang: Language = 'en') => {
       <div class="flex flex-wrap gap-2 mb-6">
         ${[
           ['', isRu ? 'Все' : 'All'],
-          ['Sales', isRu ? 'Продажи' : 'Sales'],
-          ['Analytics', isRu ? 'Аналитика' : 'Analytics'],
-          ['Marketing', isRu ? 'Маркетинг' : 'Marketing'],
-          ['Intelligence', isRu ? 'Разведка' : 'Intelligence'],
-          ['Operations', isRu ? 'Операции' : 'Operations'],
+          ['Review', isRu ? 'Обзор' : 'Review'],
+          ['Medicine', isRu ? 'Медицина' : 'Medicine'],
+          ['Data Science', isRu ? 'Данные' : 'Data Science'],
+          ['Methodology', isRu ? 'Методология' : 'Methodology'],
+          ['Engineering', isRu ? 'Инженерия' : 'Engineering'],
         ].map(([val, label]) => `
           <button onclick="filterCategory('${val}')"
             class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition"
@@ -300,11 +303,12 @@ export const scenariosPage = (lang: Language = 'en') => {
             <label class="block text-xs text-gray-400 mb-1">${isRu ? 'Категория' : 'Category'}</label>
             <select id="sc-cat"
               class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500">
-              <option value="sales">${isRu ? 'Продажи' : 'Sales'}</option>
-              <option value="analytics">${isRu ? 'Аналитика' : 'Analytics'}</option>
-              <option value="marketing">${isRu ? 'Маркетинг' : 'Marketing'}</option>
-              <option value="intelligence">${isRu ? 'Разведка' : 'Intelligence'}</option>
-              <option value="operations">${isRu ? 'Операции' : 'Operations'}</option>
+              <option value="review">${isRu ? 'Обзор' : 'Review'}</option>
+              <option value="medicine">${isRu ? 'Медицина' : 'Medicine'}</option>
+              <option value="data_science">${isRu ? 'Данные' : 'Data Science'}</option>
+              <option value="methodology">${isRu ? 'Методология' : 'Methodology'}</option>
+              <option value="engineering">${isRu ? 'Инженерия' : 'Engineering'}</option>
+              <option value="reproducibility">${isRu ? 'Воспроизводимость' : 'Reproducibility'}</option>
               <option value="custom">${isRu ? 'Кастомный' : 'Custom'}</option>
             </select>
           </div>
