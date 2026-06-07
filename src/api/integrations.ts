@@ -10,7 +10,7 @@ export interface IntegrationProvider {
   id: string
   name: string
   description: string
-  type: 'protocol' | 'framework' | 'runtime' | 'api'
+  type: 'protocol' | 'framework' | 'runtime' | 'api' | 'research'
   status: 'stable' | 'beta' | 'experimental'
   features: string[]
   configFields: ConfigField[]
@@ -428,6 +428,160 @@ export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
       ], default: 'POST' },
       { key: 'authHeader', label: 'Authorization Header', type: 'password', required: false },
       { key: 'customHeaders', label: 'Custom Headers (JSON)', type: 'text', required: false }
+    ]
+  },
+
+  // PubMed / NCBI
+  {
+    id: 'pubmed',
+    name: 'PubMed / NCBI',
+    description: 'Search and retrieve biomedical literature from the NCBI PubMed database. Free API with optional API key for higher rate limits.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'Full-text article search',
+      'Abstract retrieval',
+      'Citation metadata',
+      'MeSH term filtering',
+      'Author & journal filters',
+      'Free public API'
+    ],
+    configFields: [
+      { key: 'email', label: 'Your Email (required by NCBI)', type: 'text', required: true, placeholder: 'researcher@university.edu' },
+      { key: 'apiKey', label: 'NCBI API Key (optional)', type: 'password', required: false, placeholder: 'Increases rate limit to 10 req/s' },
+      { key: 'defaultDb', label: 'Default Database', type: 'select', required: false, options: [
+        { value: 'pubmed', label: 'PubMed' },
+        { value: 'pmc', label: 'PubMed Central' },
+        { value: 'nucleotide', label: 'Nucleotide' },
+        { value: 'protein', label: 'Protein' }
+      ], default: 'pubmed' },
+      { key: 'maxResults', label: 'Default Max Results', type: 'number', required: false, default: 20 }
+    ]
+  },
+
+  // ArXiv
+  {
+    id: 'arxiv',
+    name: 'ArXiv',
+    description: 'Open-access repository of preprints in physics, mathematics, computer science, and more. No API key required.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'Preprint retrieval',
+      'Full-text PDF links',
+      'Category filtering',
+      'Author search',
+      'Date range filters',
+      'No authentication needed'
+    ],
+    configFields: [
+      { key: 'defaultCategory', label: 'Default Category', type: 'select', required: false, options: [
+        { value: 'cs.AI', label: 'cs.AI — Artificial Intelligence' },
+        { value: 'cs.LG', label: 'cs.LG — Machine Learning' },
+        { value: 'cs.CL', label: 'cs.CL — Computation & Language' },
+        { value: 'stat.ML', label: 'stat.ML — Statistics ML' },
+        { value: 'physics', label: 'Physics (all)' },
+        { value: 'math', label: 'Mathematics (all)' },
+        { value: 'q-bio', label: 'Quantitative Biology' }
+      ], default: 'cs.AI' },
+      { key: 'maxResults', label: 'Default Max Results', type: 'number', required: false, default: 10 },
+      { key: 'sortBy', label: 'Sort By', type: 'select', required: false, options: [
+        { value: 'relevance', label: 'Relevance' },
+        { value: 'lastUpdatedDate', label: 'Last Updated' },
+        { value: 'submittedDate', label: 'Submitted Date' }
+      ], default: 'relevance' }
+    ]
+  },
+
+  // CrossRef
+  {
+    id: 'crossref',
+    name: 'CrossRef',
+    description: 'Official DOI registration agency. Look up citation metadata, funding information, and full-text links by DOI.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'DOI metadata lookup',
+      'Citation counts',
+      'Funding data',
+      'Publisher info',
+      'Journal ISSN search',
+      'Free REST API'
+    ],
+    configFields: [
+      { key: 'email', label: 'Polite Pool Email (recommended)', type: 'text', required: false, placeholder: 'researcher@university.edu' },
+      { key: 'plusApiToken', label: 'CrossRef Plus API Token (optional)', type: 'password', required: false, placeholder: 'For metadata-plus subscribers' },
+      { key: 'maxRows', label: 'Default Max Rows', type: 'number', required: false, default: 20 }
+    ]
+  },
+
+  // ORCID
+  {
+    id: 'orcid',
+    name: 'ORCID',
+    description: 'Persistent digital identifier for researchers. Look up author profiles, affiliations, and publication records.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'Researcher profiles',
+      'Publication records',
+      'Affiliation data',
+      'Employment history',
+      'Funding records',
+      'OAuth 2.0 authentication'
+    ],
+    configFields: [
+      { key: 'clientId', label: 'ORCID Client ID', type: 'text', required: true, placeholder: 'APP-XXXXXXXXXXXXXXXX' },
+      { key: 'clientSecret', label: 'ORCID Client Secret', type: 'password', required: true },
+      { key: 'sandbox', label: 'Use Sandbox (testing)', type: 'boolean', required: false, default: false }
+    ]
+  },
+
+  // Zotero
+  {
+    id: 'zotero',
+    name: 'Zotero',
+    description: 'Personal and group reference manager. Sync and query your Zotero library for citations and attachments.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'Personal library access',
+      'Group library sync',
+      'Citation export (BibTeX, RIS)',
+      'Tag & collection search',
+      'Attachment metadata',
+      'Full-text indexing'
+    ],
+    configFields: [
+      { key: 'apiKey', label: 'Zotero API Key', type: 'password', required: true, placeholder: 'From zotero.org/settings/keys' },
+      { key: 'userId', label: 'User ID', type: 'text', required: true, placeholder: 'Numeric user ID from zotero.org' },
+      { key: 'libraryType', label: 'Library Type', type: 'select', required: true, options: [
+        { value: 'user', label: 'Personal Library' },
+        { value: 'group', label: 'Group Library' }
+      ], default: 'user' },
+      { key: 'groupId', label: 'Group ID (if group library)', type: 'text', required: false }
+    ]
+  },
+
+  // Semantic Scholar
+  {
+    id: 'semantic_scholar',
+    name: 'Semantic Scholar',
+    description: 'AI-powered search engine for scientific literature. Find papers, authors, and citation graphs with free API access.',
+    type: 'research',
+    status: 'stable',
+    features: [
+      'AI-powered relevance ranking',
+      'Citation graph traversal',
+      'Influential citations',
+      'Author disambiguation',
+      'Open access filters',
+      'Abstract semantic search'
+    ],
+    configFields: [
+      { key: 'apiKey', label: 'API Key (optional)', type: 'password', required: false, placeholder: 'Request at semanticscholar.org/product/api' },
+      { key: 'maxResults', label: 'Default Max Results', type: 'number', required: false, default: 10 },
+      { key: 'fields', label: 'Default Fields', type: 'text', required: false, placeholder: 'title,authors,year,abstract', default: 'title,authors,year,abstract,citationCount' }
     ]
   }
 ]

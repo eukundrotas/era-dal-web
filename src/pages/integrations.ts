@@ -7,11 +7,12 @@ export const integrationsPage = (lang: Language = 'en') => {
   return `
 <!DOCTYPE html>
 <html lang="${lang}">
-${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL', 
-       isRu ? 'Настройте интеграции с MCP, LangChain, Ollama и другими платформами' : 'Configure integrations with MCP, LangChain, Ollama and other platforms')}
+${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
+       isRu ? 'Подключите научные базы данных, MCP, LangChain и другие платформы' : 'Connect scientific databases, MCP, LangChain and other platforms',
+       lang)}
 <body class="bg-gray-900 text-white min-h-screen">
   <div class="flex">
-    ${sidebar(lang)}
+    ${sidebar('integrations', lang)}
     
     <main class="flex-1 ml-56 p-8">
       <div class="max-w-6xl mx-auto">
@@ -44,6 +45,10 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
           <button onclick="filterProviders('api')" class="provider-filter-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700" data-filter="api">
             <i class="fas fa-cloud text-yellow-400 mr-1"></i>
             ${isRu ? 'API' : 'APIs'}
+          </button>
+          <button onclick="filterProviders('research')" class="provider-filter-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700" data-filter="research">
+            <i class="fas fa-microscope text-emerald-400 mr-1"></i>
+            ${isRu ? 'Науч. базы' : 'Research DBs'}
           </button>
         </div>
 
@@ -231,7 +236,8 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
         protocol: 'blue',
         framework: 'purple',
         runtime: 'green',
-        api: 'yellow'
+        api: 'yellow',
+        research: 'emerald'
       };
       
       const statusBadges = {
@@ -291,7 +297,13 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
         'google': 'google',
         'huggingface': 'face-smile',
         'replicate': 'copy',
-        'webhook': 'globe'
+        'webhook': 'globe',
+        'pubmed': 'dna',
+        'arxiv': 'file-alt',
+        'crossref': 'link',
+        'orcid': 'id-badge',
+        'zotero': 'book',
+        'semantic_scholar': 'graduation-cap'
       };
       return icons[id] || 'plug';
     }
