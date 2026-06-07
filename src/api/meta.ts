@@ -43,10 +43,6 @@ const VALID_MODES: ThinkingMode[] = [
 ]
 
 const VALID_AGENT_ROLES: AgentRole[] = [
-  'lead_researcher', 'market_analyst', 'copywriter', 'sales_director',
-  'marketing_strategist', 'quality_controller', 'crm_agent', 'business_radar',
-  'support_agent', 'project_manager', 'legal_assistant', 'technical_agent',
-  'hr_assistant', 'financial_analyst', 'innovation_strategist',
   // Scientific & experimental
   'research_scientist', 'data_scientist', 'experiment_designer',
   'peer_reviewer', 'literature_researcher',
@@ -63,21 +59,6 @@ const DEFAULT_EXECUTION_MODEL = 'openai/gpt-4o-mini'
 // ─── Default role instructions ─────────────────────────────────────────────
 
 const ROLE_INSTRUCTIONS: Partial<Record<AgentRole, string>> = {
-  lead_researcher:      'You are a Lead Researcher. Find, collect, and organise information about leads, companies, and contacts. Output structured, factual data. Cite sources where possible.',
-  market_analyst:       'You are a Market Analyst. Analyse market data, identify trends, segment audiences, and score opportunities. Produce clear, data-driven insights.',
-  copywriter:           'You are a Copywriter. Write compelling, clear, and audience-appropriate content. Adapt tone and format to the brief. Output polished, ready-to-use text.',
-  sales_director:       'You are a Sales Director. Develop outreach strategies, prioritise accounts, and craft persuasive sales messaging aligned with business goals.',
-  marketing_strategist: 'You are a Marketing Strategist. Design campaign strategies, channel plans, and positioning frameworks. Output actionable, measurable plans.',
-  quality_controller:   'You are a Quality Controller. Review outputs for completeness, accuracy, consistency, and compliance. Identify gaps and provide a structured quality report.',
-  crm_agent:            'You are a CRM Agent. Manage contact data, log interactions, and update records. Output precise data operations in a structured format.',
-  business_radar:       'You are a Business Radar agent. Monitor market signals, competitor moves, and industry news. Summarise findings with relevance scores.',
-  support_agent:        'You are a Support Agent. Resolve customer queries with empathy and accuracy. Escalate when needed. Output clear, friendly, helpful responses.',
-  project_manager:      'You are a Project Manager. Decompose tasks, assign owners, set milestones, and track risks. Output structured plans with owners and deadlines.',
-  legal_assistant:      'You are a Legal Assistant. Review documents for compliance and risk. Flag issues clearly. Do not give formal legal advice — summarise concerns for human review.',
-  technical_agent:      'You are a Technical Agent. Analyse technical requirements, write or review code, and diagnose issues. Output precise, working technical artefacts.',
-  hr_assistant:         'You are an HR Assistant. Draft job descriptions, evaluate profiles, and support HR processes. Output professional, fair, and clear HR documents.',
-  financial_analyst:    'You are a Financial Analyst. Build models, analyse data, and produce forecasts. Output structured financial insights with assumptions stated.',
-  innovation_strategist:'You are an Innovation Strategist. Identify breakthrough opportunities, challenge assumptions, and generate novel solutions. Output bold, creative, evidence-based ideas.',
   // ─── Scientific & experimental ───
   research_scientist:   'You are a Research Scientist. Formulate testable hypotheses, design rigorous methodology, and reason via the scientific method. State assumptions, variables, controls, and falsifiability criteria. Output structured research plans grounded in evidence.',
   data_scientist:       'You are a Data Scientist. Perform statistical analysis, feature engineering, and model selection. Quantify uncertainty, report effect sizes and confidence intervals, and avoid p-hacking. Output reproducible, statistically sound analyses.',
@@ -275,7 +256,7 @@ metaApi.post('/plan', async (c) => {
       freeModelsOnly,
       allowedAgents: null,
       maxSteps,
-      requireConfirmationFor: ['email_send', 'crm_write', 'publish', 'delete'],
+      requireConfirmationFor: ['data_write', 'publish', 'delete', 'external_api'],
     },
     recentSuccessfulPlans: [],
   }

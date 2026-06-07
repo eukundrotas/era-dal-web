@@ -33,21 +33,6 @@ export type AutonomyLevel =
 // ─── Agent types ────────────────────────────────────────────────────────────
 
 export type AgentRole =
-  | 'lead_researcher'
-  | 'market_analyst'
-  | 'copywriter'
-  | 'sales_director'
-  | 'marketing_strategist'
-  | 'quality_controller'
-  | 'crm_agent'
-  | 'business_radar'
-  | 'support_agent'
-  | 'project_manager'
-  | 'legal_assistant'
-  | 'technical_agent'
-  | 'hr_assistant'
-  | 'financial_analyst'
-  | 'innovation_strategist'
   // ─── Scientific & experimental roles ───
   | 'research_scientist'
   | 'data_scientist'
@@ -117,7 +102,7 @@ export interface ScenarioConfig {
   id: string
   name: string
   description: string
-  category: 'sales' | 'marketing' | 'analytics' | 'intelligence' | 'operations' | 'custom'
+  category: 'review' | 'medicine' | 'data_science' | 'methodology' | 'engineering' | 'reproducibility' | 'custom'
   strategy: OrchestrationStrategy
   steps: ScenarioStep[]
   estimatedTotalSeconds: number

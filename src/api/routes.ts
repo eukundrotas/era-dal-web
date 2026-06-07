@@ -30,9 +30,9 @@ const mockDashboardData = {
   topModel: 'GPT-4o',
   events: [
     { type: 'success', title: 'Query Completed', description: 'Scientific hypothesis analysis', time: '2m ago' },
-    { type: 'success', title: 'Consensus Reached', description: '5/7 models agreed', time: '5m ago' },
-    { type: 'pending', title: 'Processing', description: 'Medical diagnosis query', time: '8m ago' },
-    { type: 'success', title: 'High Confidence', description: 'Financial forecast - 94% CI', time: '15m ago' },
+    { type: 'success', title: 'Consensus Reached', description: '5/7 models agreed on dark matter evidence', time: '5m ago' },
+    { type: 'pending', title: 'Processing', description: 'Clinical trial data analysis', time: '8m ago' },
+    { type: 'success', title: 'Literature Review', description: 'Systematic review — 94% CI stability', time: '15m ago' },
     { type: 'error', title: 'Timeout', description: 'Model Llama-3.1 exceeded timeout', time: '22m ago' }
   ]
 }
@@ -272,40 +272,21 @@ apiRoutes.get('/query/:id', (c) => {
 apiRoutes.get('/profile', (c) => {
   return c.json({
     id: 'usr_001',
-    name: 'Eugene Kundrotas',
-    email: 'eukundrotas@gmail.com',
-    company: 'UAB Propriezura',
-    location: 'Lithuania',
-    plan: 'pro',
-    apiCalls: {
-      used: 847,
-      limit: 10000,
-      resetDate: '2025-01-18'
-    },
-    createdAt: '2024-12-01T00:00:00Z'
+    name: 'Researcher',
+    email: '',
+    institution: '',
+    location: '',
+    plan: 'individual',
+    createdAt: new Date().toISOString()
   })
 })
 
-// API keys
+// Research access tokens (read-only — stored in browser localStorage)
 apiRoutes.get('/api-keys', (c) => {
   return c.json({
-    keys: [
-      { id: 'key_001', name: 'Production Key', prefix: 'era_sk_prod_****...****7a3f', status: 'active', createdAt: '2024-12-01' },
-      { id: 'key_002', name: 'Development Key', prefix: 'era_sk_dev_****...****9b2e', status: 'active', createdAt: '2024-12-15' }
-    ]
+    note: 'API keys are stored in browser localStorage only — the server never holds them.',
+    keys: []
   })
-})
-
-// Generate new API key (mock)
-apiRoutes.post('/api-keys', async (c) => {
-  const body = await c.req.json()
-  return c.json({
-    id: 'key_' + Math.random().toString(36).substr(2, 9),
-    name: body.name || 'New Key',
-    key: 'era_sk_' + Math.random().toString(36).substr(2, 32),
-    status: 'active',
-    createdAt: new Date().toISOString()
-  }, 201)
 })
 
 // Submit query (mock)
@@ -356,8 +337,7 @@ apiRoutes.get('/settings', (c) => {
     notifications: {
       email: true,
       usageAlerts: true,
-      weeklyReports: false,
-      marketing: false
+      weeklyDigest: false
     }
   })
 })
@@ -399,7 +379,7 @@ apiRoutes.get('/usage', (c) => {
       science: 340,
       math: 210,
       med: 180,
-      econ: 117
+      social_science: 117
     },
     byModel: {
       'gpt-4o': 234,
