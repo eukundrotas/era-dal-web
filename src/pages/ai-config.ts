@@ -35,7 +35,7 @@ ${head(
 
         <!-- Stats bar -->
         <div class="grid grid-cols-3 gap-4 mb-8">
-          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+          <div class="glass rounded-xl p-4 flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
               <i class="fas fa-check-circle text-green-400"></i>
             </div>
@@ -44,7 +44,7 @@ ${head(
               <div class="text-xs text-gray-500">${isRu ? 'Провайдеров настроено' : 'Providers configured'}</div>
             </div>
           </div>
-          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+          <div class="glass rounded-xl p-4 flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
               <i class="fas fa-robot text-blue-400"></i>
             </div>
@@ -53,7 +53,7 @@ ${head(
               <div class="text-xs text-gray-500">${isRu ? 'Моделей доступно' : 'Models available'}</div>
             </div>
           </div>
-          <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+          <div class="glass rounded-xl p-4 flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
               <i class="fas fa-plus text-purple-400"></i>
             </div>
@@ -74,7 +74,7 @@ ${head(
         </div>
 
         <!-- Custom Models -->
-        <div class="glass-card rounded-xl p-6 mb-8">
+        <div class="glass rounded-xl p-6 mb-8">
           <h2 class="text-xl font-semibold mb-1 flex items-center gap-2">
             <i class="fas fa-plus-circle text-purple-400"></i>
             ${isRu ? 'Добавить модель вручную' : 'Add Custom Model'}
@@ -106,7 +106,7 @@ ${head(
         </div>
 
         <!-- All Available Models Summary -->
-        <div class="glass-card rounded-xl p-6 mb-8">
+        <div class="glass rounded-xl p-6 mb-8">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold flex items-center gap-2">
               <i class="fas fa-layer-group text-yellow-400"></i>
@@ -122,7 +122,7 @@ ${head(
         </div>
 
         <!-- Quick Test -->
-        <div class="glass-card rounded-xl p-6 mb-8">
+        <div class="glass rounded-xl p-6 mb-8">
           <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
             <i class="fas fa-flask text-green-400"></i>
             ${isRu ? 'Быстрый тест модели' : 'Quick Model Test'}
@@ -367,7 +367,7 @@ ${head(
       const hasKey = !!savedKey;
       const keyLabel = p.isUrl ? (isRu ? 'URL сервера' : 'Server URL') : (isRu ? 'API ключ' : 'API key');
       return \`
-        <div class="glass-card rounded-xl p-5 border \${hasKey ? 'border-green-500/30' : 'border-gray-700/50'} transition-all" id="card-\${p.id}">
+        <div class="glass rounded-xl p-5 border \${hasKey ? 'border-green-500/30' : 'border-gray-700/50'} transition-all" id="card-\${p.id}">
           <div class="flex items-start justify-between mb-3">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:\${p.color}22">

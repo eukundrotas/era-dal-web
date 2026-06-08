@@ -1,4 +1,5 @@
 import { head, sidebar, footer } from '../components/layout'
+import { toastScript, statusBadge } from '../components/shared'
 import { Language } from '../i18n/translations'
 
 export const integrationsPage = (lang: Language = 'en') => {
@@ -240,18 +241,19 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
         research: 'emerald'
       };
       
-      const statusBadges = {
-        stable: { color: 'green', label: isRu ? 'Стабильно' : 'Stable' },
-        beta: { color: 'yellow', label: 'Beta' },
-        experimental: { color: 'red', label: isRu ? 'Эксперимент' : 'Experimental' }
-      };
-      
+      const isRuLocal = LANG === 'ru';
+
       grid.innerHTML = providers.map(provider => {
         const color = typeColors[provider.type] || 'gray';
-        const status = statusBadges[provider.status] || statusBadges.stable;
         const savedConfig = localStorage.getItem(\`era_integration_\${provider.id}\`);
         const isConfigured = !!savedConfig;
-        
+        const statusMap = {
+          stable: { bg:'bg-green-900/50', text:'text-green-400', label: isRuLocal?'Стабильно':'Stable' },
+          beta:   { bg:'bg-yellow-900/50',text:'text-yellow-400',label:'Beta' },
+          experimental: { bg:'bg-red-900/50', text:'text-red-400', label: isRuLocal?'Эксперимент':'Experimental' },
+        };
+        const st = statusMap[provider.status] || statusMap.stable;
+
         return \`
           <div class="bg-gray-800 hover:bg-gray-750 rounded-xl p-5 cursor-pointer transition-all border-2 \${isConfigured ? 'border-green-500/50' : 'border-transparent hover:border-\${color}-500/50'}"
                onclick="openConfig('\${provider.id}')">
@@ -262,7 +264,7 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
                 </div>
                 <div>
                   <h3 class="font-semibold">\${provider.name}</h3>
-                  <span class="text-xs px-2 py-0.5 rounded bg-\${status.color}-900/50 text-\${status.color}-400">\${status.label}</span>
+                  <span class="text-xs px-2 py-0.5 rounded \${st.bg} \${st.text}">\${st.label}</span>
                 </div>
               </div>
               \${isConfigured ? '<i class="fas fa-check-circle text-green-400"></i>' : ''}
@@ -448,13 +450,7 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
       
       const config = getFormData();
       localStorage.setItem(\`era_integration_\${currentProvider.id}\`, JSON.stringify(config));
-      
-      // Show toast
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50';
-      toast.innerHTML = \`<i class="fas fa-check-circle"></i> \${isRu ? 'Интеграция сохранена!' : 'Integration saved!'}\`;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+      showToast(isRu ? 'Интеграция сохранена!' : 'Integration saved!', 'success');
       
       closeModal();
       loadProviders();
@@ -689,6 +685,7 @@ ${head(isRu ? 'Интеграции | ERA DAL' : 'Integrations | ERA DAL',
       }
     }
   </script>
+  ${toastScript()}
 </body>
 </html>
 `
